@@ -1,0 +1,13 @@
+[package]
+name = "schema"
+version = "0.1.0"
+edition = "2024"
+
+[features]
+enums = ["refinery/enums"]
+
+[dependencies]
+log = { version = "0.4.27" }
+env_logger = { version = "0.11.8" }
+refinery = { version = "0.8.16", features = ["tokio-postgres", "enums"] }
+postgres = { version = "0.19.10" }
