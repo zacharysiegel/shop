@@ -16,7 +16,6 @@ fn main() -> Result<(), postgres::Error> {
     postgres_config.host("localhost");
     postgres_config.port(5432);
     postgres_config.connect_timeout(Duration::from_secs(5));
-    log::debug!("{:?}", postgres_config);
 
     let mut client: Client = postgres_config.connect(NoTls)?;
     check_connection(&mut client)?;
