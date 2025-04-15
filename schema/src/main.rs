@@ -1,40 +1,44 @@
-use std::net::{IpAddr, Ipv4Addr};
+use std::time::Duration;
 
-use log::info;
-use refinery::Migration;
+use postgres::{Client, Config, NoTls};
 
 refinery::embed_migrations!("migrations");
 
 fn main() -> Result<(), postgres::Error> {
-    env_logger::init();
+    env_logger::builder()
+        .filter_level(log::LevelFilter::Info)
+        .init();
 
-    let mut config = postgres::Config::new();
-    config.user("user");
-    config.password("password");
-    config.dbname("connect");
-    config.hostaddr(IpAddr::V4(Ipv4Addr::new(172, 0, 0, 1)));
-    config.port(5432);
+    let mut postgres_config = Config::new();
+    postgres_config.user("user");
+    postgres_config.password("password");
+    postgres_config.dbname("collect");
+    postgres_config.host("localhost");
+    postgres_config.port(5432);
+    postgres_config.connect_timeout(Duration::from_secs(5));
+    log::debug!("{:?}", postgres_config);
 
-    let mut client: postgres::Client = config.connect(postgres::NoTls)?;
-    migrations::runner().run(&mut client).unwrap();
+    let mut client: Client = postgres_config.connect(NoTls)?;
+    check_connection(&mut client)?;
 
-    return Result::Ok(());
+    // The "migrations" module is created by the "embed_migrations" macro
+    let report = migrations::runner().run(&mut client).unwrap();
+    for migration in report.applied_migrations() {
+        log::info!("Migration applied: {}", migration)
+    }
+
+    Result::Ok(())
 }
 
-fn process_migration(migration: Migration) {
-    #[cfg(not(feature = "enums"))]
-    {
-        // run something after each migration
-        info!("Post-processing a migration: {}", migration)
+fn check_connection(client: &mut Client) -> Result<(), postgres::Error> {
+    let connection_timeout = Duration::from_secs(5);
+    if let Err(e) = client.is_valid(connection_timeout) {
+        log::error!(
+            "Failed to establish a connection to Postgres within {} seconds; {}",
+            connection_timeout.as_secs(),
+            e
+        );
+        return Err(e);
     }
-
-    #[cfg(feature = "enums")]
-    {
-        // or with the `enums` feature enabled, match against migrations to run specific post-migration steps
-        use migrations::EmbeddedMigration;
-        match migration.into() {
-            EmbeddedMigration::Initial(m) => info!("V{}: Initialized the database!", m.version()),
-            m => info!("Got a migration: {:?}", m),
-        }
-    }
+    Ok(())
 }
