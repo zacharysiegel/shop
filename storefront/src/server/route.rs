@@ -1,11 +1,14 @@
 use crate::server::state::AppState;
+use actix_web::http::Method;
 use actix_web::web::ServiceConfig;
-use actix_web::{get, web, HttpResponse, Responder};
+use actix_web::{HttpResponse, Responder, get, web};
 
 pub fn configuration(service_config: &mut ServiceConfig) -> () {
-    service_config
-        .service(hello)
-        .route("/me", web::get().to(me));
+    service_config.service(
+        web::scope("/storefront")
+            .route("/me", web::route().method(Method::GET).to(me))
+            .service(hello),
+    );
 }
 
 #[get("/hello")]
