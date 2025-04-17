@@ -1,17 +1,13 @@
-mod api;
-mod state;
-
-use actix_web::{middleware, web, App, HttpResponse, HttpServer};
-use state::AppState;
+use actix_web::{App, HttpResponse, HttpServer, middleware, web};
 
 pub async fn open_server() -> std::io::Result<()> {
     HttpServer::new(|| {
         App::new()
-            .app_data(web::Data::new(AppState::new()))
             .wrap(middleware::Logger::default())
             .default_service(web::route().to(HttpResponse::NotFound))
-            .configure(super::template::configuration)
-            .service(web::scope("/api").configure(api::configuration))
+            .configure(crate::public::configuration)
+            .service(web::scope("/admin").configure(crate::admin::configuration))
+            .service(web::scope("/api").configure(crate::api::configuration))
     })
     .bind("127.0.0.1:8080")?
     .run()

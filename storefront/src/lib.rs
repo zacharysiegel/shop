@@ -1,3 +1,5 @@
 pub mod server;
 
-mod template;
+mod admin;
+mod api;
+mod public;
