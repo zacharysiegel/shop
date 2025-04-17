@@ -1,4 +1,4 @@
-mod route;
+mod api;
 mod state;
 
 use actix_web::{middleware, web, App, HttpResponse, HttpServer};
@@ -9,8 +9,9 @@ pub async fn open_server() -> std::io::Result<()> {
         App::new()
             .app_data(web::Data::new(AppState::new()))
             .wrap(middleware::Logger::default())
-            .default_service(web::route().to(|| HttpResponse::NotFound()))
-            .configure(route::configuration)
+            .default_service(web::route().to(HttpResponse::NotFound))
+            .configure(super::template::configuration)
+            .service(web::scope("/api").configure(api::configuration))
     })
     .bind("127.0.0.1:8080")?
     .run()
