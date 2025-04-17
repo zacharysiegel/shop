@@ -8,7 +8,7 @@ pub async fn open_server() -> std::io::Result<()> {
     HttpServer::new(|| {
         App::new()
             .app_data(web::Data::new(AppState::new()))
-            .configure(route::conf)
+            .configure(route::configuration)
     })
     .bind("127.0.0.1:8080")?
     .run()

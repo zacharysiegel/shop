@@ -2,7 +2,7 @@ use crate::server::state::AppState;
 use actix_web::web::ServiceConfig;
 use actix_web::{get, web, HttpResponse, Responder};
 
-pub fn conf(service_config: &mut ServiceConfig) -> () {
+pub fn configuration(service_config: &mut ServiceConfig) -> () {
     service_config
         .service(hello)
         .route("/me", web::get().to(me));
