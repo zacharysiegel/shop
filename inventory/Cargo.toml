@@ -8,4 +8,7 @@ log = { version = "0.4" }
 env_logger = { version = "0.11.8" }
 actix-web = { version = "4" }
 sqlx = { version = "0.8", features = ["postgres", "macros", "uuid", "runtime-tokio", "tls-native-tls"] }
-dotenv = { version = "0.15" }
+dotenvy = { version = "0.15" }
+
+[profile.dev.package.sqlx-macros]
+opt-level = 3

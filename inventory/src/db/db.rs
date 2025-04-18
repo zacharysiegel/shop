@@ -7,7 +7,7 @@ pub async fn sqlx_connect() -> Result<Pool<Postgres>, std::io::Error> {
 		.connect("postgres://user:password@localhost:5432/shop")
 		.await;
 
-	match (pool_result) {
+	match pool_result {
 		Ok(pool) => Ok(pool),
 		Err(error) => Err(std::io::Error::new(std::io::ErrorKind::Other, error)),
 	}
