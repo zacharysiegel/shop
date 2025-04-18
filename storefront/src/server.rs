@@ -9,7 +9,7 @@ pub async fn open_server() -> std::io::Result<()> {
 			.service(web::scope("/admin").configure(crate::admin::configuration))
 			.service(web::scope("/api").configure(crate::api::configuration))
 	})
-	.bind("127.0.0.1:8080")?
+	.bind("127.0.0.1:11000")?
 	.run()
 	.await
 }

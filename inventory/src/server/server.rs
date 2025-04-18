@@ -7,8 +7,9 @@ pub async fn open_server(pgpool: Pool<Postgres>) -> std::io::Result<()> {
             .wrap(middleware::Logger::default())
             .app_data(web::Data::new(pgpool.clone()))
             .default_service(web::route().to(HttpResponse::NotFound))
+            .service(crate::category::get_category_route)
     })
-        .bind("127.0.0.1:8080")?
+        .bind("127.0.0.1:11001")?
         .run()
         .await
 }
