@@ -12,7 +12,7 @@ fn main() -> Result<(), postgres::Error> {
 	let mut postgres_config = Config::new();
 	postgres_config.user("user");
 	postgres_config.password("password");
-	postgres_config.dbname("collect");
+	postgres_config.dbname("shop");
 	postgres_config.host("localhost");
 	postgres_config.port(5432);
 	postgres_config.connect_timeout(Duration::from_secs(5));
