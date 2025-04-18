@@ -7,7 +7,7 @@ edition = "2024"
 log = { version = "0.4" }
 env_logger = { version = "0.11.8" }
 actix-web = { version = "4" }
-sqlx = { version = "0.8", features = ["postgres", "macros", "uuid", "runtime-tokio", "tls-native-tls"] }
+sqlx = { version = "0.8", features = ["postgres", "macros", "uuid", "chrono", "runtime-tokio", "tls-native-tls"] }
 dotenvy = { version = "0.15" }
 
 [profile.dev.package.sqlx-macros]
