@@ -3,6 +3,8 @@ use sqlx::{Pool, Postgres};
 
 #[actix_web::main]
 async fn main() -> Result<(), std::io::Error> {
+	inventory::env::load_env()?;
+
 	env_logger::builder()
 		.filter_level(LevelFilter::Info)
 		.filter_module("actix_server", LevelFilter::Debug)
