@@ -14,8 +14,8 @@ create table if not exists product
     internal_name text unique not null,
     upc text unique nulls distinct, -- nullable
     release_date date,
-    created timestamp without time zone not null,
-    updated timestamp without time zone not null
+    created timestamp with time zone not null,
+    updated timestamp with time zone not null
 );
 create index if not exists idx_product_display_name on product (display_name);
 create index if not exists idx_product_upc on product (upc);
@@ -45,11 +45,11 @@ create table if not exists item
     price decimal(10, 2) not null,
     priority int not null,
     note text,
-    acquisition_datetime timestamp without time zone not null,
+    acquisition_datetime timestamp with time zone not null,
     acquisition_price decimal(10, 2),
     acquisition_location text,
-    created timestamp without time zone not null,
-    updated timestamp without time zone not null
+    created timestamp with time zone not null,
+    updated timestamp with time zone not null
 );
 create index if not exists idx_item_product_id on item (product_id);
 create index if not exists idx_item_price on item (price);
@@ -95,7 +95,7 @@ create table if not exists item_audit
     status_after int not null,
     initiated_by_admin bool,
     note text,
-    created timestamp without time zone not null
+    created timestamp with time zone not null
 );
 create index if not exists idx_item_audit_item_id on item_audit (item_id);
 
@@ -127,8 +127,8 @@ create table if not exists customer
     billing_district text,
     billing_postal_area text,
     billing_country text,
-    created timestamp without time zone not null,
-    updated timestamp without time zone not null
+    created timestamp with time zone not null,
+    updated timestamp with time zone not null
 );
 
 create table if not exists marketplace
@@ -146,8 +146,8 @@ create table if not exists listing
     marketplace_id uuid references marketplace (id) not null,
     uri text unique,
     status int not null, -- corresponds to enum
-    created timestamp without time zone not null,
-    updated timestamp without time zone not null
+    created timestamp with time zone not null,
+    updated timestamp with time zone not null
 );
 create index if not exists idx_listing_item_id on listing (item_id);
 create index if not exists idx_listing_status on listing (status);
