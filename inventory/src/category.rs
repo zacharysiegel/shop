@@ -3,6 +3,7 @@ use serde::{Deserialize, Serialize};
 use sqlx::postgres::PgQueryResult;
 use sqlx::{query, query_as, Error, PgPool, Pool, Postgres};
 use uuid::Uuid;
+use crate::InventoryResource;
 
 #[derive(Debug)]
 pub struct Category {
@@ -12,7 +13,7 @@ pub struct Category {
 	pub parent_id: Option<Uuid>,
 }
 
-impl crate::Resource for Category {
+impl InventoryResource for Category {
 	type Serializable = CategorySerial;
 
 	fn to_serial(&self) -> CategorySerial {
@@ -68,6 +69,7 @@ pub async fn get_category(pool: &Pool<Postgres>, id: Uuid) -> Result<Option<Cate
 		.await
 }
 
+// todo: restrict to authenticated administrator
 pub async fn create_category(
 	pool: &Pool<Postgres>,
 	category: Category,
@@ -85,7 +87,6 @@ pub async fn create_category(
 
 pub mod route {
 	use super::*;
-	use crate::Resource;
 	use actix_web::http::StatusCode;
 	use actix_web::{get, post, web, HttpResponseBuilder, Responder};
 

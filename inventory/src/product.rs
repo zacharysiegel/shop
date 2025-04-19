@@ -1,7 +1,9 @@
+use crate::InventoryResource;
 use crate::category::Category;
 use crate::server::JsonHttpResponse;
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
+use sqlx::postgres::PgQueryResult;
 use sqlx::types::chrono;
 use sqlx::{Error, PgPool, query_as};
 use uuid::Uuid;
@@ -17,7 +19,7 @@ pub struct Product {
 	pub updated: DateTime<Utc>,
 }
 
-impl crate::Resource for Product {
+impl InventoryResource for Product {
 	type Serializable = ProductSerial;
 
 	fn to_serial(&self) -> Self::Serializable {
@@ -87,9 +89,28 @@ pub async fn get_product_categories(
         .await
 }
 
+pub async fn create_product(pgpool: &PgPool, product: Product) -> Result<PgQueryResult, Error> {
+	query_as!(
+		Product,
+		"
+		insert into product (id, display_name, internal_name, upc, release_date, created, updated)
+		values ($1, $2, $3, $4, $5, $6, $7)
+	",
+		product.id,
+		product.display_name,
+		product.internal_name,
+		product.upc,
+		product.release_date,
+		product.created,
+		product.updated
+	)
+	.execute(pgpool)
+	.await
+}
+
 pub mod route {
 	use super::*;
-	use crate::Resource;
+	use crate::InventoryResource;
 	use crate::category::CategorySerial;
 	use actix_web::http::StatusCode;
 	use actix_web::{HttpResponseBuilder, Responder, get, post, web};
@@ -98,7 +119,8 @@ pub mod route {
 		config.service(
 			web::scope("/product")
 				.service(get_product)
-				.service(get_product_categories),
+				.service(get_product_categories)
+				.service(create_product),
 		);
 	}
 
@@ -141,10 +163,19 @@ pub mod route {
 			.to_http_response()
 	}
 
-	// #[post("")]
-	// pub async fn create_product(
-	// 	pgpool: web::Data<PgPool>,
-	// 	body: web::Json<ProductSerial>,
-	// ) -> impl Responder {
-	// }
+	// todo: restrict to authenticated administrator
+	#[post("")]
+	pub async fn create_product(
+		pgpool: web::Data<PgPool>,
+		body: web::Json<ProductSerial>,
+	) -> impl Responder {
+		let product: Product = Product::from_serial(&body.into_inner());
+
+		let result: Result<PgQueryResult, Error> = super::create_product(&pgpool, product).await;
+		match result {
+			Ok(query_result) => HttpResponseBuilder::new(StatusCode::CREATED)
+				.body(query_result.rows_affected().to_string()),
+			Err(_) => HttpResponseBuilder::new(StatusCode::INTERNAL_SERVER_ERROR).finish(),
+		}
+	}
 }
