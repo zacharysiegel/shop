@@ -1,17 +1,19 @@
+use crate::category::Category;
 use crate::server::JsonHttpResponse;
 use serde::{Deserialize, Serialize};
-use sqlx::types::{Uuid, chrono};
-use sqlx::{Error, PgPool, query_as};
+use sqlx::types::chrono;
+use sqlx::{query_as, Error, PgPool};
+use uuid::Uuid;
 
 #[derive(Debug)]
 pub struct Product {
-	id: Uuid,
-	display_name: String,
-	internal_name: String,
-	upc: Option<String>,
-	release_date: Option<chrono::NaiveDate>,
-	created: chrono::NaiveDateTime,
-	updated: chrono::NaiveDateTime,
+	pub id: Uuid,
+	pub display_name: String,
+	pub internal_name: String,
+	pub upc: Option<String>,
+	pub release_date: Option<chrono::NaiveDate>,
+	pub created: chrono::NaiveDateTime,
+	pub updated: chrono::NaiveDateTime,
 }
 
 impl crate::Resource for Product {
@@ -44,13 +46,13 @@ impl crate::Resource for Product {
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct ProductSerial {
-	id: Uuid,
-	display_name: String,
-	internal_name: String,
-	upc: Option<String>,
-	release_date: Option<chrono::NaiveDate>,
-	created: chrono::NaiveDateTime,
-	updated: chrono::NaiveDateTime,
+	pub id: Uuid,
+	pub display_name: String,
+	pub internal_name: String,
+	pub upc: Option<String>,
+	pub release_date: Option<chrono::NaiveDate>,
+	pub created: chrono::NaiveDateTime,
+	pub updated: chrono::NaiveDateTime,
 }
 
 impl JsonHttpResponse for ProductSerial {}
@@ -61,14 +63,33 @@ pub async fn get_product(pgpool: &PgPool, product_id: Uuid) -> Result<Option<Pro
 		.await
 }
 
+pub async fn get_product_categories(
+	pgpool: &PgPool,
+	product_id: Uuid,
+) -> Result<Vec<Category>, Error> {
+	query_as!(Category, "
+        select category.*
+		from category
+        inner join product_category_association on category.id = product_category_association.category_id
+        where product_category_association.product_id = $1
+    ", product_id) // todo
+        .fetch_all(pgpool)
+        .await
+}
+
 pub mod route {
 	use super::*;
+	use crate::category::CategorySerial;
 	use crate::Resource;
 	use actix_web::http::StatusCode;
-	use actix_web::{HttpResponseBuilder, Responder, get, web};
+	use actix_web::{get, web, HttpResponseBuilder, Responder};
 
 	pub fn configurer(config: &mut web::ServiceConfig) {
-		config.service(web::scope("/product").service(get_product));
+		config.service(
+			web::scope("/product")
+				.service(get_product)
+				.service(get_product_categories),
+		);
 	}
 
 	#[get("/{product_id}")]
@@ -87,5 +108,26 @@ pub mod route {
 		product
 			.map(|product| product.to_serial().to_http_response())
 			.unwrap_or(HttpResponseBuilder::new(StatusCode::INTERNAL_SERVER_ERROR).finish())
+	}
+
+	#[get("/{product_id}/category")]
+	pub async fn get_product_categories(
+		pgpool: web::Data<PgPool>,
+		product_id: web::Path<String>,
+	) -> impl Responder {
+		let Ok(product_id) = Uuid::try_parse(product_id.into_inner().as_str()) else {
+			return HttpResponseBuilder::new(StatusCode::INTERNAL_SERVER_ERROR).finish();
+		};
+
+		let Ok(product_categories) = super::get_product_categories(&pgpool, product_id).await
+		else {
+			return HttpResponseBuilder::new(StatusCode::INTERNAL_SERVER_ERROR).finish();
+		};
+
+		product_categories
+			.iter()
+			.map(|category| category.to_serial())
+			.collect::<Vec<CategorySerial>>()
+			.to_http_response()
 	}
 }

@@ -1,15 +1,15 @@
 use crate::server::JsonHttpResponse;
 use serde::{Deserialize, Serialize};
 use sqlx::postgres::PgQueryResult;
-use sqlx::types::Uuid;
 use sqlx::{query, query_as, Error, PgPool, Pool, Postgres};
+use uuid::Uuid;
 
 #[derive(Debug)]
 pub struct Category {
-	id: Uuid,
-	display_name: String,
-	internal_name: String,
-	parent_id: Option<Uuid>,
+	pub id: Uuid,
+	pub display_name: String,
+	pub internal_name: String,
+	pub parent_id: Option<Uuid>,
 }
 
 impl crate::Resource for Category {
@@ -37,10 +37,10 @@ impl crate::Resource for Category {
 #[derive(Debug, Serialize, Deserialize)]
 #[serde(default)]
 pub struct CategorySerial {
-	id: Uuid,
-	display_name: String,
-	internal_name: String,
-	parent_id: Option<Uuid>,
+	pub id: Uuid,
+	pub display_name: String,
+	pub internal_name: String,
+	pub parent_id: Option<Uuid>,
 }
 
 impl Default for CategorySerial {

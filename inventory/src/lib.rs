@@ -1,6 +1,6 @@
 use rand::RngCore;
 use rand::prelude::ThreadRng;
-use sqlx::types::Uuid;
+use uuid::Uuid;
 
 pub mod db;
 pub mod server;
