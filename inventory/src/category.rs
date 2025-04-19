@@ -100,7 +100,7 @@ pub mod route {
 	}
 
 	#[get("")]
-	pub async fn get_all_categories(pgpool: web::Data<PgPool>) -> impl Responder {
+	async fn get_all_categories(pgpool: web::Data<PgPool>) -> impl Responder {
 		let all_categories = super::get_all_categories(pgpool.get_ref()).await;
 		let Ok(all_categories) = all_categories else {
 			return HttpResponseBuilder::new(StatusCode::INTERNAL_SERVER_ERROR).finish();
@@ -113,7 +113,7 @@ pub mod route {
 	}
 
 	#[get("/{category_id}")]
-	pub async fn get_category(
+	async fn get_category(
 		pgpool: web::Data<Pool<Postgres>>,
 		category_id: web::Path<String>,
 	) -> impl Responder {
@@ -131,7 +131,7 @@ pub mod route {
 	}
 
 	#[post("")]
-	pub async fn create_category(
+	async fn create_category(
 		pgpool: web::Data<Pool<Postgres>>,
 		body: web::Json<CategorySerial>,
 	) -> impl Responder {

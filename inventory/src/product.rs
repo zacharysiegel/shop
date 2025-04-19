@@ -142,7 +142,7 @@ pub mod route {
 	}
 
 	#[get("/{product_id}")]
-	pub async fn get_product(
+	async fn get_product(
 		pgpool: web::Data<PgPool>,
 		product_id: web::Path<String>,
 	) -> impl Responder {
@@ -160,7 +160,7 @@ pub mod route {
 	}
 
 	#[get("/{product_id}/category")]
-	pub async fn get_product_categories(
+	async fn get_product_categories(
 		pgpool: web::Data<PgPool>,
 		product_id: web::Path<String>,
 	) -> impl Responder {
@@ -182,7 +182,7 @@ pub mod route {
 
 	// todo: restrict to authenticated administrator
 	#[post("")]
-	pub async fn create_product(
+	async fn create_product(
 		pgpool: web::Data<PgPool>,
 		body: web::Json<ProductSerial>,
 	) -> impl Responder {
@@ -198,7 +198,7 @@ pub mod route {
 
 	// todo: restrict to authenticated administrator
 	#[post("/{product_id}/category/{category_id}")]
-	pub async fn create_product_category_association(
+	async fn create_product_category_association(
 		pgpool: web::Data<PgPool>,
 		path: web::Path<(String, String)>,
 	) -> impl Responder {
