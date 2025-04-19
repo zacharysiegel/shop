@@ -1,16 +1,16 @@
-use crate::InventoryResource;
+use crate::InventoryEntity;
 use crate::server::JsonHttpResponse;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
 #[derive(Debug)]
-pub struct InventoryLocation {
+pub struct InventoryLocationEntity {
 	pub id: Uuid,
 	pub display_name: String,
 	pub internal_name: String,
 }
 
-impl InventoryResource for InventoryLocation {
+impl InventoryEntity for InventoryLocationEntity {
 	type Serializable = InventoryLocationSerial;
 
 	fn to_serial(&self) -> Self::Serializable {
@@ -22,7 +22,7 @@ impl InventoryResource for InventoryLocation {
 	}
 
 	fn from_serial(serializable: &Self::Serializable) -> Self {
-		InventoryLocation {
+		InventoryLocationEntity {
 			id: serializable.id.clone(),
 			display_name: serializable.display_name.clone(),
 			internal_name: serializable.internal_name.clone(),
@@ -42,13 +42,13 @@ impl JsonHttpResponse for InventoryLocationSerial {}
 impl JsonHttpResponse for Vec<InventoryLocationSerial> {}
 
 pub mod db {
-	use crate::inventory_location::InventoryLocation;
+	use crate::inventory_location::InventoryLocationEntity;
 	use sqlx::postgres::PgQueryResult;
 	use sqlx::{Error, PgPool, query, query_as};
 
 	pub async fn create_inventory_location(
 		pgpool: &PgPool,
-		inventory_location: InventoryLocation,
+		inventory_location: InventoryLocationEntity,
 	) -> Result<PgQueryResult, Error> {
 		query!(
 			"\
@@ -65,9 +65,9 @@ pub mod db {
 
 	pub async fn get_all_inventory_locations(
 		pgpool: &PgPool,
-	) -> Result<Vec<InventoryLocation>, Error> {
+	) -> Result<Vec<InventoryLocationEntity>, Error> {
 		query_as!(
-			InventoryLocation,
+			InventoryLocationEntity,
 			"select id, display_name, internal_name from inventory_location"
 		)
 		.fetch_all(pgpool)
@@ -95,7 +95,7 @@ pub mod route {
 		body: web::Json<InventoryLocationSerial>,
 	) -> impl Responder {
 		let inventory_location = body.into_inner();
-		let inventory_location = InventoryLocation::from_serial(&inventory_location);
+		let inventory_location = InventoryLocationEntity::from_serial(&inventory_location);
 
 		let result = db::create_inventory_location(&pgpool, inventory_location).await;
 		match result {
@@ -118,7 +118,7 @@ pub mod route {
 
 		inventory_locations
 			.iter()
-			.map(|inventory_location| InventoryLocation::to_serial(inventory_location))
+			.map(|inventory_location| InventoryLocationEntity::to_serial(inventory_location))
 			.collect::<Vec<InventoryLocationSerial>>()
 			.to_http_response()
 	}

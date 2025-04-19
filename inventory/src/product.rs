@@ -1,4 +1,4 @@
-use crate::InventoryResource;
+use crate::InventoryEntity;
 use crate::server::JsonHttpResponse;
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
@@ -8,7 +8,7 @@ use sqlx::{Error, PgPool};
 use uuid::Uuid;
 
 #[derive(Debug)]
-pub struct Product {
+pub struct ProductEntity {
 	pub id: Uuid,
 	pub display_name: String,
 	pub internal_name: String,
@@ -18,7 +18,7 @@ pub struct Product {
 	pub updated: DateTime<Utc>,
 }
 
-impl InventoryResource for Product {
+impl InventoryEntity for ProductEntity {
 	type Serializable = ProductSerial;
 
 	fn to_serial(&self) -> Self::Serializable {
@@ -32,7 +32,7 @@ impl InventoryResource for Product {
 	}
 
 	fn from_serial(serializable: &Self::Serializable) -> Self {
-		Product {
+		ProductEntity {
 			id: serializable.id.clone(),
 			display_name: serializable.display_name.clone(),
 			internal_name: serializable.internal_name.clone(),
@@ -57,14 +57,14 @@ pub struct ProductSerial {
 impl JsonHttpResponse for ProductSerial {}
 
 mod db {
-	use crate::category::Category;
-	use crate::product::Product;
+	use crate::category::CategoryEntity;
+	use crate::product::ProductEntity;
 	use sqlx::postgres::PgQueryResult;
 	use sqlx::{Error, PgPool, query, query_as};
 	use uuid::Uuid;
 
-	pub async fn get_product(pgpool: &PgPool, product_id: Uuid) -> Result<Option<Product>, Error> {
-		query_as!(Product, "select * from product where id = $1", product_id)
+	pub async fn get_product(pgpool: &PgPool, product_id: Uuid) -> Result<Option<ProductEntity>, Error> {
+		query_as!(ProductEntity, "select * from product where id = $1", product_id)
 			.fetch_optional(pgpool)
 			.await
 	}
@@ -72,8 +72,8 @@ mod db {
 	pub async fn get_product_categories(
 		pgpool: &PgPool,
 		product_id: Uuid,
-	) -> Result<Vec<Category>, Error> {
-		query_as!(Category, "
+	) -> Result<Vec<CategoryEntity>, Error> {
+		query_as!(CategoryEntity, "
         select category.*
 		from category
         inner join product_category_association on category.id = product_category_association.category_id
@@ -83,7 +83,7 @@ mod db {
 			.await
 	}
 
-	pub async fn create_product(pgpool: &PgPool, product: Product) -> Result<PgQueryResult, Error> {
+	pub async fn create_product(pgpool: &PgPool, product: ProductEntity) -> Result<PgQueryResult, Error> {
 		query!(
 			"\
 		insert into product (id, display_name, internal_name, upc, release_date, created, updated)\
@@ -121,7 +121,7 @@ mod db {
 
 pub mod route {
 	use super::*;
-	use crate::InventoryResource;
+	use crate::InventoryEntity;
 	use crate::category::CategorySerial;
 	use actix_web::http::StatusCode;
 	use actix_web::{HttpResponseBuilder, Responder, get, post, web};
@@ -180,7 +180,7 @@ pub mod route {
 		pgpool: web::Data<PgPool>,
 		body: web::Json<ProductSerial>,
 	) -> impl Responder {
-		let product: Product = Product::from_serial(&body.into_inner());
+		let product: ProductEntity = ProductEntity::from_serial(&body.into_inner());
 
 		let result: Result<PgQueryResult, Error> = db::create_product(&pgpool, product).await;
 		match result {

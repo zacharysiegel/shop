@@ -1,18 +1,18 @@
 use crate::server::JsonHttpResponse;
-use crate::InventoryResource;
+use crate::InventoryEntity;
 use serde::{Deserialize, Serialize};
 use sqlx::{PgPool, Pool, Postgres};
 use uuid::Uuid;
 
 #[derive(Debug)]
-pub struct Category {
+pub struct CategoryEntity {
 	pub id: Uuid,
 	pub display_name: String,
 	pub internal_name: String,
 	pub parent_id: Option<Uuid>,
 }
 
-impl InventoryResource for Category {
+impl InventoryEntity for CategoryEntity {
 	type Serializable = CategorySerial;
 
 	fn to_serial(&self) -> CategorySerial {
@@ -24,8 +24,8 @@ impl InventoryResource for Category {
 		}
 	}
 
-	fn from_serial(serial: &CategorySerial) -> Category {
-		Category {
+	fn from_serial(serial: &CategorySerial) -> CategoryEntity {
+		CategoryEntity {
 			id: serial.id.clone(),
 			display_name: serial.display_name.clone(),
 			internal_name: serial.internal_name.clone(),
@@ -47,19 +47,19 @@ impl JsonHttpResponse for CategorySerial {}
 impl JsonHttpResponse for Vec<CategorySerial> {}
 
 mod db {
-	use crate::category::Category;
+	use crate::category::CategoryEntity;
 	use sqlx::postgres::PgQueryResult;
 	use sqlx::{query, query_as, Error, PgPool, Pool, Postgres};
 	use uuid::Uuid;
 
-	pub async fn get_all_categories(pool: &PgPool) -> Result<Vec<Category>, Error> {
-		query_as!(Category, "SELECT * FROM category")
+	pub async fn get_all_categories(pool: &PgPool) -> Result<Vec<CategoryEntity>, Error> {
+		query_as!(CategoryEntity, "SELECT * FROM category")
 			.fetch_all(pool)
 			.await
 	}
 
-	pub async fn get_category(pool: &Pool<Postgres>, id: Uuid) -> Result<Option<Category>, Error> {
-		query_as!(Category, "SELECT * FROM category WHERE id = $1", id)
+	pub async fn get_category(pool: &Pool<Postgres>, id: Uuid) -> Result<Option<CategoryEntity>, Error> {
+		query_as!(CategoryEntity, "SELECT * FROM category WHERE id = $1", id)
 			.fetch_optional(pool)
 			.await
 	}
@@ -67,7 +67,7 @@ mod db {
 	// todo: restrict to authenticated administrator
 	pub async fn create_category(
 		pool: &Pool<Postgres>,
-		category: Category,
+		category: CategoryEntity,
 	) -> Result<PgQueryResult, Error> {
 		query!(
 			"insert into category (id, display_name, internal_name, parent_id) values ($1, $2, $3, $4)",
@@ -131,7 +131,7 @@ pub mod route {
 		pgpool: web::Data<Pool<Postgres>>,
 		body: web::Json<CategorySerial>,
 	) -> impl Responder {
-		let category = Category::from_serial(&body.into_inner());
+		let category = CategoryEntity::from_serial(&body.into_inner());
 
 		let result = db::create_category(&pgpool, category).await;
 		match result {

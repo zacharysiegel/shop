@@ -29,7 +29,7 @@ pub fn random_uuid() -> Uuid {
 }
 
 /// Standard mappings between structs at the service-level and api-level
-pub trait InventoryResource {
+pub trait InventoryEntity {
 	type Serializable;
 
 	fn to_serial(&self) -> Self::Serializable;

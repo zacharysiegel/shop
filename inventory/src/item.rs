@@ -1,11 +1,11 @@
 use crate::server::JsonHttpResponse;
-use crate::InventoryResource;
+use crate::InventoryEntity;
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
 #[derive(Debug)]
-pub struct Item { // todo: rename all of these to ...Entity
+pub struct ItemEntity {
 	id: Uuid,
 	product_id: Uuid,
 	inventory_location_id: Uuid,
@@ -21,7 +21,7 @@ pub struct Item { // todo: rename all of these to ...Entity
 	updated: DateTime<Utc>,
 }
 
-impl InventoryResource for Item {
+impl InventoryEntity for ItemEntity {
 	type Serializable = ItemSerial;
 
 	fn to_serial(&self) -> Self::Serializable {
@@ -43,7 +43,7 @@ impl InventoryResource for Item {
 	}
 
 	fn from_serial(serializable: &Self::Serializable) -> Self {
-		Item {
+		ItemEntity {
             id: serializable.id.clone(),
             product_id: serializable.product_id.clone(),
             inventory_location_id: serializable.inventory_location_id.clone(),
