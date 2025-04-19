@@ -46,25 +46,13 @@ impl InventoryResource for Product {
 }
 
 #[derive(Debug, Serialize, Deserialize)]
-#[serde(default)]
 pub struct ProductSerial {
+	#[serde(skip_deserializing, default = "crate::random_uuid")]
 	pub id: Uuid,
 	pub display_name: String,
 	pub internal_name: String,
 	pub upc: Option<String>,
 	pub release_date: Option<chrono::NaiveDate>,
-}
-
-impl Default for ProductSerial {
-	fn default() -> Self {
-		ProductSerial {
-			id: crate::random_uuid(),
-			display_name: String::new(),
-			internal_name: String::new(),
-			upc: None,
-			release_date: None,
-		}
-	}
 }
 
 impl JsonHttpResponse for ProductSerial {}

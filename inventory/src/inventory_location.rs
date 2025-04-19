@@ -30,21 +30,11 @@ impl InventoryResource for InventoryLocation {
 }
 
 #[derive(Debug, Serialize, Deserialize)]
-#[serde(default)] // todo: this mechanism allows clients to choose their own ids
 pub struct InventoryLocationSerial {
+	#[serde(skip_deserializing, default = "crate::random_uuid")]
 	pub id: Uuid,
 	pub display_name: String,
 	pub internal_name: String,
-}
-
-impl Default for InventoryLocationSerial {
-	fn default() -> Self {
-		InventoryLocationSerial {
-			id: crate::random_uuid(),
-			display_name: String::new(),
-			internal_name: String::new(),
-		}
-	}
 }
 
 pub mod db {

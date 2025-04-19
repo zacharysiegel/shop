@@ -36,24 +36,14 @@ impl InventoryResource for Category {
 }
 
 #[derive(Debug, Serialize, Deserialize)]
-#[serde(default)]
 pub struct CategorySerial {
+	#[serde(skip_deserializing, default = "crate::random_uuid")]
 	pub id: Uuid,
 	pub display_name: String,
 	pub internal_name: String,
 	pub parent_id: Option<Uuid>,
 }
 
-impl Default for CategorySerial {
-	fn default() -> Self {
-		CategorySerial {
-			id: crate::random_uuid(),
-			display_name: String::new(),
-			internal_name: String::new(),
-			parent_id: None,
-		}
-	}
-}
 impl JsonHttpResponse for CategorySerial {}
 impl JsonHttpResponse for Vec<CategorySerial> {}
 
