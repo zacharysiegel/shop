@@ -21,11 +21,11 @@ create index if not exists idx_product_display_name on product (display_name);
 create index if not exists idx_product_upc on product (upc);
 create index if not exists idx_product_release_date on product (release_date);
 
-create table if not exists product_group_association
+create table if not exists product_category_association
 (
-    group_id uuid not null references category (id) on delete restrict not null,
+    category_id uuid not null references category (id) on delete restrict not null,
     product_id uuid not null references product (id) on delete cascade not null,
-    constraint pk_product_group_association primary key (group_id, product_id)
+    constraint pk_product_category_association primary key (category_id, product_id)
 );
 
 create table if not exists inventory_location
