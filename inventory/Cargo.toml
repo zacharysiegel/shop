@@ -11,6 +11,3 @@ sqlx = { version = "0.8", features = ["postgres", "macros", "uuid", "chrono", "r
 dotenvy = { version = "0.15" }
 serde = { version = "1.0" }
 serde_json = { version = "1.0" }
-
-[profile.dev.package.sqlx-macros]
-opt-level = 3

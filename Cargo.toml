@@ -1,0 +1,6 @@
+[workspace]
+resolver = "2"
+members = ["inventory", "storefront", "schema"]
+
+[profile.dev.package.sqlx-macros]
+opt-level = 3
