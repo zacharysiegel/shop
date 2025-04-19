@@ -1,8 +1,8 @@
 use crate::server::JsonHttpResponse;
 use serde::{Deserialize, Serialize};
 use sqlx::postgres::PgQueryResult;
-use sqlx::types::{Uuid, uuid};
-use sqlx::{Error, PgPool, Pool, Postgres, query, query_as};
+use sqlx::types::Uuid;
+use sqlx::{query, query_as, Error, PgPool, Pool, Postgres};
 
 #[derive(Debug)]
 pub struct Category {
@@ -12,42 +12,41 @@ pub struct Category {
 	parent_id: Option<Uuid>,
 }
 
-impl Category {
-	pub fn to_serial(&self) -> CategorySerial {
+impl crate::Resource for Category {
+	type Serializable = CategorySerial;
+
+	fn to_serial(&self) -> CategorySerial {
 		CategorySerial {
-			id: self.id.to_string(),
+			id: self.id.clone(),
 			display_name: self.display_name.clone(),
 			internal_name: self.internal_name.clone(),
-			parent_id: self.parent_id.map(|id| id.to_string()),
+			parent_id: self.parent_id.clone(),
 		}
 	}
 
-	pub fn from_serial(serial: &CategorySerial) -> Result<Category, uuid::Error> {
-		Ok(Category {
-			id: Uuid::parse_str(&serial.id)?,
+	fn from_serial(serial: &CategorySerial) -> Category {
+		Category {
+			id: serial.id.clone(),
 			display_name: serial.display_name.clone(),
 			internal_name: serial.internal_name.clone(),
-			parent_id: match serial.parent_id.clone() {
-				Some(id) => Some(Uuid::parse_str(id.as_ref())?),
-				None => None,
-			},
-		})
+			parent_id: serial.parent_id.clone(),
+		}
 	}
 }
 
 #[derive(Debug, Serialize, Deserialize)]
 #[serde(default)]
 pub struct CategorySerial {
-	id: String,
+	id: Uuid,
 	display_name: String,
 	internal_name: String,
-	parent_id: Option<String>,
+	parent_id: Option<Uuid>,
 }
 
 impl Default for CategorySerial {
 	fn default() -> Self {
 		CategorySerial {
-			id: crate::random_uuid().to_string(),
+			id: crate::random_uuid(),
 			display_name: String::new(),
 			internal_name: String::new(),
 			parent_id: None,
@@ -86,8 +85,9 @@ pub async fn create_category(
 
 pub mod route {
 	use super::*;
+	use crate::Resource;
 	use actix_web::http::StatusCode;
-	use actix_web::{HttpResponseBuilder, Responder, get, post, web};
+	use actix_web::{get, post, web, HttpResponseBuilder, Responder};
 
 	pub fn configurer(config: &mut web::ServiceConfig) {
 		config.service(
@@ -126,7 +126,7 @@ pub mod route {
 		};
 		category
 			.map(|category| category.to_serial().to_http_response())
-			.unwrap_or_else(|| HttpResponseBuilder::new(StatusCode::INTERNAL_SERVER_ERROR).finish())
+			.unwrap_or(HttpResponseBuilder::new(StatusCode::INTERNAL_SERVER_ERROR).finish())
 	}
 
 	#[post("")]
@@ -134,9 +134,7 @@ pub mod route {
 		pgpool: web::Data<Pool<Postgres>>,
 		body: web::Json<CategorySerial>,
 	) -> impl Responder {
-		let Ok(category) = Category::from_serial(&body.into_inner()) else {
-			return HttpResponseBuilder::new(StatusCode::BAD_REQUEST).finish();
-		};
+		let category = Category::from_serial(&body.into_inner());
 
 		let result = super::create_category(&pgpool, category).await;
 		match result {

@@ -10,6 +10,7 @@ pub async fn open_server(pgpool: Pool<Postgres>) -> std::io::Result<()> {
 			.app_data(web::Data::new(pgpool.clone()))
 			.default_service(web::route().to(HttpResponse::NotFound))
 			.configure(crate::category::route::configurer)
+			.configure(crate::product::route::configurer)
 	})
 	.bind("127.0.0.1:11001")?
 	.run()

@@ -1,11 +1,12 @@
-use rand::prelude::ThreadRng;
 use rand::RngCore;
+use rand::prelude::ThreadRng;
 use sqlx::types::Uuid;
 
 pub mod db;
 pub mod server;
 
 mod category;
+mod product;
 
 pub mod env {
 	pub fn load_env() -> Result<(), std::io::Error> {
@@ -23,4 +24,12 @@ pub fn random_uuid() -> Uuid {
 
 	assert_eq!(random_bytes.len(), 16);
 	Uuid::from_slice(&random_bytes[..]).unwrap() // Err is only returned for non 16 byte length
+}
+
+/// Standard mappings between structs at the service-level and api-level
+pub trait Resource {
+	type Serializable;
+
+	fn to_serial(&self) -> Self::Serializable;
+	fn from_serial(serializable: &Self::Serializable) -> Self;
 }
