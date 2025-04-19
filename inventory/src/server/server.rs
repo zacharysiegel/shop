@@ -1,15 +1,29 @@
-use actix_web::{App, HttpResponse, HttpServer, middleware, web};
+use actix_web::http::StatusCode;
+use actix_web::{App, HttpResponse, HttpResponseBuilder, HttpServer, middleware, web};
+use serde::Serialize;
 use sqlx::{Pool, Postgres};
 
 pub async fn open_server(pgpool: Pool<Postgres>) -> std::io::Result<()> {
-    HttpServer::new(move || {
-        App::new()
-            .wrap(middleware::Logger::default())
-            .app_data(web::Data::new(pgpool.clone()))
-            .default_service(web::route().to(HttpResponse::NotFound))
-            .service(crate::category::get_category_route)
-    })
-        .bind("127.0.0.1:11001")?
-        .run()
-        .await
+	HttpServer::new(move || {
+		App::new()
+			.wrap(middleware::Logger::default())
+			.app_data(web::Data::new(pgpool.clone()))
+			.default_service(web::route().to(HttpResponse::NotFound))
+			.configure(crate::category::route::configurer)
+	})
+	.bind("127.0.0.1:11001")?
+	.run()
+	.await
+}
+
+pub trait JsonHttpResponse
+where
+	Self: Sized + Serialize,
+{
+	fn to_http_response(&self) -> HttpResponse {
+		let Ok(json) = serde_json::to_string(&self) else {
+			return HttpResponseBuilder::new(StatusCode::INTERNAL_SERVER_ERROR).body(());
+		};
+		HttpResponseBuilder::new(StatusCode::OK).body(json)
+	}
 }
