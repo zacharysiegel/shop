@@ -5,7 +5,7 @@ use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use sqlx::postgres::PgQueryResult;
 use sqlx::types::chrono;
-use sqlx::{Error, PgPool, query_as};
+use sqlx::{Error, PgPool, query, query_as};
 use uuid::Uuid;
 
 #[derive(Debug)]
@@ -90,12 +90,11 @@ pub async fn get_product_categories(
 }
 
 pub async fn create_product(pgpool: &PgPool, product: Product) -> Result<PgQueryResult, Error> {
-	query_as!(
-		Product,
-		"
-		insert into product (id, display_name, internal_name, upc, release_date, created, updated)
-		values ($1, $2, $3, $4, $5, $6, $7)
-	",
+	query!(
+		"\
+		insert into product (id, display_name, internal_name, upc, release_date, created, updated)\
+		values ($1, $2, $3, $4, $5, $6, $7)\
+		",
 		product.id,
 		product.display_name,
 		product.internal_name,
@@ -103,6 +102,23 @@ pub async fn create_product(pgpool: &PgPool, product: Product) -> Result<PgQuery
 		product.release_date,
 		product.created,
 		product.updated
+	)
+	.execute(pgpool)
+	.await
+}
+
+pub async fn create_product_category_association(
+	pgpool: &PgPool,
+	product_id: Uuid,
+	category_id: Uuid,
+) -> Result<PgQueryResult, Error> {
+	query!(
+		"\
+		insert into product_category_association (category_id, product_id)\
+		values ($1, $2)\
+		",
+		category_id,
+		product_id,
 	)
 	.execute(pgpool)
 	.await
@@ -120,7 +136,8 @@ pub mod route {
 			web::scope("/product")
 				.service(get_product)
 				.service(get_product_categories)
-				.service(create_product),
+				.service(create_product)
+				.service(create_product_category_association),
 		);
 	}
 
@@ -172,6 +189,29 @@ pub mod route {
 		let product: Product = Product::from_serial(&body.into_inner());
 
 		let result: Result<PgQueryResult, Error> = super::create_product(&pgpool, product).await;
+		match result {
+			Ok(query_result) => HttpResponseBuilder::new(StatusCode::CREATED)
+				.body(query_result.rows_affected().to_string()),
+			Err(_) => HttpResponseBuilder::new(StatusCode::INTERNAL_SERVER_ERROR).finish(),
+		}
+	}
+
+	// todo: restrict to authenticated administrator
+	#[post("/{product_id}/category/{category_id}")]
+	pub async fn create_product_category_association(
+		pgpool: web::Data<PgPool>,
+		path: web::Path<(String, String)>,
+	) -> impl Responder {
+		let (product_id, category_id) = path.into_inner();
+		let Ok(product_id) = Uuid::try_parse(product_id.as_str()) else {
+			return HttpResponseBuilder::new(StatusCode::INTERNAL_SERVER_ERROR).finish();
+		};
+		let Ok(category_id) = Uuid::try_parse(category_id.as_str()) else {
+			return HttpResponseBuilder::new(StatusCode::INTERNAL_SERVER_ERROR).finish();
+		};
+
+		let result =
+			super::create_product_category_association(&pgpool, product_id, category_id).await;
 		match result {
 			Ok(query_result) => HttpResponseBuilder::new(StatusCode::CREATED)
 				.body(query_result.rows_affected().to_string()),
