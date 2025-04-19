@@ -1,3 +1,7 @@
+use rand::prelude::ThreadRng;
+use rand::RngCore;
+use sqlx::types::Uuid;
+
 pub mod db;
 pub mod server;
 
@@ -10,4 +14,13 @@ pub mod env {
 			Err(error) => Err(std::io::Error::new(std::io::ErrorKind::Other, error))?,
 		}
 	}
+}
+
+pub fn random_uuid() -> Uuid {
+	let mut rng: ThreadRng = rand::rng();
+	let mut random_bytes: [u8; 128 >> 3] = [0; 128 >> 3]; // 128 bits
+	rng.fill_bytes(&mut random_bytes); // ThreadRng::fill_bytes never panics
+
+	assert_eq!(random_bytes.len(), 16);
+	Uuid::from_slice(&random_bytes[..]).unwrap() // Err is only returned for non 16 byte length
 }
