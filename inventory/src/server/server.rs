@@ -11,6 +11,7 @@ pub async fn open_server(pgpool: Pool<Postgres>) -> std::io::Result<()> {
 			.default_service(web::route().to(HttpResponse::NotFound))
 			.configure(crate::category::route::configurer)
 			.configure(crate::product::route::configurer)
+			.configure(crate::inventory_location::route::configurer)
 	})
 	.bind("127.0.0.1:11001")?
 	.run()

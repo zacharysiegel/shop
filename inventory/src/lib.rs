@@ -7,6 +7,7 @@ pub mod server;
 
 mod category;
 mod product;
+mod inventory_location;
 
 pub mod env {
 	pub fn load_env() -> Result<(), std::io::Error> {
