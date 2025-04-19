@@ -1,9 +1,8 @@
 use crate::server::JsonHttpResponse;
-use serde::{Deserialize, Serialize};
-use sqlx::postgres::PgQueryResult;
-use sqlx::{query, query_as, Error, PgPool, Pool, Postgres};
-use uuid::Uuid;
 use crate::InventoryResource;
+use serde::{Deserialize, Serialize};
+use sqlx::{PgPool, Pool, Postgres};
+use uuid::Uuid;
 
 #[derive(Debug)]
 pub struct Category {
@@ -47,32 +46,39 @@ pub struct CategorySerial {
 impl JsonHttpResponse for CategorySerial {}
 impl JsonHttpResponse for Vec<CategorySerial> {}
 
-pub async fn get_all_categories(pool: &PgPool) -> Result<Vec<Category>, Error> {
-	query_as!(Category, "SELECT * FROM category")
-		.fetch_all(pool)
-		.await
-}
+mod db {
+	use crate::category::Category;
+	use sqlx::postgres::PgQueryResult;
+	use sqlx::{query, query_as, Error, PgPool, Pool, Postgres};
+	use uuid::Uuid;
 
-pub async fn get_category(pool: &Pool<Postgres>, id: Uuid) -> Result<Option<Category>, Error> {
-	query_as!(Category, "SELECT * FROM category WHERE id = $1", id)
-		.fetch_optional(pool)
-		.await
-}
+	pub async fn get_all_categories(pool: &PgPool) -> Result<Vec<Category>, Error> {
+		query_as!(Category, "SELECT * FROM category")
+			.fetch_all(pool)
+			.await
+	}
 
-// todo: restrict to authenticated administrator
-pub async fn create_category(
-	pool: &Pool<Postgres>,
-	category: Category,
-) -> Result<PgQueryResult, Error> {
-	query!(
-		"insert into category (id, display_name, internal_name, parent_id) values ($1, $2, $3, $4)",
-		category.id,
-		category.display_name,
-		category.internal_name,
-		category.parent_id
-	)
-	.execute(pool)
-	.await
+	pub async fn get_category(pool: &Pool<Postgres>, id: Uuid) -> Result<Option<Category>, Error> {
+		query_as!(Category, "SELECT * FROM category WHERE id = $1", id)
+			.fetch_optional(pool)
+			.await
+	}
+
+	// todo: restrict to authenticated administrator
+	pub async fn create_category(
+		pool: &Pool<Postgres>,
+		category: Category,
+	) -> Result<PgQueryResult, Error> {
+		query!(
+			"insert into category (id, display_name, internal_name, parent_id) values ($1, $2, $3, $4)",
+			category.id,
+			category.display_name,
+			category.internal_name,
+			category.parent_id
+		)
+		.execute(pool)
+		.await
+	}
 }
 
 pub mod route {
@@ -91,7 +97,7 @@ pub mod route {
 
 	#[get("")]
 	async fn get_all_categories(pgpool: web::Data<PgPool>) -> impl Responder {
-		let all_categories = super::get_all_categories(pgpool.get_ref()).await;
+		let all_categories = db::get_all_categories(pgpool.get_ref()).await;
 		let Ok(all_categories) = all_categories else {
 			return HttpResponseBuilder::new(StatusCode::INTERNAL_SERVER_ERROR).finish();
 		};
@@ -111,7 +117,7 @@ pub mod route {
 			return HttpResponseBuilder::new(StatusCode::BAD_REQUEST).finish();
 		};
 
-		let category = super::get_category(pgpool.get_ref(), category_id).await;
+		let category = db::get_category(pgpool.get_ref(), category_id).await;
 		let Ok(category) = category else {
 			return HttpResponseBuilder::new(StatusCode::INTERNAL_SERVER_ERROR).finish();
 		};
@@ -127,7 +133,7 @@ pub mod route {
 	) -> impl Responder {
 		let category = Category::from_serial(&body.into_inner());
 
-		let result = super::create_category(&pgpool, category).await;
+		let result = db::create_category(&pgpool, category).await;
 		match result {
 			Ok(pg_query_result) => HttpResponseBuilder::new(StatusCode::CREATED)
 				.body(pg_query_result.rows_affected().to_string()),
