@@ -17,9 +17,9 @@ create table if not exists product
     created timestamp without time zone not null,
     updated timestamp without time zone not null
 );
-create index idx_product_display_name on product (display_name);
-create index idx_product_upc on product (upc);
-create index idx_product_release_date on product (release_date);
+create index if not exists idx_product_display_name on product (display_name);
+create index if not exists idx_product_upc on product (upc);
+create index if not exists idx_product_release_date on product (release_date);
 
 create table if not exists product_group_association
 (
@@ -51,8 +51,8 @@ create table if not exists item
     created timestamp without time zone not null,
     updated timestamp without time zone not null
 );
-create index idx_item_product_id on item (product_id);
-create index idx_item_price on item (price);
+create index if not exists idx_item_product_id on item (product_id);
+create index if not exists idx_item_price on item (price);
 
 create table if not exists label
 (
@@ -97,7 +97,7 @@ create table if not exists item_audit
     note text,
     created timestamp without time zone not null
 );
-create index idx_item_audit_item_id on item_audit (item_id);
+create index if not exists idx_item_audit_item_id on item_audit (item_id);
 
 create table if not exists metric_counter
 (
@@ -149,8 +149,8 @@ create table if not exists listing
     created timestamp without time zone not null,
     updated timestamp without time zone not null
 );
-create index idx_listing_item_id on listing (item_id);
-create index idx_listing_status on listing (status);
+create index if not exists idx_listing_item_id on listing (item_id);
+create index if not exists idx_listing_status on listing (status);
 
 create table if not exists purchase
 (
@@ -183,7 +183,7 @@ create table if not exists purchase
     created timestamp with time zone not null,
     updated timestamp with time zone not null
 );
-create index idx_purchase_external_id on purchase (external_id);
-create index idx_purchase_customer_id on purchase (customer_id);
-create index idx_purchase_status on purchase (status);
-create index idx_purchase_created on purchase (created);
+create index if not exists idx_purchase_external_id on purchase (external_id);
+create index if not exists idx_purchase_customer_id on purchase (customer_id);
+create index if not exists idx_purchase_status on purchase (status);
+create index if not exists idx_purchase_created on purchase (created);
