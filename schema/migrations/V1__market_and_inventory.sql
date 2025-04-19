@@ -42,17 +42,17 @@ create table if not exists item
     inventory_location_id uuid references inventory_location (id) on delete restrict not null,
     condition int not null, -- corresponds to enum
     status int not null,    -- corresponds to enum
-    price decimal(10, 2) not null,
+    price_cents bigint not null,
     priority int not null,
     note text,
     acquisition_datetime timestamp with time zone not null,
-    acquisition_price decimal(10, 2),
+    acquisition_price_cents bigint,
     acquisition_location text,
     created timestamp with time zone not null,
     updated timestamp with time zone not null
 );
 create index if not exists idx_item_product_id on item (product_id);
-create index if not exists idx_item_price on item (price);
+create index if not exists idx_item_price on item (price_cents);
 
 create table if not exists label
 (
@@ -161,11 +161,11 @@ create table if not exists purchase
     contact_email_address text not null,
     listing_id uuid references listing (id) not null,
     status int not null,                       -- corresponds to enum
-    cost_subtotal decimal(10, 2) not null,
-    cost_tax decimal(10, 2) not null,
-    cost_shipping decimal(10, 2) not null,
-    cost_discount decimal(10, 2) not null,
-    seller_cost_total decimal(10, 2) not null,
+    cost_subtotal_cents bigint not null,
+    cost_tax_cents bigint not null,
+    cost_shipping_cents bigint not null,
+    cont_discount_cents bigint not null,
+    seller_cost_total_cents bigint not null,
     shipping_method int not null,              -- corresponds to enum
     payment_method int not null,               -- corresponds to enum
     note text,
