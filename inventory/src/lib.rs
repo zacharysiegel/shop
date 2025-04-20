@@ -1,5 +1,8 @@
 use rand::RngCore;
 use rand::prelude::ThreadRng;
+use std::error::Error;
+use std::fmt;
+use std::fmt::{Debug, Display, Formatter};
 use uuid::Uuid;
 
 pub mod db;
@@ -35,3 +38,14 @@ pub trait InventoryEntity {
 	fn to_serial(&self) -> Self::Serializable;
 	fn from_serial(serializable: &Self::Serializable) -> Self;
 }
+
+#[derive(Debug)]
+pub struct InventoryError {}
+
+impl Display for InventoryError {
+	fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
+		write!(f, "InventoryError")
+	}
+}
+
+impl Error for InventoryError {}
