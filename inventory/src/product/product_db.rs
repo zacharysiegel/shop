@@ -1,5 +1,6 @@
 use super::*;
 use crate::category::CategoryEntity;
+use crate::item::ItemEntity;
 use sqlx::postgres::PgQueryResult;
 use sqlx::{Error, PgPool, query, query_as};
 use uuid::Uuid;
@@ -10,7 +11,11 @@ pub async fn get_product(
 ) -> Result<Option<ProductEntity>, Error> {
 	query_as!(
 		ProductEntity,
-		"select * from product where id = $1",
+		"\
+		select id, display_name, internal_name, upc, release_date, created, updated \
+		from product \
+		where id = $1 \
+		",
 		product_id
 	)
 	.fetch_optional(pgpool)
@@ -22,7 +27,7 @@ pub async fn get_product_categories(
 	product_id: Uuid,
 ) -> Result<Vec<CategoryEntity>, Error> {
 	query_as!(CategoryEntity, "
-        select category.*
+        select category.id, category.display_name, category.internal_name, category.parent_id
 		from category
         inner join product_category_association on category.id = product_category_association.category_id
         where product_category_association.product_id = $1
@@ -66,5 +71,22 @@ pub async fn create_product_category_association(
 		product_id,
 	)
 	.execute(pgpool)
+	.await
+}
+
+pub async fn get_product_items(
+	pgpool: &PgPool,
+	product_id: Uuid,
+) -> Result<Vec<ItemEntity>, Error> {
+	query_as!(
+		ItemEntity,
+		"\
+		select id, product_id, inventory_location_id, condition, status, price_cents, priority, note, acquisition_datetime, acquisition_price_cents, acquisition_location, created, updated \
+		from item \
+		where product_id = $1 \
+		",
+		product_id
+	)
+	.fetch_all(pgpool)
 	.await
 }

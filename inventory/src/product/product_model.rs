@@ -3,9 +3,7 @@ use crate::server::JsonHttpResponse;
 use crate::{ShopEntity, ShopModel, ShopSerial};
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
-use sqlx::postgres::PgQueryResult;
 use sqlx::types::chrono;
-use sqlx::{Error, PgPool};
 use uuid::Uuid;
 
 #[derive(Debug, Clone)]

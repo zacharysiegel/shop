@@ -4,7 +4,9 @@ use sqlx::{Error, PgPool, Pool, Postgres, query, query_as};
 use uuid::Uuid;
 
 pub async fn get_all_categories(pool: &PgPool) -> Result<Vec<CategoryEntity>, Error> {
-	query_as!(CategoryEntity, "SELECT * FROM category")
+	query_as!(CategoryEntity, "\
+		select id, display_name, internal_name, parent_id from category \
+	")
 		.fetch_all(pool)
 		.await
 }
@@ -13,7 +15,11 @@ pub async fn get_category(
 	pool: &Pool<Postgres>,
 	id: Uuid,
 ) -> Result<Option<CategoryEntity>, Error> {
-	query_as!(CategoryEntity, "SELECT * FROM category WHERE id = $1", id)
+	query_as!(CategoryEntity, "\
+		select id, display_name, internal_name, parent_id \
+		from category \
+		where id = $1 \
+	", id)
 		.fetch_optional(pool)
 		.await
 }

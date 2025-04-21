@@ -7,19 +7,19 @@ use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
 pub struct Item {
-	id: Uuid,
-	product_id: Uuid,
-	inventory_location_id: Uuid,
-	condition: ItemCondition,
-	status: ItemStatus,
-	price_cents: u32,
-	priority: i32,
-	note: Option<String>,
-	acquisition_datetime: DateTime<Utc>,
-	acquisition_price_cents: Option<u32>,
-	acquisition_location: Option<String>,
-	created: DateTime<Utc>,
-	updated: DateTime<Utc>,
+	pub id: Uuid,
+	pub product_id: Uuid,
+	pub inventory_location_id: Uuid,
+	pub condition: ItemCondition,
+	pub status: ItemStatus,
+	pub price_cents: u32,
+	pub priority: i32,
+	pub note: Option<String>,
+	pub acquisition_datetime: DateTime<Utc>,
+	pub acquisition_price_cents: Option<u32>,
+	pub acquisition_location: Option<String>,
+	pub created: DateTime<Utc>,
+	pub updated: DateTime<Utc>,
 	// Add grading information?
 	// Add refurbishment information?
 }
@@ -162,19 +162,19 @@ impl ShopModel for Item {
 
 #[derive(Debug)]
 pub struct ItemEntity {
-	id: Uuid,
-	product_id: Uuid,
-	inventory_location_id: Uuid,
-	condition: i32,
-	status: i32,
-	price_cents: i64,
-	priority: i32,
-	note: Option<String>,
-	acquisition_datetime: DateTime<Utc>,
-	acquisition_price_cents: Option<i64>,
-	acquisition_location: Option<String>,
-	created: DateTime<Utc>,
-	updated: DateTime<Utc>,
+	pub id: Uuid,
+	pub product_id: Uuid,
+	pub inventory_location_id: Uuid,
+	pub condition: i32,
+	pub status: i32,
+	pub price_cents: i64,
+	pub priority: i32,
+	pub note: Option<String>,
+	pub acquisition_datetime: DateTime<Utc>,
+	pub acquisition_price_cents: Option<i64>,
+	pub acquisition_location: Option<String>,
+	pub created: DateTime<Utc>,
+	pub updated: DateTime<Utc>,
 }
 
 impl ShopEntity for ItemEntity {
@@ -184,19 +184,19 @@ impl ShopEntity for ItemEntity {
 #[derive(Debug, Serialize, Deserialize)]
 pub struct ItemSerial {
 	#[serde(skip_deserializing, default = "crate::random_uuid")]
-	id: Uuid,
-	product_id: Uuid,
-	inventory_location_id: Uuid,
-	condition: u8,
-	status: u8,
-	price_cents: u32,
-	priority: i32,
-	note: Option<String>,
-	acquisition_datetime: DateTime<Utc>,
-	acquisition_price_cents: Option<u32>,
-	acquisition_location: Option<String>,
-	created: DateTime<Utc>,
-	updated: DateTime<Utc>,
+	pub id: Uuid,
+	pub product_id: Uuid,
+	pub inventory_location_id: Uuid,
+	pub condition: u8,
+	pub status: u8,
+	pub price_cents: u32,
+	pub priority: i32,
+	pub note: Option<String>,
+	pub acquisition_datetime: DateTime<Utc>,
+	pub acquisition_price_cents: Option<u32>,
+	pub acquisition_location: Option<String>,
+	pub created: DateTime<Utc>,
+	pub updated: DateTime<Utc>,
 }
 
 impl ShopSerial for ItemSerial {
