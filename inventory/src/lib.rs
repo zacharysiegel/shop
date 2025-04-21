@@ -36,7 +36,7 @@ pub trait ShopModel: Sized {
 	type Serial: ShopSerial<Model = Self>;
 
 	fn to_serial(&self) -> Self::Serial;
-	fn try_from_serial(serializable: &Self::Serial) -> Result<Self, ShopError>;
+	fn try_from_serial(serial: &Self::Serial) -> Result<Self, ShopError>;
 
 	fn to_entity(&self) -> Self::Entity;
 	fn try_from_entity(entity: &Self::Entity) -> Result<Self, ShopError>;

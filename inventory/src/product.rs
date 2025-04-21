@@ -36,13 +36,13 @@ impl ShopModel for ProductEntity {
 		}
 	}
 
-	fn try_from_serial(serializable: &Self::Serial) -> Result<Self, ShopError> {
+	fn try_from_serial(serial: &Self::Serial) -> Result<Self, ShopError> {
 		Ok(ProductEntity {
-			id: serializable.id.clone(),
-			display_name: serializable.display_name.clone(),
-			internal_name: serializable.internal_name.clone(),
-			upc: serializable.upc.clone(),
-			release_date: serializable.release_date.clone(),
+			id: serial.id.clone(),
+			display_name: serial.display_name.clone(),
+			internal_name: serial.internal_name.clone(),
+			upc: serial.upc.clone(),
+			release_date: serial.release_date.clone(),
 			created: Utc::now(),
 			updated: Utc::now(),
 		})

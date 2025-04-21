@@ -3,11 +3,13 @@ use std::fmt;
 use std::fmt::{Display, Formatter};
 
 #[derive(Debug)]
-pub struct ShopError {}
+pub struct ShopError {
+	pub message: String,
+}
 
-impl Display for ShopError {
+impl  Display for ShopError {
 	fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
-		write!(f, "InventoryError")
+		write!(f, "ShopError [{}]", self.message)
 	}
 }
 
