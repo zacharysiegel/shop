@@ -1,6 +1,8 @@
 use super::*;
 use crate::ShopModel;
 use crate::category::CategorySerial;
+use crate::error::ShopError;
+use crate::item::{Item, ItemSerial};
 use crate::server::JsonHttpResponse;
 use actix_web::http::StatusCode;
 use actix_web::{HttpResponseBuilder, Responder, get, post, web};
@@ -14,7 +16,8 @@ pub fn configurer(config: &mut web::ServiceConfig) {
 			.service(get_product)
 			.service(get_product_categories)
 			.service(create_product)
-			.service(create_product_category_association),
+			.service(create_product_category_association)
+			.service(get_product_items),
 	);
 }
 
@@ -92,6 +95,31 @@ async fn create_product_category_association(
 	match result {
 		Ok(query_result) => HttpResponseBuilder::new(StatusCode::CREATED)
 			.body(query_result.rows_affected().to_string()),
+		Err(_) => HttpResponseBuilder::new(StatusCode::INTERNAL_SERVER_ERROR).finish(),
+	}
+}
+
+#[get("/{product_id}/item")]
+async fn get_product_items(
+	pgpool: web::Data<PgPool>,
+	product_id: web::Path<String>,
+) -> impl Responder {
+	let Ok(product_id) = Uuid::try_parse(product_id.into_inner().as_str()) else {
+		return HttpResponseBuilder::new(StatusCode::INTERNAL_SERVER_ERROR).finish();
+	};
+
+	let Ok(items) = product_db::get_product_items(&pgpool, product_id).await else {
+		return HttpResponseBuilder::new(StatusCode::INTERNAL_SERVER_ERROR).finish();
+	};
+
+	let item_serial_vec = items
+		.iter()
+		.map(|item| Item::try_from_entity(item))
+		.map(|item_result| item_result.map(|item| item.to_serial()))
+		.collect::<Result<Vec<ItemSerial>, ShopError>>();
+
+	match item_serial_vec {
+		Ok(item_serial_vec) => item_serial_vec.to_http_response(),
 		Err(_) => HttpResponseBuilder::new(StatusCode::INTERNAL_SERVER_ERROR).finish(),
 	}
 }

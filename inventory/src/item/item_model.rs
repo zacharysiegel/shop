@@ -52,7 +52,7 @@ impl ItemCondition {
 #[derive(IntEnum, Clone)]
 pub enum ItemStatus {
 	/// Item is only partially constructed and expects modifications before publishing
-	Incomplete,
+	Incomplete = 0,
 	/// Item is completely specified but is not yet listed on any marketplace
 	CompleteUnlisted,
 	/// Item is listed on any marketplace

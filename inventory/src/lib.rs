@@ -45,7 +45,7 @@ pub trait ShopModel: Sized {
 pub trait ShopEntity: Sized {
 	type Model: ShopModel<Entity = Self>;
 
-	fn to_model(&self) -> Result<Self::Model, ShopError> {
+	fn try_to_model(&self) -> Result<Self::Model, ShopError> {
 		Self::Model::try_from_entity(self)
 	}
 	fn from_model(model: &Self::Model) -> Self {
@@ -56,7 +56,7 @@ pub trait ShopEntity: Sized {
 pub trait ShopSerial: Sized {
 	type Model: ShopModel<Serial = Self>;
 
-	fn to_model(&self) -> Result<Self::Model, ShopError> {
+	fn try_to_model(&self) -> Result<Self::Model, ShopError> {
 		Self::Model::try_from_serial(self)
 	}
 	fn from_model(model: &Self::Model) -> Self {
