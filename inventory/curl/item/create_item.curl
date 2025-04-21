@@ -1,4 +1,4 @@
 url = http://localhost:11001/item
 request = POST
 header = "content-type: application/json"
-data = @create_item.json
+data = @./item/create_item.json

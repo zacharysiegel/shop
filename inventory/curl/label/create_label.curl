@@ -1,4 +1,4 @@
 url = http://localhost:11001/label
 request = POST
 header = "content-type: application/json"
-data = @./create_label.json
+data = @./label/create_label.json
