@@ -1,0 +1,15 @@
+{
+  "id": null,
+  "product_id": "a23fe0e9-dfcc-fe40-7042-ed0b38e77580",
+  "inventory_location_id": "7006b72d-0bd4-62fb-04d0-a619ef9621de",
+  "condition": 1,
+  "status": 1,
+  "price_cents": 900,
+  "priority": 0,
+  "note": null,
+  "acquisition_datetime": "2025-04-21T21:43:28+00:00",
+  "acquisition_price_cents": 800,
+  "acquisition_location": null,
+  "created": "2025-04-21T21:43:28+00:00",
+  "updated": "2025-04-21T21:43:28+00:00"
+}
