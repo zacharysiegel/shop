@@ -30,7 +30,7 @@ pub fn random_uuid() -> Uuid {
 	Uuid::from_slice(&random_bytes[..]).unwrap() // Err is only returned for non 16 byte length
 }
 
-/// Standard mappings between structs at the service-level and api-level
+/// Standard mappings between structs at the db-level, service-level, and api-level
 pub trait ShopModel {
 	type Entity: ShopEntity<Model = Self>;
 	type Serial: ShopSerial<Model = Self>;
