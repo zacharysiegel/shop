@@ -1,5 +1,5 @@
-use crate::InventoryEntity;
 use crate::server::JsonHttpResponse;
+use crate::{ShopEntity, ShopModel, ShopSerial};
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use sqlx::postgres::PgQueryResult;
@@ -7,7 +7,7 @@ use sqlx::types::chrono;
 use sqlx::{Error, PgPool};
 use uuid::Uuid;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct ProductEntity {
 	pub id: Uuid,
 	pub display_name: String,
@@ -18,10 +18,14 @@ pub struct ProductEntity {
 	pub updated: DateTime<Utc>,
 }
 
-impl InventoryEntity for ProductEntity {
-	type Serializable = ProductSerial;
+impl ShopEntity for ProductEntity {
+	type Model = Self;
+}
+impl ShopModel for ProductEntity {
+	type Entity = Self;
+	type Serial = ProductSerial;
 
-	fn to_serial(&self) -> Self::Serializable {
+	fn to_serial(&self) -> Self::Serial {
 		ProductSerial {
 			id: self.id.clone(),
 			display_name: self.display_name.clone(),
@@ -31,7 +35,7 @@ impl InventoryEntity for ProductEntity {
 		}
 	}
 
-	fn from_serial(serializable: &Self::Serializable) -> Self {
+	fn from_serial(serializable: &Self::Serial) -> Self {
 		ProductEntity {
 			id: serializable.id.clone(),
 			display_name: serializable.display_name.clone(),
@@ -41,6 +45,14 @@ impl InventoryEntity for ProductEntity {
 			created: Utc::now(),
 			updated: Utc::now(),
 		}
+	}
+
+	fn to_entity(&self) -> Self::Entity {
+		self.clone()
+	}
+
+	fn from_entity(entity: &Self::Entity) -> Self {
+		entity.clone()
 	}
 }
 
@@ -54,6 +66,9 @@ pub struct ProductSerial {
 	pub release_date: Option<chrono::NaiveDate>,
 }
 
+impl ShopSerial for ProductSerial {
+	type Model = ProductEntity;
+}
 impl JsonHttpResponse for ProductSerial {}
 
 mod db {
@@ -63,10 +78,17 @@ mod db {
 	use sqlx::{Error, PgPool, query, query_as};
 	use uuid::Uuid;
 
-	pub async fn get_product(pgpool: &PgPool, product_id: Uuid) -> Result<Option<ProductEntity>, Error> {
-		query_as!(ProductEntity, "select * from product where id = $1", product_id)
-			.fetch_optional(pgpool)
-			.await
+	pub async fn get_product(
+		pgpool: &PgPool,
+		product_id: Uuid,
+	) -> Result<Option<ProductEntity>, Error> {
+		query_as!(
+			ProductEntity,
+			"select * from product where id = $1",
+			product_id
+		)
+		.fetch_optional(pgpool)
+		.await
 	}
 
 	pub async fn get_product_categories(
@@ -83,7 +105,10 @@ mod db {
 			.await
 	}
 
-	pub async fn create_product(pgpool: &PgPool, product: ProductEntity) -> Result<PgQueryResult, Error> {
+	pub async fn create_product(
+		pgpool: &PgPool,
+		product: ProductEntity,
+	) -> Result<PgQueryResult, Error> {
 		query!(
 			"\
 		insert into product (id, display_name, internal_name, upc, release_date, created, updated)\
@@ -121,7 +146,7 @@ mod db {
 
 pub mod route {
 	use super::*;
-	use crate::InventoryEntity;
+	use crate::ShopModel;
 	use crate::category::CategorySerial;
 	use actix_web::http::StatusCode;
 	use actix_web::{HttpResponseBuilder, Responder, get, post, web};

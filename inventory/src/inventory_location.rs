@@ -1,19 +1,23 @@
-use crate::InventoryEntity;
 use crate::server::JsonHttpResponse;
+use crate::{ShopEntity, ShopModel, ShopSerial};
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct InventoryLocationEntity {
 	pub id: Uuid,
 	pub display_name: String,
 	pub internal_name: String,
 }
 
-impl InventoryEntity for InventoryLocationEntity {
-	type Serializable = InventoryLocationSerial;
+impl ShopEntity for InventoryLocationEntity {
+	type Model = InventoryLocationEntity;
+}
+impl ShopModel for InventoryLocationEntity {
+	type Entity = Self;
+	type Serial = InventoryLocationSerial;
 
-	fn to_serial(&self) -> Self::Serializable {
+	fn to_serial(&self) -> Self::Serial {
 		InventoryLocationSerial {
 			id: self.id,
 			display_name: self.display_name.clone(),
@@ -21,12 +25,20 @@ impl InventoryEntity for InventoryLocationEntity {
 		}
 	}
 
-	fn from_serial(serializable: &Self::Serializable) -> Self {
+	fn from_serial(serializable: &Self::Serial) -> Self {
 		InventoryLocationEntity {
 			id: serializable.id.clone(),
 			display_name: serializable.display_name.clone(),
 			internal_name: serializable.internal_name.clone(),
 		}
+	}
+
+	fn to_entity(&self) -> Self::Entity {
+		self.clone()
+	}
+
+	fn from_entity(entity: &Self::Entity) -> Self {
+		entity.clone()
 	}
 }
 
@@ -38,6 +50,9 @@ pub struct InventoryLocationSerial {
 	pub internal_name: String,
 }
 
+impl ShopSerial for InventoryLocationSerial {
+	type Model = InventoryLocationEntity;
+}
 impl JsonHttpResponse for InventoryLocationSerial {}
 impl JsonHttpResponse for Vec<InventoryLocationSerial> {}
 

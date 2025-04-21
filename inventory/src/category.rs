@@ -1,10 +1,10 @@
 use crate::server::JsonHttpResponse;
-use crate::InventoryEntity;
+use crate::{ShopEntity, ShopModel, ShopSerial};
 use serde::{Deserialize, Serialize};
 use sqlx::{PgPool, Pool, Postgres};
 use uuid::Uuid;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct CategoryEntity {
 	pub id: Uuid,
 	pub display_name: String,
@@ -12,8 +12,12 @@ pub struct CategoryEntity {
 	pub parent_id: Option<Uuid>,
 }
 
-impl InventoryEntity for CategoryEntity {
-	type Serializable = CategorySerial;
+impl ShopEntity for CategoryEntity {
+	type Model = Self;
+}
+impl ShopModel for CategoryEntity {
+	type Entity = Self;
+	type Serial = CategorySerial;
 
 	fn to_serial(&self) -> CategorySerial {
 		CategorySerial {
@@ -32,6 +36,14 @@ impl InventoryEntity for CategoryEntity {
 			parent_id: serial.parent_id.clone(),
 		}
 	}
+
+	fn to_entity(&self) -> Self::Entity {
+		self.clone()
+	}
+
+	fn from_entity(entity: &Self::Entity) -> Self {
+		entity.clone()
+	}
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -43,13 +55,16 @@ pub struct CategorySerial {
 	pub parent_id: Option<Uuid>,
 }
 
+impl ShopSerial for CategorySerial {
+	type Model = CategoryEntity;
+}
 impl JsonHttpResponse for CategorySerial {}
 impl JsonHttpResponse for Vec<CategorySerial> {}
 
 mod db {
 	use crate::category::CategoryEntity;
 	use sqlx::postgres::PgQueryResult;
-	use sqlx::{query, query_as, Error, PgPool, Pool, Postgres};
+	use sqlx::{Error, PgPool, Pool, Postgres, query, query_as};
 	use uuid::Uuid;
 
 	pub async fn get_all_categories(pool: &PgPool) -> Result<Vec<CategoryEntity>, Error> {
@@ -58,7 +73,10 @@ mod db {
 			.await
 	}
 
-	pub async fn get_category(pool: &Pool<Postgres>, id: Uuid) -> Result<Option<CategoryEntity>, Error> {
+	pub async fn get_category(
+		pool: &Pool<Postgres>,
+		id: Uuid,
+	) -> Result<Option<CategoryEntity>, Error> {
 		query_as!(CategoryEntity, "SELECT * FROM category WHERE id = $1", id)
 			.fetch_optional(pool)
 			.await
@@ -84,7 +102,7 @@ mod db {
 pub mod route {
 	use super::*;
 	use actix_web::http::StatusCode;
-	use actix_web::{get, post, web, HttpResponseBuilder, Responder};
+	use actix_web::{HttpResponseBuilder, Responder, get, post, web};
 
 	pub fn configurer(config: &mut web::ServiceConfig) {
 		config.service(

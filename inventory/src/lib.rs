@@ -1,12 +1,13 @@
-use rand::prelude::ThreadRng;
+use crate::server::JsonHttpResponse;
 use rand::RngCore;
+use rand::prelude::ThreadRng;
 use uuid::Uuid;
 
 pub mod db;
 pub mod server;
 
-mod error;
 mod category;
+mod error;
 mod inventory_location;
 mod item;
 mod product;
@@ -30,9 +31,35 @@ pub fn random_uuid() -> Uuid {
 }
 
 /// Standard mappings between structs at the service-level and api-level
-pub trait InventoryEntity {
-	type Serializable;
+pub trait ShopModel {
+	type Entity: ShopEntity<Model = Self>;
+	type Serial: ShopSerial<Model = Self>;
 
-	fn to_serial(&self) -> Self::Serializable;
-	fn from_serial(serializable: &Self::Serializable) -> Self;
+	fn to_serial(&self) -> Self::Serial;
+	fn from_serial(serializable: &Self::Serial) -> Self;
+
+	fn to_entity(&self) -> Self::Entity;
+	fn from_entity(entity: &Self::Entity) -> Self;
+}
+
+pub trait ShopEntity: Sized {
+	type Model: ShopModel<Entity = Self>;
+
+	fn to_model(&self) -> Self::Model {
+		Self::Model::from_entity(self)
+	}
+	fn from_model(model: &Self::Model) -> Self {
+		Self::Model::to_entity(model)
+	}
+}
+
+pub trait ShopSerial: Sized {
+	type Model: ShopModel<Serial = Self>;
+
+	fn to_model(&self) -> Self::Model {
+		Self::Model::from_serial(self)
+	}
+	fn from_model(model: &Self::Model) -> Self {
+		Self::Model::to_serial(model)
+	}
 }
