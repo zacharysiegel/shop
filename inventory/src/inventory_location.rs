@@ -1,3 +1,4 @@
+use crate::error::ShopError;
 use crate::server::JsonHttpResponse;
 use crate::{ShopEntity, ShopModel, ShopSerial};
 use serde::{Deserialize, Serialize};
@@ -25,20 +26,20 @@ impl ShopModel for InventoryLocationEntity {
 		}
 	}
 
-	fn from_serial(serializable: &Self::Serial) -> Self {
-		InventoryLocationEntity {
+	fn try_from_serial(serializable: &Self::Serial) -> Result<Self, ShopError> {
+		Ok(InventoryLocationEntity {
 			id: serializable.id.clone(),
 			display_name: serializable.display_name.clone(),
 			internal_name: serializable.internal_name.clone(),
-		}
+		})
 	}
 
 	fn to_entity(&self) -> Self::Entity {
 		self.clone()
 	}
 
-	fn from_entity(entity: &Self::Entity) -> Self {
-		entity.clone()
+	fn try_from_entity(entity: &Self::Entity) -> Result<Self, ShopError> {
+		Ok(entity.clone())
 	}
 }
 
@@ -110,7 +111,10 @@ pub mod route {
 		body: web::Json<InventoryLocationSerial>,
 	) -> impl Responder {
 		let inventory_location = body.into_inner();
-		let inventory_location = InventoryLocationEntity::from_serial(&inventory_location);
+		let Ok(inventory_location) = InventoryLocationEntity::try_from_serial(&inventory_location)
+		else {
+			return HttpResponseBuilder::new(StatusCode::BAD_REQUEST).finish();
+		};
 
 		let result = db::create_inventory_location(&pgpool, inventory_location).await;
 		match result {

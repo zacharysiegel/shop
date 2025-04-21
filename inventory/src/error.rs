@@ -3,12 +3,12 @@ use std::fmt;
 use std::fmt::{Display, Formatter};
 
 #[derive(Debug)]
-pub struct InventoryError {}
+pub struct ShopError {}
 
-impl Display for InventoryError {
+impl Display for ShopError {
 	fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
 		write!(f, "InventoryError")
 	}
 }
 
-impl Error for InventoryError {}
+impl Error for ShopError {}

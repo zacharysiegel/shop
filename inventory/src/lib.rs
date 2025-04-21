@@ -1,4 +1,4 @@
-use crate::server::JsonHttpResponse;
+use crate::error::ShopError;
 use rand::RngCore;
 use rand::prelude::ThreadRng;
 use uuid::Uuid;
@@ -31,22 +31,22 @@ pub fn random_uuid() -> Uuid {
 }
 
 /// Standard mappings between structs at the db-level, service-level, and api-level
-pub trait ShopModel {
+pub trait ShopModel: Sized {
 	type Entity: ShopEntity<Model = Self>;
 	type Serial: ShopSerial<Model = Self>;
 
 	fn to_serial(&self) -> Self::Serial;
-	fn from_serial(serializable: &Self::Serial) -> Self;
+	fn try_from_serial(serializable: &Self::Serial) -> Result<Self, ShopError>;
 
 	fn to_entity(&self) -> Self::Entity;
-	fn from_entity(entity: &Self::Entity) -> Self;
+	fn try_from_entity(entity: &Self::Entity) -> Result<Self, ShopError>;
 }
 
 pub trait ShopEntity: Sized {
 	type Model: ShopModel<Entity = Self>;
 
-	fn to_model(&self) -> Self::Model {
-		Self::Model::from_entity(self)
+	fn to_model(&self) -> Result<Self::Model, ShopError> {
+		Self::Model::try_from_entity(self)
 	}
 	fn from_model(model: &Self::Model) -> Self {
 		Self::Model::to_entity(model)
@@ -56,8 +56,8 @@ pub trait ShopEntity: Sized {
 pub trait ShopSerial: Sized {
 	type Model: ShopModel<Serial = Self>;
 
-	fn to_model(&self) -> Self::Model {
-		Self::Model::from_serial(self)
+	fn to_model(&self) -> Result<Self::Model, ShopError> {
+		Self::Model::try_from_serial(self)
 	}
 	fn from_model(model: &Self::Model) -> Self {
 		Self::Model::to_serial(model)

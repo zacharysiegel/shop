@@ -1,3 +1,4 @@
+use crate::error::ShopError;
 use crate::server::JsonHttpResponse;
 use crate::{ShopEntity, ShopModel, ShopSerial};
 use chrono::{DateTime, Utc};
@@ -35,8 +36,8 @@ impl ShopModel for ProductEntity {
 		}
 	}
 
-	fn from_serial(serializable: &Self::Serial) -> Self {
-		ProductEntity {
+	fn try_from_serial(serializable: &Self::Serial) -> Result<Self, ShopError> {
+		Ok(ProductEntity {
 			id: serializable.id.clone(),
 			display_name: serializable.display_name.clone(),
 			internal_name: serializable.internal_name.clone(),
@@ -44,15 +45,15 @@ impl ShopModel for ProductEntity {
 			release_date: serializable.release_date.clone(),
 			created: Utc::now(),
 			updated: Utc::now(),
-		}
+		})
 	}
 
 	fn to_entity(&self) -> Self::Entity {
 		self.clone()
 	}
 
-	fn from_entity(entity: &Self::Entity) -> Self {
-		entity.clone()
+	fn try_from_entity(entity: &Self::Entity) -> Result<Self, ShopError> {
+		Ok(entity.clone())
 	}
 }
 
@@ -205,7 +206,9 @@ pub mod route {
 		pgpool: web::Data<PgPool>,
 		body: web::Json<ProductSerial>,
 	) -> impl Responder {
-		let product: ProductEntity = ProductEntity::from_serial(&body.into_inner());
+		let Ok(product) = ProductEntity::try_from_serial(&body.into_inner()) else {
+			return HttpResponseBuilder::new(StatusCode::BAD_REQUEST).finish();
+		};
 
 		let result: Result<PgQueryResult, Error> = db::create_product(&pgpool, product).await;
 		match result {

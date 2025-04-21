@@ -1,3 +1,4 @@
+use crate::error::ShopError;
 use crate::server::JsonHttpResponse;
 use crate::{ShopEntity, ShopModel, ShopSerial};
 use serde::{Deserialize, Serialize};
@@ -28,21 +29,21 @@ impl ShopModel for CategoryEntity {
 		}
 	}
 
-	fn from_serial(serial: &CategorySerial) -> CategoryEntity {
-		CategoryEntity {
+	fn try_from_serial(serial: &CategorySerial) -> Result<CategoryEntity, ShopError> {
+		Ok(CategoryEntity {
 			id: serial.id.clone(),
 			display_name: serial.display_name.clone(),
 			internal_name: serial.internal_name.clone(),
 			parent_id: serial.parent_id.clone(),
-		}
+		})
 	}
 
 	fn to_entity(&self) -> Self::Entity {
 		self.clone()
 	}
 
-	fn from_entity(entity: &Self::Entity) -> Self {
-		entity.clone()
+	fn try_from_entity(entity: &Self::Entity) -> Result<CategoryEntity, ShopError> {
+		Ok(entity.clone())
 	}
 }
 
@@ -64,7 +65,7 @@ impl JsonHttpResponse for Vec<CategorySerial> {}
 mod db {
 	use crate::category::CategoryEntity;
 	use sqlx::postgres::PgQueryResult;
-	use sqlx::{Error, PgPool, Pool, Postgres, query, query_as};
+	use sqlx::{query, query_as, Error, PgPool, Pool, Postgres};
 	use uuid::Uuid;
 
 	pub async fn get_all_categories(pool: &PgPool) -> Result<Vec<CategoryEntity>, Error> {
@@ -102,7 +103,7 @@ mod db {
 pub mod route {
 	use super::*;
 	use actix_web::http::StatusCode;
-	use actix_web::{HttpResponseBuilder, Responder, get, post, web};
+	use actix_web::{get, post, web, HttpResponseBuilder, Responder};
 
 	pub fn configurer(config: &mut web::ServiceConfig) {
 		config.service(
@@ -149,7 +150,9 @@ pub mod route {
 		pgpool: web::Data<Pool<Postgres>>,
 		body: web::Json<CategorySerial>,
 	) -> impl Responder {
-		let category = CategoryEntity::from_serial(&body.into_inner());
+		let Ok(category) = CategoryEntity::try_from_serial(&body.into_inner()) else {
+			return HttpResponseBuilder::new(StatusCode::BAD_REQUEST).finish();
+		};
 
 		let result = db::create_category(&pgpool, category).await;
 		match result {
