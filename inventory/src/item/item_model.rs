@@ -204,7 +204,3 @@ impl ShopSerial for ItemSerial {
 }
 impl JsonHttpResponse for ItemSerial {}
 impl JsonHttpResponse for Vec<ItemSerial> {}
-
-mod db {}
-
-pub mod route {}

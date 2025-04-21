@@ -1,0 +1,35 @@
+use super::*;
+use sqlx::postgres::PgQueryResult;
+use sqlx::{Error, PgPool, Pool, Postgres, query, query_as};
+use uuid::Uuid;
+
+pub async fn get_all_categories(pool: &PgPool) -> Result<Vec<CategoryEntity>, Error> {
+	query_as!(CategoryEntity, "SELECT * FROM category")
+		.fetch_all(pool)
+		.await
+}
+
+pub async fn get_category(
+	pool: &Pool<Postgres>,
+	id: Uuid,
+) -> Result<Option<CategoryEntity>, Error> {
+	query_as!(CategoryEntity, "SELECT * FROM category WHERE id = $1", id)
+		.fetch_optional(pool)
+		.await
+}
+
+// todo: restrict to authenticated administrator
+pub async fn create_category(
+	pool: &Pool<Postgres>,
+	category: CategoryEntity,
+) -> Result<PgQueryResult, Error> {
+	query!(
+		"insert into category (id, display_name, internal_name, parent_id) values ($1, $2, $3, $4)",
+		category.id,
+		category.display_name,
+		category.internal_name,
+		category.parent_id
+	)
+	.execute(pool)
+	.await
+}

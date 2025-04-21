@@ -8,9 +8,9 @@ pub mod server;
 
 mod category;
 mod error;
-mod inventory_location;
 mod item;
 mod product;
+mod inventory_location;
 
 pub mod env {
 	pub fn load_env() -> Result<(), std::io::Error> {
