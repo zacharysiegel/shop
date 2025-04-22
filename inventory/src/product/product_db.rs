@@ -74,7 +74,7 @@ pub async fn create_product_category_association(
 	.await
 }
 
-pub async fn get_product_items(
+pub async fn get_all_product_items(
 	pgpool: &PgPool,
 	product_id: Uuid,
 ) -> Result<Vec<ItemEntity>, Error> {

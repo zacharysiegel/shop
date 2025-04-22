@@ -108,7 +108,7 @@ async fn get_product_items(
 		return HttpResponseBuilder::new(StatusCode::INTERNAL_SERVER_ERROR).finish();
 	};
 
-	let Ok(items) = product_db::get_product_items(&pgpool, product_id).await else {
+	let Ok(items) = product_db::get_all_product_items(&pgpool, product_id).await else {
 		return HttpResponseBuilder::new(StatusCode::INTERNAL_SERVER_ERROR).finish();
 	};
 
