@@ -6,7 +6,7 @@ use uuid::Uuid;
 pub async fn get_item(pgpool: &PgPool, item_id: Uuid) -> Result<Option<ItemEntity>, Error> {
     query_as!(ItemEntity, "\
 		select id, product_id, inventory_location_id, condition, status, price_cents, priority, note, acquisition_datetime, acquisition_price_cents, acquisition_location, created, updated \
-		from item \
+		from shop.public.item \
 		where id = $1 \
 		",
 		item_id
@@ -17,7 +17,7 @@ pub async fn get_item(pgpool: &PgPool, item_id: Uuid) -> Result<Option<ItemEntit
 
 pub async fn create_item(pgpool: &PgPool, item: ItemEntity) -> Result<PgQueryResult, Error> {
     query!("\
-		insert into item (id, product_id, inventory_location_id, condition, status, price_cents, priority, note, acquisition_datetime, acquisition_price_cents, acquisition_location, created, updated)\
+		insert into shop.public.item (id, product_id, inventory_location_id, condition, status, price_cents, priority, note, acquisition_datetime, acquisition_price_cents, acquisition_location, created, updated)\
 		values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)\
 		",
 	item.id,

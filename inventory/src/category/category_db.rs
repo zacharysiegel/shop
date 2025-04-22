@@ -5,7 +5,8 @@ use uuid::Uuid;
 
 pub async fn get_all_categories(pool: &PgPool) -> Result<Vec<CategoryEntity>, Error> {
 	query_as!(CategoryEntity, "\
-		select id, display_name, internal_name, parent_id from category \
+		select id, display_name, internal_name, parent_id \
+		from shop.public.category \
 	")
 		.fetch_all(pool)
 		.await
@@ -17,7 +18,7 @@ pub async fn get_category(
 ) -> Result<Option<CategoryEntity>, Error> {
 	query_as!(CategoryEntity, "\
 		select id, display_name, internal_name, parent_id \
-		from category \
+		from shop.public.category \
 		where id = $1 \
 	", id)
 		.fetch_optional(pool)
@@ -29,8 +30,10 @@ pub async fn create_category(
 	pool: &Pool<Postgres>,
 	category: CategoryEntity,
 ) -> Result<PgQueryResult, Error> {
-	query!(
-		"insert into category (id, display_name, internal_name, parent_id) values ($1, $2, $3, $4)",
+	query!("\
+		insert into shop.public.category (id, display_name, internal_name, parent_id) \
+		values ($1, $2, $3, $4) \
+	",
 		category.id,
 		category.display_name,
 		category.internal_name,

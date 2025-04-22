@@ -13,7 +13,7 @@ pub async fn get_product(
 		ProductEntity,
 		"\
 		select id, display_name, internal_name, upc, release_date, created, updated \
-		from product \
+		from shop.public.product \
 		where id = $1 \
 		",
 		product_id
@@ -28,8 +28,8 @@ pub async fn get_product_categories(
 ) -> Result<Vec<CategoryEntity>, Error> {
 	query_as!(CategoryEntity, "
         select category.id, category.display_name, category.internal_name, category.parent_id
-		from category
-        inner join product_category_association on category.id = product_category_association.category_id
+		from shop.public.category
+        inner join shop.public.product_category_association on category.id = product_category_association.category_id
         where product_category_association.product_id = $1
     ", product_id)
         .fetch_all(pgpool)
@@ -42,7 +42,7 @@ pub async fn create_product(
 ) -> Result<PgQueryResult, Error> {
 	query!(
 		"\
-		insert into product (id, display_name, internal_name, upc, release_date, created, updated)\
+		insert into shop.public.product (id, display_name, internal_name, upc, release_date, created, updated)\
 		values ($1, $2, $3, $4, $5, $6, $7)\
 		",
 		product.id,
@@ -64,7 +64,7 @@ pub async fn create_product_category_association(
 ) -> Result<PgQueryResult, Error> {
 	query!(
 		"\
-		insert into product_category_association (category_id, product_id)\
+		insert into shop.public.product_category_association (category_id, product_id)\
 		values ($1, $2)\
 		",
 		category_id,
@@ -82,7 +82,7 @@ pub async fn get_product_items(
 		ItemEntity,
 		"\
 		select id, product_id, inventory_location_id, condition, status, price_cents, priority, note, acquisition_datetime, acquisition_price_cents, acquisition_location, created, updated \
-		from item \
+		from shop.public.item \
 		where product_id = $1 \
 		",
 		product_id

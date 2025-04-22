@@ -5,8 +5,8 @@ use uuid::Uuid;
 
 pub async fn get_label(pgpool: &PgPool, label_id: Uuid) -> Result<Option<Label>, sqlx::Error> {
     query_as!(Label, "\
-        select * \
-        from label \
+        select id, display_name, internal_name \
+        from shop.public.label \
         where id = $1 \
     ", label_id)
         .fetch_optional(pgpool)
@@ -15,7 +15,7 @@ pub async fn get_label(pgpool: &PgPool, label_id: Uuid) -> Result<Option<Label>,
 
 pub async fn create_label(pgpool: &PgPool, label: &Label) -> Result<PgQueryResult, sqlx::Error> {
     query!("\
-        insert into label (id, display_name, internal_name) \
+        insert into shop.public.label (id, display_name, internal_name) \
         values ($1, $2, $3) \
     ",
         label.id,
@@ -29,7 +29,7 @@ pub async fn create_label(pgpool: &PgPool, label: &Label) -> Result<PgQueryResul
 pub async fn get_all_labels(pgpool: &PgPool) -> Result<Vec<Label>, sqlx::Error> {
     query_as!(Label, "\
         select id, display_name, internal_name \
-        from label \
+        from shop.public.label \
     ")
         .fetch_all(pgpool)
         .await
