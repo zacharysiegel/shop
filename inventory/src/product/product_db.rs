@@ -7,7 +7,7 @@ use uuid::Uuid;
 
 pub async fn get_product(
 	pgpool: &PgPool,
-	product_id: Uuid,
+	product_id: &Uuid,
 ) -> Result<Option<ProductEntity>, Error> {
 	query_as!(
 		ProductEntity,
@@ -24,7 +24,7 @@ pub async fn get_product(
 
 pub async fn get_product_categories(
 	pgpool: &PgPool,
-	product_id: Uuid,
+	product_id: &Uuid,
 ) -> Result<Vec<CategoryEntity>, Error> {
 	query_as!(CategoryEntity, "
         select category.id, category.display_name, category.internal_name, category.parent_id
@@ -38,7 +38,7 @@ pub async fn get_product_categories(
 
 pub async fn create_product(
 	pgpool: &PgPool,
-	product: ProductEntity,
+	product: &ProductEntity,
 ) -> Result<PgQueryResult, Error> {
 	query!(
 		"\
@@ -59,8 +59,8 @@ pub async fn create_product(
 
 pub async fn create_product_category_association(
 	pgpool: &PgPool,
-	product_id: Uuid,
-	category_id: Uuid,
+	product_id: &Uuid,
+	category_id: &Uuid,
 ) -> Result<PgQueryResult, Error> {
 	query!(
 		"\
@@ -74,9 +74,25 @@ pub async fn create_product_category_association(
 	.await
 }
 
+pub async fn delete_product_category_association(
+	pgpool: &PgPool,
+	product_id: &Uuid,
+	category_id: &Uuid,
+) -> Result<PgQueryResult, Error> {
+	query!("\
+		delete from shop.public.product_category_association \
+		where product_id = $1 and category_id = $2 \
+	",
+		product_id,
+		category_id
+	)
+		.execute(pgpool)
+		.await
+}
+
 pub async fn get_all_product_items(
 	pgpool: &PgPool,
-	product_id: Uuid,
+	product_id: &Uuid,
 ) -> Result<Vec<ItemEntity>, Error> {
 	query_as!(
 		ItemEntity,

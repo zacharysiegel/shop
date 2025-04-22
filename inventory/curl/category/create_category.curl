@@ -1,0 +1,4 @@
+url = http://localhost:11001/category
+request = POST
+header = "content-type: application/json"
+data = @./category/create_category.json
