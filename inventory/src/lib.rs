@@ -3,6 +3,9 @@ use rand::RngCore;
 use rand::prelude::ThreadRng;
 use uuid::Uuid;
 
+// Declarative macros (macro_rules) must be defined before use
+mod unwrap_http;
+
 pub mod db;
 pub mod server;
 
