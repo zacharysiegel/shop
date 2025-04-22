@@ -12,6 +12,7 @@ mod item;
 mod product;
 mod inventory_location;
 mod label;
+mod item_image;
 
 pub mod env {
 	pub fn load_env() -> Result<(), std::io::Error> {

@@ -1,16 +1,20 @@
 use super::*;
+use crate::item_image::ItemImageSerial;
 use crate::server::JsonHttpResponse;
 use crate::{ShopEntity, ShopModel, ShopSerial};
 use actix_web::http::StatusCode;
-use actix_web::{get, post, web, HttpResponseBuilder, Responder};
+use actix_web::{web, HttpResponse, HttpResponseBuilder, Responder};
 use sqlx::PgPool;
 use uuid::Uuid;
 
 pub fn configurer(config: &mut web::ServiceConfig) {
-    config.service(web::scope("/item").service(get_item).service(create_item));
+    config.service(web::scope("/item")
+        .route("", web::post().to(create_item))
+        .route("/{item_id}", web::get().to(get_item))
+        .route("/{item_id}/image", web::get().to(get_all_item_images))
+    );
 }
 
-#[get("/{item_id}")]
 async fn get_item(pgpool: web::Data<PgPool>, item_id: web::Path<String>) -> impl Responder {
     let Ok(item_id) = Uuid::try_parse(item_id.into_inner().as_str()) else {
         return HttpResponseBuilder::new(StatusCode::INTERNAL_SERVER_ERROR).finish();
@@ -33,7 +37,6 @@ async fn get_item(pgpool: web::Data<PgPool>, item_id: web::Path<String>) -> impl
     }
 }
 
-#[post("")]
 async fn create_item(pgpool: web::Data<PgPool>, item: web::Json<ItemSerial>) -> impl Responder {
     let Ok(item) = item.into_inner().try_to_model() else {
         return HttpResponseBuilder::new(StatusCode::INTERNAL_SERVER_ERROR).finish();
@@ -46,4 +49,25 @@ async fn create_item(pgpool: web::Data<PgPool>, item: web::Json<ItemSerial>) -> 
         }
         Err(_) => HttpResponseBuilder::new(StatusCode::INTERNAL_SERVER_ERROR).finish(),
     }
+}
+
+async fn get_all_item_images(
+    pgpool: web::Data<PgPool>,
+    item_id: web::Path<String>,
+) -> impl Responder {
+    let Ok(item_id) = Uuid::try_parse(item_id.into_inner().as_str()) else {
+        return HttpResponse::BadRequest().finish();
+    };
+
+    let result = crate::item_image::item_image_db::get_all_item_images(&pgpool, item_id)
+        .await;
+    let Ok(item_images) = result else {
+        return HttpResponse::InternalServerError().finish();
+    };
+
+    item_images
+        .iter()
+        .map(|item_image| item_image.to_serial())
+        .collect::<Vec<ItemImageSerial>>()
+        .to_http_response()
 }
