@@ -90,10 +90,10 @@ create table if not exists item_label_association
 create table if not exists item_audit
 (
     id uuid primary key,
-    item_id uuid, -- no foreign key constraint in order to retain this field after potential item deletion
+    item_id uuid not null, -- no foreign key constraint in order to retain this field after potential item deletion
     status_before int not null,
     status_after int not null,
-    initiated_by_admin bool,
+    initiated_by_admin bool not null,
     note text,
     created timestamp with time zone not null
 );
