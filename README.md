@@ -2,7 +2,7 @@
 
 ## Setup instructions for MacOS
 
-### Podman
+### Podman setup
 
 Download and install [Podman](https://podman.io).
 
@@ -17,3 +17,21 @@ Install podman-compose
 
     brew install podman-compose
 
+### Application setup
+
+Start the application database.
+
+    # At the repository root
+    podman compose up -d
+
+Run the migrations via the `schema` application.
+
+    cargo run -p schema
+
+Start the inventory management server.
+
+    cargo run -p inventory
+
+Start the web server.
+
+    cargo run -p storefront
