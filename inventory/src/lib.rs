@@ -1,3 +1,4 @@
+use std::fmt::Debug;
 use crate::error::ShopError;
 use rand::RngCore;
 use rand::prelude::ThreadRng;
@@ -19,6 +20,7 @@ mod item_image;
 mod item_attribute;
 mod item_audit;
 mod metric_counter;
+mod customer;
 
 pub mod env {
 	pub fn load_env() -> Result<(), std::io::Error> {
@@ -39,7 +41,7 @@ pub fn random_uuid() -> Uuid {
 }
 
 /// Standard mappings between structs at the db-level, service-level, and api-level
-pub trait ShopModel: Sized {
+pub trait ShopModel: Sized + Debug {
 	type Entity: ShopEntity<Model = Self>;
 	type Serial: ShopSerial<Model = Self>;
 
@@ -50,7 +52,7 @@ pub trait ShopModel: Sized {
 	fn try_from_entity(entity: &Self::Entity) -> Result<Self, ShopError>;
 }
 
-pub trait ShopEntity: Sized {
+pub trait ShopEntity: Sized + Debug {
 	type Model: ShopModel<Entity = Self>;
 
 	fn try_to_model(&self) -> Result<Self::Model, ShopError> {
@@ -61,7 +63,7 @@ pub trait ShopEntity: Sized {
 	}
 }
 
-pub trait ShopSerial: Sized {
+pub trait ShopSerial: Sized + Debug {
 	type Model: ShopModel<Serial = Self>;
 
 	fn try_to_model(&self) -> Result<Self::Model, ShopError> {

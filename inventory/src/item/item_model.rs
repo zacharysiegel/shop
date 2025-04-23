@@ -6,6 +6,7 @@ use int_enum::IntEnum;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
+#[derive(Debug)]
 pub struct Item {
     pub id: Uuid,
     pub product_id: Uuid,
@@ -26,7 +27,7 @@ pub struct Item {
 
 /// Variants inspired by Ebay: https://www.ebay.com/help/selling/listings/creating-managing-listings/item-conditions-category.
 /// See the "Movies & TV, Music, Video Games" section.
-#[derive(IntEnum, Clone)] // todo: Reimplement this myself and remove the int-enum dependency
+#[derive(IntEnum, Debug, Clone)] // todo: Reimplement this myself and remove the int-enum dependency
 #[repr(u8)]
 pub enum ItemCondition {
     Inapplicable = 0,
@@ -50,7 +51,7 @@ impl ItemCondition {
     }
 }
 
-#[derive(Debug, Clone, IntEnum)]
+#[derive(IntEnum, Debug, Clone)]
 #[repr(u8)]
 pub enum ItemStatus {
     /// Item is only partially constructed and expects modifications before publishing
