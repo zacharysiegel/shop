@@ -17,6 +17,7 @@ mod inventory_location;
 mod label;
 mod item_image;
 mod item_attribute;
+mod item_audit;
 
 pub mod env {
 	pub fn load_env() -> Result<(), std::io::Error> {

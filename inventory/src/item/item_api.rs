@@ -7,6 +7,7 @@ use actix_web::{web, HttpResponse, HttpResponseBuilder, Responder};
 use sqlx::PgPool;
 use sqlx::postgres::PgQueryResult;
 use uuid::Uuid;
+use crate::item_audit::{item_audit_db, ItemAuditModel, ItemAuditSerial};
 use crate::label::LabelSerial;
 
 pub fn configurer(config: &mut web::ServiceConfig) {
@@ -17,6 +18,7 @@ pub fn configurer(config: &mut web::ServiceConfig) {
         .route("/{item_id}/label", web::get().to(get_all_item_labels))
         .route("/{item_id}/label/{label_id}", web::post().to(create_item_label_association))
         .route("/{item_id}/label/{label_id}", web::delete().to(delete_item_label_association))
+        .route("/{item_id}/item_audit", web::get().to(get_all_item_item_audits))
     );
 }
 
@@ -117,4 +119,25 @@ async fn delete_item_label_association(
         item_db::delete_item_label_association(&pgpool, &item_id, &label_id).await
     );
     HttpResponse::Ok().body(query_result.rows_affected().to_string())
+}
+
+async fn get_all_item_item_audits(
+    pgpool: web::Data<PgPool>,
+    item_id: web::Path<String>,
+) -> impl Responder {
+    let item_id = unwrap_result_else_400!(Uuid::parse_str(&item_id));
+
+    let item_audit_entity_vec = unwrap_result_else_500!(
+        item_audit_db::get_all_item_item_audits(&pgpool, &item_id).await
+    );
+    let mut item_audit_model_vec: Vec<ItemAuditModel> = Vec::new();
+    for item_audit_entity in item_audit_entity_vec {
+        item_audit_model_vec.push(unwrap_result_else_500!(item_audit_entity.try_to_model()));
+    }
+
+    item_audit_model_vec
+        .iter()
+        .map(|audit_model| audit_model.to_serial())
+        .collect::<Vec<ItemAuditSerial>>()
+        .to_http_response()
 }
