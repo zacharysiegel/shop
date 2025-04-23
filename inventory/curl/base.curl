@@ -1,0 +1,5 @@
+config = ./local.curl
+
+variable = scheme=http
+expand-variable = base_url={{scheme}}://{{host}}:{{port}}
+variable = "json=Content-Type: application/json"

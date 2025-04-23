@@ -1,0 +1,6 @@
+config = ./base.curl
+
+expand-url = {{base_url}}/metric/counter
+request = POST
+expand-header = {{json}}
+data = @./metric/create_metric_counter.json

@@ -18,6 +18,7 @@ mod label;
 mod item_image;
 mod item_attribute;
 mod item_audit;
+mod metric_counter;
 
 pub mod env {
 	pub fn load_env() -> Result<(), std::io::Error> {

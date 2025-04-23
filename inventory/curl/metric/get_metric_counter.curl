@@ -1,0 +1,5 @@
+config = ./base.curl
+variable = metric_id=6a548832-297d-3fc3-e7c9-a6d88b334830
+
+expand-url = {{base_url}}/metric/counter/{{metric_id}}
+request = GET
