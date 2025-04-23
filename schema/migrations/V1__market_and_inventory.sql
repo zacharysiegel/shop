@@ -106,6 +106,7 @@ create table if not exists metric_counter
     object_id text unique nulls distinct, -- could be a foreign key to several tables, but this is not constrained
     value bigint not null
 );
+create index if not exists idx_metric_counter_internal_name on metric_counter (internal_name);
 
 -- On storing addresses: https://web.archive.org/web/20191008203135/http://www.endswithsaurus.com/2009/07/lesson-in-address-storage.html
 create table if not exists customer
