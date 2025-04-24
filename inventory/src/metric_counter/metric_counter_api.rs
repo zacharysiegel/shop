@@ -3,8 +3,7 @@ use crate::server::JsonHttpResponse;
 use crate::{unwrap_option_else_404, unwrap_result_else_400, unwrap_result_else_500, ShopModel, ShopSerial};
 use actix_web::web::ServiceConfig;
 use actix_web::{web, HttpResponse, Responder};
-use serde::de::DeserializeOwned;
-use serde::{Deserialize, Deserializer};
+use serde::Deserialize;
 use sqlx::PgPool;
 use uuid::Uuid;
 

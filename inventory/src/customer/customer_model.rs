@@ -1,10 +1,10 @@
+use crate::error::ShopError;
+use crate::server::JsonHttpResponse;
+use crate::{impl_try_from_custom, ShopEntity, ShopModel, ShopSerial};
 use chrono::{DateTime, Utc};
 use int_enum::IntEnum;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
-use crate::{ShopEntity, ShopModel, ShopSerial};
-use crate::error::ShopError;
-use crate::server::JsonHttpResponse;
 
 #[derive(Debug)]
 pub struct CustomerEntity {
@@ -17,7 +17,7 @@ pub struct CustomerEntity {
     pub status: i32,
     pub shipping_street_address: Option<String>,
     pub shipping_municipality: Option<String>,
-    pub shipping_district: Option<String> ,
+    pub shipping_district: Option<String>,
     pub shipping_postal_area: Option<String>,
     pub shipping_country: Option<String>,
     pub billing_street_address: Option<String>,
@@ -45,7 +45,7 @@ pub struct CustomerModel {
     pub status: CustomerStatus,
     pub shipping_street_address: Option<String>,
     pub shipping_municipality: Option<String>, // minor + major
-    pub shipping_district: Option<String> ,
+    pub shipping_district: Option<String>,
     pub shipping_postal_area: Option<String>,
     pub shipping_country: Option<String>,
     pub billing_street_address: Option<String>, // street number + number suffix + street name + street type + direction + address type + sub id
@@ -62,19 +62,99 @@ impl ShopModel for CustomerModel {
     type Serial = CustomerSerial;
 
     fn to_serial(&self) -> Self::Serial {
-        todo!()
+        Self::Serial {
+            id: self.id.clone(),
+            email_address: self.email_address.clone(),
+            phone_number: self.phone_number.clone(),
+            password_hash: self.password_hash.clone(),
+            display_name: self.display_name.clone(),
+            role: self.role.clone() as u8,
+            status: self.status.clone() as u8,
+            shipping_street_address: self.shipping_street_address.clone(),
+            shipping_municipality: self.shipping_municipality.clone(),
+            shipping_district: self.shipping_district.clone(),
+            shipping_postal_area: self.shipping_postal_area.clone(),
+            shipping_country: self.shipping_country.clone(),
+            billing_street_address: self.billing_street_address.clone(),
+            billing_municipality: self.billing_municipality.clone(),
+            billing_district: self.billing_district.clone(),
+            billing_postal_area: self.billing_postal_area.clone(),
+            billing_country: self.billing_country.clone(),
+            created: self.created.clone(),
+            updated: self.updated.clone(),
+        }
     }
 
     fn try_from_serial(serial: &Self::Serial) -> Result<Self, ShopError> {
-        todo!()
+        Ok(Self {
+            id: serial.id.clone(),
+            email_address: serial.email_address.clone(),
+            phone_number: serial.phone_number.clone(),
+            password_hash: serial.password_hash.clone(),
+            display_name: serial.display_name.clone(),
+            role: CustomerRole::try_from_with_shoperror(serial.role.clone())?,
+            status: CustomerStatus::try_from_with_shoperror(serial.status.clone())?,
+            shipping_street_address: serial.shipping_street_address.clone(),
+            shipping_municipality: serial.shipping_municipality.clone(),
+            shipping_district: serial.shipping_district.clone(),
+            shipping_postal_area: serial.shipping_postal_area.clone(),
+            shipping_country: serial.shipping_country.clone(),
+            billing_street_address: serial.billing_street_address.clone(),
+            billing_municipality: serial.billing_municipality.clone(),
+            billing_district: serial.billing_district.clone(),
+            billing_postal_area: serial.billing_postal_area.clone(),
+            billing_country: serial.billing_country.clone(),
+            created: serial.created.clone(),
+            updated: serial.updated.clone(),
+        })
     }
 
     fn to_entity(&self) -> Self::Entity {
-        todo!()
+        Self::Entity {
+            id: self.id.clone(),
+            email_address: self.email_address.clone(),
+            phone_number: self.phone_number.clone(),
+            password_hash: self.password_hash.clone(),
+            display_name: self.display_name.clone(),
+            role: self.role.clone() as i32,
+            status: self.status.clone() as i32,
+            shipping_street_address: self.shipping_street_address.clone(),
+            shipping_municipality: self.shipping_municipality.clone(),
+            shipping_district: self.shipping_district.clone(),
+            shipping_postal_area: self.shipping_postal_area.clone(),
+            shipping_country: self.shipping_country.clone(),
+            billing_street_address: self.billing_street_address.clone(),
+            billing_municipality: self.billing_municipality.clone(),
+            billing_district: self.billing_district.clone(),
+            billing_postal_area: self.billing_postal_area.clone(),
+            billing_country: self.billing_country.clone(),
+            created: self.created.clone(),
+            updated: self.updated.clone(),
+        }
     }
 
     fn try_from_entity(entity: &Self::Entity) -> Result<Self, ShopError> {
-        todo!()
+        Ok(Self {
+            id: entity.id.clone(),
+            email_address: entity.email_address.clone(),
+            phone_number: entity.phone_number.clone(),
+            password_hash: entity.password_hash.clone(),
+            display_name: entity.display_name.clone(),
+            role: CustomerRole::try_from_with_shoperror(entity.role.clone() as u8)?,
+            status: CustomerStatus::try_from_with_shoperror(entity.status.clone() as u8)?,
+            shipping_street_address: entity.shipping_street_address.clone(),
+            shipping_municipality: entity.shipping_municipality.clone(),
+            shipping_district: entity.shipping_district.clone(),
+            shipping_postal_area: entity.shipping_postal_area.clone(),
+            shipping_country: entity.shipping_country.clone(),
+            billing_street_address: entity.billing_street_address.clone(),
+            billing_municipality: entity.billing_municipality.clone(),
+            billing_district: entity.billing_district.clone(),
+            billing_postal_area: entity.billing_postal_area.clone(),
+            billing_country: entity.billing_country.clone(),
+            created: entity.created.clone(),
+            updated: entity.updated.clone(),
+        })
     }
 }
 
@@ -87,12 +167,16 @@ pub enum CustomerRole {
     Developer,
 }
 
+impl_try_from_custom!(CustomerRole<u8>);
+
 #[derive(IntEnum, Debug, Clone)]
 #[repr(u8)]
 pub enum CustomerStatus {
     Disabled = 0,
     Enabled,
 }
+
+impl_try_from_custom!(CustomerStatus<u8>);
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct CustomerSerial {
@@ -106,7 +190,7 @@ pub struct CustomerSerial {
     pub status: u8,
     pub shipping_street_address: Option<String>,
     pub shipping_municipality: Option<String>,
-    pub shipping_district: Option<String> ,
+    pub shipping_district: Option<String>,
     pub shipping_postal_area: Option<String>,
     pub shipping_country: Option<String>,
     pub billing_street_address: Option<String>,

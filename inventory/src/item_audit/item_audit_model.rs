@@ -52,8 +52,8 @@ impl ShopModel for ItemAuditModel {
         Ok(ItemAuditModel {
             id: serial.id.clone(),
             item_id: serial.item_id.clone(),
-            status_before: ItemStatus::try_from_custom(&serial.status_before)?,
-            status_after: ItemStatus::try_from_custom(&serial.status_after)?,
+            status_before: ItemStatus::try_from_with_shoperror(serial.status_before)?,
+            status_after: ItemStatus::try_from_with_shoperror(serial.status_after)?,
             initiated_by_admin: serial.initiated_by_admin.clone(),
             note: serial.note.clone(),
             created: serial.created.clone(),
@@ -76,8 +76,8 @@ impl ShopModel for ItemAuditModel {
         Ok(ItemAuditModel {
             id: entity.id.clone(),
             item_id: entity.item_id.clone(),
-            status_before: ItemStatus::try_from_custom(&(entity.status_before as u8))?,
-            status_after: ItemStatus::try_from_custom(&(entity.status_after as u8))?,
+            status_before: ItemStatus::try_from_with_shoperror(entity.status_before as u8)?,
+            status_after: ItemStatus::try_from_with_shoperror(entity.status_after as u8)?,
             initiated_by_admin: entity.initiated_by_admin.clone(),
             note: entity.note.clone(),
             created: entity.created.clone(),

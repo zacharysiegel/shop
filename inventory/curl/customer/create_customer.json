@@ -1,0 +1,21 @@
+{
+  "id": null,
+  "email_address": "a@example.com",
+  "phone_number": "777-7777",
+  "password_hash": "asdfasdf",
+  "display_name": "a",
+  "role": 0,
+  "status": 0,
+  "shipping_street_address": null,
+  "shipping_municipality": null,
+  "shipping_district": null,
+  "shipping_postal_area": null,
+  "shipping_country": null,
+  "billing_street_address": null,
+  "billing_municipality": null,
+  "billing_district": null,
+  "billing_postal_area": null,
+  "billing_country": null,
+  "created": "2025-04-23T21:35:40-05:00",
+  "updated": "2025-04-23T21:35:40-05:00"
+}
