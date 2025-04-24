@@ -1,13 +1,13 @@
-use actix_web::http::StatusCode;
-use actix_web::web::ServiceConfig;
-use actix_web::{web, HttpResponseBuilder};
+mod index;
+mod page;
 
-pub fn configuration(config: &mut ServiceConfig) -> () {
+use actix_web::web;
+use actix_web::web::ServiceConfig;
+
+pub fn configurer(config: &mut ServiceConfig) -> () {
     config
         .service(web::scope("/admin")
-            .route(
-                "/test",
-                web::get().to(|| async { HttpResponseBuilder::new(StatusCode::OK).body("test body") }),
-            )
-        );
+            .route("/index.html", web::get().to(index::render))
+        )
+    ;
 }
