@@ -1,0 +1,4 @@
+config = ./base.curl
+
+expand-url = {{base_url}}/marketplace
+request = GET

@@ -1,0 +1,6 @@
+config = ./base.curl
+
+variable = id=e5978ecc-db30-418f-83e4-48120ab2901f
+
+expand-url = {{base_url}}/marketplace/{{id}}
+request = GET

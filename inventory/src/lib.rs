@@ -22,6 +22,7 @@ mod item_attribute;
 mod item_audit;
 mod metric_counter;
 mod customer;
+mod marketplace;
 
 pub mod env {
 	pub fn load_env() -> Result<(), std::io::Error> {
