@@ -5,9 +5,8 @@ pub async fn open_server() -> std::io::Result<()> {
         App::new()
             .wrap(middleware::Logger::default())
             .default_service(web::route().to(HttpResponse::NotFound))
-            .configure(crate::public::configuration)
-            .service(web::scope("/admin").configure(crate::admin::configuration))
-            .service(web::scope("/api").configure(crate::api::configuration))
+            .configure(crate::www::configuration)
+            .configure(crate::admin::configuration)
     })
         .bind("127.0.0.1:11000")?
         .run()
