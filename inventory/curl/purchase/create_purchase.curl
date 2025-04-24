@@ -1,0 +1,6 @@
+config = ./base.curl
+
+expand-url = {{base_url}}/purchase
+expand-header = {{h_json}}
+request = POST
+data = @./purchase/create_purchase.json

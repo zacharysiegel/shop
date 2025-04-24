@@ -20,6 +20,7 @@ pub async fn open_server(pgpool: Pool<Postgres>) -> std::io::Result<()> {
 			.configure(crate::customer::customer_api::configurer)
 			.configure(crate::marketplace::marketplace_api::configurer)
 			.configure(crate::listing::listing_api::configurer)
+			.configure(crate::purchase::purchase_api::configurer)
 	})
 	.bind("127.0.0.1:11001")?
 	.run()

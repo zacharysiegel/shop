@@ -1,6 +1,6 @@
+use crate::marketplace::MarketplaceEntity;
 use sqlx::{query_as, Error, PgPool};
 use uuid::Uuid;
-use crate::marketplace::{MarketplaceEntity, MarketplaceSerial};
 
 pub async fn get_marketplace(
     pgpool: &PgPool,

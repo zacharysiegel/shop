@@ -1,0 +1,5 @@
+config = ./base.curl
+variable = id=4bfc3207-8b95-2cc4-1fe4-cb600619aa70
+
+expand-url = {{base_url}}/purchase/{{id}}
+request = GET

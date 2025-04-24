@@ -2,6 +2,7 @@ use super::*;
 use sqlx::{query, query_as, Error, PgPool};
 use sqlx::postgres::PgQueryResult;
 use uuid::Uuid;
+use crate::purchase::PurchaseEntity;
 
 pub async fn get_customer(
     pgpool: &PgPool,
@@ -47,5 +48,20 @@ pub async fn create_customer(
         customer.updated,
     )
         .execute(pgpool)
+        .await
+}
+
+pub async fn get_all_customer_purchases(
+    pgpool: &PgPool,
+    customer_id: &Uuid,
+) -> Result<Vec<PurchaseEntity>, Error> {
+    query_as!(PurchaseEntity, "\
+        select id, marketplace_id, external_id, customer_id, contact_email_address, listing_id, status, cost_subtotal_cents, cost_tax_cents, cost_shipping_cents, cost_discount_cents, seller_cost_total_cents, shipping_method, payment_method, note, shipping_street_address, shipping_municipality, shipping_district, shipping_postal_area, shipping_country, billing_street_address, billing_municipality, billing_district, billing_postal_area, billing_country, created, updated \
+        from shop.public.purchase \
+        where customer_id = $1 \
+    ",
+        customer_id,
+    )
+        .fetch_all(pgpool)
         .await
 }
