@@ -19,6 +19,18 @@ hr {
 a {
     background-color: transparent;
 }
+a:link {
+    color: royalblue;
+}
+a:visited {
+    color: royalblue;
+}
+a:hover {
+    color: royalblue;
+}
+a:active {
+    color: royalblue;
+}
 
 b, strong {
     font-weight: bolder;
