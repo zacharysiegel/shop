@@ -1,6 +1,6 @@
 use crate::error::ShopError;
 use crate::server::JsonHttpResponse;
-use crate::{impl_try_from_custom, ShopEntity, ShopModel, ShopSerial};
+use crate::{enum_try_from_int_with_shoperror, ShopEntity, ShopModel, ShopSerial};
 use chrono::{DateTime, Utc};
 use int_enum::IntEnum;
 use serde::{Deserialize, Serialize};
@@ -92,8 +92,8 @@ impl ShopModel for CustomerModel {
             phone_number: serial.phone_number.clone(),
             password_hash: serial.password_hash.clone(),
             display_name: serial.display_name.clone(),
-            role: CustomerRole::try_from_with_shoperror(serial.role.clone())?,
-            status: CustomerStatus::try_from_with_shoperror(serial.status.clone())?,
+            role: CustomerRole::try_from_int_with_shoperror(serial.role.clone())?,
+            status: CustomerStatus::try_from_int_with_shoperror(serial.status.clone())?,
             shipping_street_address: serial.shipping_street_address.clone(),
             shipping_municipality: serial.shipping_municipality.clone(),
             shipping_district: serial.shipping_district.clone(),
@@ -140,8 +140,8 @@ impl ShopModel for CustomerModel {
             phone_number: entity.phone_number.clone(),
             password_hash: entity.password_hash.clone(),
             display_name: entity.display_name.clone(),
-            role: CustomerRole::try_from_with_shoperror(entity.role.clone() as u8)?,
-            status: CustomerStatus::try_from_with_shoperror(entity.status.clone() as u8)?,
+            role: CustomerRole::try_from_int_with_shoperror(entity.role.clone() as u8)?,
+            status: CustomerStatus::try_from_int_with_shoperror(entity.status.clone() as u8)?,
             shipping_street_address: entity.shipping_street_address.clone(),
             shipping_municipality: entity.shipping_municipality.clone(),
             shipping_district: entity.shipping_district.clone(),
@@ -167,7 +167,7 @@ pub enum CustomerRole {
     Developer,
 }
 
-impl_try_from_custom!(CustomerRole<u8>);
+enum_try_from_int_with_shoperror!(CustomerRole<u8>);
 
 #[derive(IntEnum, Debug, Clone)]
 #[repr(u8)]
@@ -176,7 +176,7 @@ pub enum CustomerStatus {
     Enabled,
 }
 
-impl_try_from_custom!(CustomerStatus<u8>);
+enum_try_from_int_with_shoperror!(CustomerStatus<u8>);
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct CustomerSerial {

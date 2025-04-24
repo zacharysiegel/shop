@@ -1,0 +1,6 @@
+config = ./base.curl
+
+expand-url = {{base_url}}/listing
+request = POST
+expand-header = {{h_json}}
+data = @./listing/create_listing.json

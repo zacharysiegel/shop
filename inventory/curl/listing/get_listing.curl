@@ -1,0 +1,6 @@
+config = ./base.curl
+
+variable = id=98eaae80-0f12-dcad-c1af-460fac3ae259
+
+expand-url = {{base_url}}/listing/{{id}}
+request = GET

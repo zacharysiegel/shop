@@ -1,6 +1,6 @@
 use crate::error::ShopError;
 use crate::server::JsonHttpResponse;
-use crate::{impl_try_from_custom, ShopEntity, ShopModel, ShopSerial};
+use crate::{enum_try_from_int_with_shoperror, ShopEntity, ShopModel, ShopSerial};
 use chrono::{DateTime, Utc};
 use int_enum::IntEnum;
 use serde::{Deserialize, Serialize};
@@ -39,7 +39,7 @@ pub enum ItemCondition {
     Digital,
 }
 
-impl_try_from_custom!(ItemCondition<u8>);
+enum_try_from_int_with_shoperror!(ItemCondition<u8>);
 
 #[derive(IntEnum, Debug, Clone)]
 #[repr(u8)]
@@ -64,7 +64,7 @@ pub enum ItemStatus {
     Received,
 }
 
-impl_try_from_custom!(ItemStatus<u8>);
+enum_try_from_int_with_shoperror!(ItemStatus<u8>);
 
 impl ShopModel for Item {
     type Entity = ItemEntity;
@@ -93,8 +93,8 @@ impl ShopModel for Item {
             id: serial.id.clone(),
             product_id: serial.product_id.clone(),
             inventory_location_id: serial.inventory_location_id.clone(),
-            condition: ItemCondition::try_from_with_shoperror(serial.condition)?,
-            status: ItemStatus::try_from_with_shoperror(serial.status)?,
+            condition: ItemCondition::try_from_int_with_shoperror(serial.condition)?,
+            status: ItemStatus::try_from_int_with_shoperror(serial.status)?,
             price_cents: serial.price_cents.clone(),
             priority: serial.priority.clone(),
             note: serial.note.clone(),
@@ -129,8 +129,8 @@ impl ShopModel for Item {
             id: entity.id.clone(),
             product_id: entity.product_id.clone(),
             inventory_location_id: entity.inventory_location_id.clone(),
-            condition: ItemCondition::try_from_with_shoperror(entity.condition as u8)?,
-            status: ItemStatus::try_from_with_shoperror(entity.status as u8)?,
+            condition: ItemCondition::try_from_int_with_shoperror(entity.condition as u8)?,
+            status: ItemStatus::try_from_int_with_shoperror(entity.status as u8)?,
             price_cents: 0,
             priority: 0,
             note: None,

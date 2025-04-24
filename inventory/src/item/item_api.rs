@@ -1,14 +1,14 @@
 use super::*;
+use crate::item_audit::{item_audit_db, ItemAuditModel, ItemAuditSerial};
 use crate::item_image::ItemImageSerial;
+use crate::label::LabelSerial;
 use crate::server::JsonHttpResponse;
 use crate::{unwrap_result_else_400, unwrap_result_else_500, ShopEntity, ShopModel, ShopSerial};
 use actix_web::http::StatusCode;
 use actix_web::{web, HttpResponse, HttpResponseBuilder, Responder};
-use sqlx::PgPool;
 use sqlx::postgres::PgQueryResult;
+use sqlx::PgPool;
 use uuid::Uuid;
-use crate::item_audit::{item_audit_db, ItemAuditModel, ItemAuditSerial};
-use crate::label::LabelSerial;
 
 pub fn configurer(config: &mut web::ServiceConfig) {
     config.service(web::scope("/item")
@@ -19,6 +19,7 @@ pub fn configurer(config: &mut web::ServiceConfig) {
         .route("/{item_id}/label/{label_id}", web::post().to(create_item_label_association))
         .route("/{item_id}/label/{label_id}", web::delete().to(delete_item_label_association))
         .route("/{item_id}/item_audit", web::get().to(get_all_item_item_audits))
+        .route("/{item_id}/listing", web::get().to(get_all_item_listings))
     );
 }
 
@@ -140,4 +141,20 @@ async fn get_all_item_item_audits(
         .map(|audit_model| audit_model.to_serial())
         .collect::<Vec<ItemAuditSerial>>()
         .to_http_response()
+}
+
+async fn get_all_item_listings(
+    pgpool: web::Data<PgPool>,
+    item_id: web::Path<String>,
+) -> impl Responder {
+    let item_id = unwrap_result_else_400!(Uuid::try_parse(item_id.into_inner().as_str()));
+    let listing_vec = unwrap_result_else_500!(item_db::get_all_item_listings(&pgpool, &item_id).await);
+
+    let mut listing_serial_vec = Vec::new();
+    for listing_entity in listing_vec {
+        let listing_model = unwrap_result_else_500!(listing_entity.try_to_model());
+        listing_serial_vec.push(listing_model.to_serial());
+    }
+
+    listing_serial_vec.to_http_response()
 }

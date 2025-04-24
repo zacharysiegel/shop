@@ -3,6 +3,7 @@ use crate::label::Label;
 use sqlx::postgres::PgQueryResult;
 use sqlx::{query, query_as, Error, PgPool};
 use uuid::Uuid;
+use crate::listing::ListingEntity;
 
 pub async fn get_item(pgpool: &PgPool, item_id: &Uuid) -> Result<Option<ItemEntity>, Error> {
     query_as!(ItemEntity, "\
@@ -79,4 +80,16 @@ pub async fn delete_item_label_association(pgpool: &PgPool, item_id: &Uuid, labe
 	)
         .execute(pgpool)
         .await
+}
+
+pub async fn get_all_item_listings(pgpool: &PgPool, item_id: &Uuid) -> Result<Vec<ListingEntity>, Error> {
+	query_as!(ListingEntity, "\
+		select * \
+		from shop.public.listing \
+		where item_id = $1 \
+	",
+		item_id,
+	)
+		.fetch_all(pgpool)
+		.await
 }
