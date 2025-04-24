@@ -9,7 +9,7 @@ pub async fn open_server() -> std::io::Result<()> {
             .wrap(middleware::Logger::default())
             .default_service(web::route().to(HttpResponse::NotFound))
             .configure(crate::www::configurer)
-            .configure(crate::admin::configurer)
+            .configure(crate::admin::index_page::configurer)
             .service(ResourceFiles::new("/", generate_static_file_map()).do_not_resolve_defaults())
     })
         .bind("127.0.0.1:11000")?
