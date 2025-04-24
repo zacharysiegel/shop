@@ -1,0 +1,1 @@
+pub const RELATIVE_PATH: &str = "/admin/product";

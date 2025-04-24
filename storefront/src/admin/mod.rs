@@ -1,6 +1,7 @@
 mod index;
 mod page;
 mod item;
+mod product;
 
 use actix_web::web;
 use actix_web::web::ServiceConfig;
