@@ -160,12 +160,12 @@ create table if not exists purchase
     external_id text unique nulls distinct,    -- identify an analogous order with an external marketplace
     customer_id uuid references customer (id), -- optional so non-users can still mae
     contact_email_address text not null,
-    listing_id uuid references listing (id) not null,
+    listing_id uuid references listing (id) not null unique,
     status int not null,                       -- corresponds to enum
     cost_subtotal_cents bigint not null,
     cost_tax_cents bigint not null,
     cost_shipping_cents bigint not null,
-    cont_discount_cents bigint not null,
+    cost_discount_cents bigint not null,
     seller_cost_total_cents bigint not null,
     shipping_method int not null,              -- corresponds to enum
     payment_method int not null,               -- corresponds to enum
