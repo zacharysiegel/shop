@@ -1,7 +1,7 @@
-use maud::{Markup, html};
+use maud::{html, Markup};
 
 pub async fn render() -> Markup {
-	super::page::page(html! {
+    super::page::page(html! {
 		section class="hero" {
 			div class="hero-content" {
 				h1 { "Rare Star Wars Collectibles" }
@@ -24,5 +24,5 @@ pub async fn render() -> Markup {
 			}
 		}
 	})
-	.await
+        .await
 }

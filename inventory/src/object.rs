@@ -1,8 +1,11 @@
-use std::fmt::Debug;
+use crate::error::ShopError;
+use actix_web::http::StatusCode;
+use actix_web::{HttpResponse, HttpResponseBuilder};
 use rand::prelude::ThreadRng;
 use rand::RngCore;
+use serde::Serialize;
+use std::fmt::Debug;
 use uuid::Uuid;
-use crate::error::ShopError;
 
 pub fn random_uuid() -> Uuid {
     let mut rng: ThreadRng = rand::rng();
@@ -44,5 +47,17 @@ pub trait ShopSerial: Sized + Debug {
     }
     fn from_model(model: &Self::Model) -> Self {
         Self::Model::to_serial(model)
+    }
+}
+
+pub trait JsonHttpResponse
+where
+    Self: Sized + Serialize,
+{
+    fn to_http_response(&self) -> HttpResponse {
+        let Ok(json) = serde_json::to_string(&self) else {
+            return HttpResponseBuilder::new(StatusCode::INTERNAL_SERVER_ERROR).body(());
+        };
+        HttpResponseBuilder::new(StatusCode::OK).body(json)
     }
 }

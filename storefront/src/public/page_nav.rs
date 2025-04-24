@@ -1,11 +1,11 @@
-use maud::{DOCTYPE, Markup, html};
+use maud::{html, Markup, DOCTYPE};
 
 const NAV_WIDTH: &str = "17rem";
 const NAV_PADDING: &str = "8px";
 
 /// Deprecated
 pub async fn page_nav(content: Markup) -> Markup {
-	html! {
+    html! {
 		(DOCTYPE)
 		html {
 			head {
@@ -53,7 +53,7 @@ pub async fn page_nav(content: Markup) -> Markup {
 }
 
 fn nav_top() -> Markup {
-	html! {
+    html! {
 		div style="\
 		display: flex;\
 		justify-content: space-between;\
@@ -66,7 +66,7 @@ fn nav_top() -> Markup {
 }
 
 fn nav_bottom() -> Markup {
-	html! {
+    html! {
 		div style="\
 		display: flex;\
 		flex-direction: row;\

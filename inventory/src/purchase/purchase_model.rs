@@ -1,5 +1,5 @@
 use crate::error::ShopError;
-use crate::server::JsonHttpResponse;
+use crate::object::JsonHttpResponse;
 use crate::{enum_try_from_int_with_shoperror, ShopEntity, ShopModel, ShopSerial};
 use chrono::{DateTime, Utc};
 use int_enum::IntEnum;
@@ -122,8 +122,12 @@ impl ShopModel for PurchaseModel {
             cost_shipping_cents: serial.cost_shipping_cents.clone(),
             cost_discount_cents: serial.cost_discount_cents.clone(),
             seller_cost_total_cents: serial.seller_cost_total_cents.clone(),
-            shipping_method: ShippingMethod::try_from_int_with_shoperror(serial.shipping_method.clone())?,
-            payment_method: PaymentMethod::try_from_int_with_shoperror(serial.payment_method.clone())?,
+            shipping_method: ShippingMethod::try_from_int_with_shoperror(
+                serial.shipping_method.clone(),
+            )?,
+            payment_method: PaymentMethod::try_from_int_with_shoperror(
+                serial.payment_method.clone(),
+            )?,
             note: serial.note.clone(),
             shipping_street_address: serial.shipping_street_address.clone(),
             shipping_municipality: serial.shipping_municipality.clone(),
@@ -186,8 +190,12 @@ impl ShopModel for PurchaseModel {
             cost_shipping_cents: entity.cost_shipping_cents.clone(),
             cost_discount_cents: entity.cost_discount_cents.clone(),
             seller_cost_total_cents: entity.seller_cost_total_cents.clone(),
-            shipping_method: ShippingMethod::try_from_int_with_shoperror(entity.shipping_method.clone() as u8)?,
-            payment_method: PaymentMethod::try_from_int_with_shoperror(entity.payment_method.clone() as u8)?,
+            shipping_method: ShippingMethod::try_from_int_with_shoperror(
+                entity.shipping_method.clone() as u8,
+            )?,
+            payment_method: PaymentMethod::try_from_int_with_shoperror(
+                entity.payment_method.clone() as u8,
+            )?,
             note: entity.note.clone(),
             shipping_street_address: entity.shipping_street_address.clone(),
             shipping_municipality: entity.shipping_municipality.clone(),

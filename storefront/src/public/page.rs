@@ -1,7 +1,7 @@
-use maud::{DOCTYPE, Markup, html};
+use maud::{html, Markup, DOCTYPE};
 
 pub async fn page(content: Markup) -> Markup {
-	html! {
+    html! {
 		(DOCTYPE)
 		html {
 			head {

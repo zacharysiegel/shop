@@ -1,5 +1,5 @@
 use crate::error::ShopError;
-use crate::server::JsonHttpResponse;
+use crate::object::JsonHttpResponse;
 use crate::{enum_try_from_int_with_shoperror, ShopEntity, ShopModel, ShopSerial};
 use chrono::{DateTime, Utc};
 use int_enum::IntEnum;
@@ -49,7 +49,7 @@ pub struct CustomerModel {
     pub shipping_postal_area: Option<String>,
     pub shipping_country: Option<String>,
     pub billing_street_address: Option<String>, // street number + number suffix + street name + street type + direction + address type + sub id
-    pub billing_municipality: Option<String>, // minor + major
+    pub billing_municipality: Option<String>,   // minor + major
     pub billing_district: Option<String>,
     pub billing_postal_area: Option<String>,
     pub billing_country: Option<String>,

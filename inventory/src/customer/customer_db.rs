@@ -1,13 +1,10 @@
 use super::*;
-use sqlx::{query, query_as, Error, PgPool};
-use sqlx::postgres::PgQueryResult;
-use uuid::Uuid;
 use crate::purchase::PurchaseEntity;
+use sqlx::postgres::PgQueryResult;
+use sqlx::{query, query_as, Error, PgPool};
+use uuid::Uuid;
 
-pub async fn get_customer(
-    pgpool: &PgPool,
-    id: &Uuid,
-) -> Result<Option<CustomerEntity>, Error> {
+pub async fn get_customer(pgpool: &PgPool, id: &Uuid) -> Result<Option<CustomerEntity>, Error> {
     query_as!(CustomerEntity, "\
         select id, email_address, phone_number, password_hash, display_name, role, status, shipping_street_address, shipping_municipality, shipping_district, shipping_postal_area, shipping_country, billing_street_address, billing_municipality, billing_district, billing_postal_area, billing_country, created, updated \
         from shop.public.customer \

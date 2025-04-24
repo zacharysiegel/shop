@@ -1,5 +1,5 @@
 use crate::label::{label_db, LabelSerial};
-use crate::server::JsonHttpResponse;
+use crate::object::JsonHttpResponse;
 use crate::{ShopModel, ShopSerial};
 use actix_web::web::ServiceConfig;
 use actix_web::{web, HttpResponse, Responder};
@@ -11,14 +11,11 @@ pub fn configurer(config: &mut ServiceConfig) {
         web::scope("/label")
             .route("", web::post().to(create_label))
             .route("", web::get().to(get_all_labels))
-            .route("/{label_id}", web::get().to(get_label))
+            .route("/{label_id}", web::get().to(get_label)),
     );
 }
 
-async fn get_label(
-    pgpool: web::Data<PgPool>,
-    label_id: web::Path<String>,
-) -> impl Responder {
+async fn get_label(pgpool: web::Data<PgPool>, label_id: web::Path<String>) -> impl Responder {
     let Ok(label_id) = Uuid::parse_str(label_id.into_inner().as_ref()) else {
         return HttpResponse::BadRequest().finish();
     };
@@ -28,18 +25,12 @@ async fn get_label(
     };
 
     match label {
-        None => {
-            HttpResponse::NotFound().finish()
-        }
-        Some(label) => {
-            label.to_serial().to_http_response()
-        }
+        None => HttpResponse::NotFound().finish(),
+        Some(label) => label.to_serial().to_http_response(),
     }
 }
 
-async fn get_all_labels(
-    pgpool: web::Data<PgPool>,
-) -> impl Responder {
+async fn get_all_labels(pgpool: web::Data<PgPool>) -> impl Responder {
     let Ok(labels) = label_db::get_all_labels(&pgpool).await else {
         return HttpResponse::InternalServerError().finish();
     };
@@ -51,10 +42,7 @@ async fn get_all_labels(
         .to_http_response()
 }
 
-async fn create_label(
-    pgpool: web::Data<PgPool>,
-    label: web::Json<LabelSerial>,
-) -> impl Responder {
+async fn create_label(pgpool: web::Data<PgPool>, label: web::Json<LabelSerial>) -> impl Responder {
     let result = label
         .into_inner()
         .try_to_model()

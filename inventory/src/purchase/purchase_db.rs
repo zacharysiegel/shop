@@ -1,8 +1,8 @@
-use sqlx::{query, query_as, Error, PgPool};
-use sqlx::postgres::PgQueryResult;
-use uuid::Uuid;
 use crate::listing::ListingEntity;
 use crate::purchase::PurchaseEntity;
+use sqlx::postgres::PgQueryResult;
+use sqlx::{query, query_as, Error, PgPool};
+use uuid::Uuid;
 
 pub async fn create_purchase(
     pgpool: &PgPool,
@@ -48,13 +48,15 @@ pub async fn get_purchase(
     pgpool: &PgPool,
     purchase_id: &Uuid,
 ) -> Result<Option<PurchaseEntity>, Error> {
-    query_as!(PurchaseEntity, "\
+    query_as!(
+		PurchaseEntity,
+		"\
         select * \
         from shop.public.purchase \
         where id = $1 \
     ",
-        purchase_id,
-    )
+		purchase_id,
+	)
         .fetch_optional(pgpool)
         .await
 }

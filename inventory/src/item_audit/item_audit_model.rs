@@ -1,6 +1,6 @@
 use crate::error::ShopError;
 use crate::item::ItemStatus;
-use crate::server::JsonHttpResponse;
+use crate::object::JsonHttpResponse;
 use crate::{ShopEntity, ShopModel, ShopSerial};
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};

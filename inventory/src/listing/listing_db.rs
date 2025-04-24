@@ -1,7 +1,7 @@
-use sqlx::{query, query_as, Error, PgPool};
-use sqlx::postgres::PgQueryResult;
-use uuid::Uuid;
 use crate::listing::ListingEntity;
+use sqlx::postgres::PgQueryResult;
+use sqlx::{query, query_as, Error, PgPool};
+use uuid::Uuid;
 
 pub async fn create_listing(
     pgpool: &PgPool,
@@ -27,13 +27,15 @@ pub async fn get_listing(
     pgpool: &PgPool,
     listing_id: &Uuid,
 ) -> Result<Option<ListingEntity>, Error> {
-    query_as!(ListingEntity, "\
+    query_as!(
+		ListingEntity,
+		"\
         select * \
         from shop.public.listing \
         where id = $1 \
     ",
-        listing_id
-    )
+		listing_id
+	)
         .fetch_optional(pgpool)
         .await
 }

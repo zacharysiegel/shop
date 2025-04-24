@@ -2,14 +2,14 @@ use super::*;
 use crate::category::CategoryEntity;
 use crate::item::ItemEntity;
 use sqlx::postgres::PgQueryResult;
-use sqlx::{Error, PgPool, query, query_as};
+use sqlx::{query, query_as, Error, PgPool};
 use uuid::Uuid;
 
 pub async fn get_product(
-	pgpool: &PgPool,
-	product_id: &Uuid,
+    pgpool: &PgPool,
+    product_id: &Uuid,
 ) -> Result<Option<ProductEntity>, Error> {
-	query_as!(
+    query_as!(
 		ProductEntity,
 		"\
 		select id, display_name, internal_name, upc, release_date, created, updated \
@@ -18,15 +18,15 @@ pub async fn get_product(
 		",
 		product_id
 	)
-	.fetch_optional(pgpool)
-	.await
+        .fetch_optional(pgpool)
+        .await
 }
 
 pub async fn get_product_categories(
-	pgpool: &PgPool,
-	product_id: &Uuid,
+    pgpool: &PgPool,
+    product_id: &Uuid,
 ) -> Result<Vec<CategoryEntity>, Error> {
-	query_as!(CategoryEntity, "
+    query_as!(CategoryEntity, "
         select category.id, category.display_name, category.internal_name, category.parent_id
 		from shop.public.category
         inner join shop.public.product_category_association on category.id = product_category_association.category_id
@@ -37,10 +37,10 @@ pub async fn get_product_categories(
 }
 
 pub async fn create_product(
-	pgpool: &PgPool,
-	product: &ProductEntity,
+    pgpool: &PgPool,
+    product: &ProductEntity,
 ) -> Result<PgQueryResult, Error> {
-	query!(
+    query!(
 		"\
 		insert into shop.public.product (id, display_name, internal_name, upc, release_date, created, updated)\
 		values ($1, $2, $3, $4, $5, $6, $7)\
@@ -53,16 +53,16 @@ pub async fn create_product(
 		product.created,
 		product.updated
 	)
-	.execute(pgpool)
-	.await
+        .execute(pgpool)
+        .await
 }
 
 pub async fn create_product_category_association(
-	pgpool: &PgPool,
-	product_id: &Uuid,
-	category_id: &Uuid,
+    pgpool: &PgPool,
+    product_id: &Uuid,
+    category_id: &Uuid,
 ) -> Result<PgQueryResult, Error> {
-	query!(
+    query!(
 		"\
 		insert into shop.public.product_category_association (category_id, product_id)\
 		values ($1, $2)\
@@ -70,31 +70,32 @@ pub async fn create_product_category_association(
 		category_id,
 		product_id,
 	)
-	.execute(pgpool)
-	.await
+        .execute(pgpool)
+        .await
 }
 
 pub async fn delete_product_category_association(
-	pgpool: &PgPool,
-	product_id: &Uuid,
-	category_id: &Uuid,
+    pgpool: &PgPool,
+    product_id: &Uuid,
+    category_id: &Uuid,
 ) -> Result<PgQueryResult, Error> {
-	query!("\
+    query!(
+		"\
 		delete from shop.public.product_category_association \
 		where product_id = $1 and category_id = $2 \
 	",
 		product_id,
 		category_id
 	)
-		.execute(pgpool)
-		.await
+        .execute(pgpool)
+        .await
 }
 
 pub async fn get_all_product_items(
-	pgpool: &PgPool,
-	product_id: &Uuid,
+    pgpool: &PgPool,
+    product_id: &Uuid,
 ) -> Result<Vec<ItemEntity>, Error> {
-	query_as!(
+    query_as!(
 		ItemEntity,
 		"\
 		select id, product_id, inventory_location_id, condition, status, price_cents, priority, note, acquisition_datetime, acquisition_price_cents, acquisition_location, created, updated \
@@ -103,6 +104,6 @@ pub async fn get_all_product_items(
 		",
 		product_id
 	)
-	.fetch_all(pgpool)
-	.await
+        .fetch_all(pgpool)
+        .await
 }

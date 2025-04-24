@@ -1,9 +1,9 @@
 use super::*;
 use crate::label::Label;
+use crate::listing::ListingEntity;
 use sqlx::postgres::PgQueryResult;
 use sqlx::{query, query_as, Error, PgPool};
 use uuid::Uuid;
-use crate::listing::ListingEntity;
 
 pub async fn get_item(pgpool: &PgPool, item_id: &Uuid) -> Result<Option<ItemEntity>, Error> {
     query_as!(ItemEntity, "\
@@ -40,16 +40,17 @@ pub async fn create_item(pgpool: &PgPool, item: &ItemEntity) -> Result<PgQueryRe
         .await
 }
 
-pub async fn get_all_item_labels(
-    pgpool: &PgPool,
-    item_id: &Uuid,
-) -> Result<Vec<Label>, Error> {
-    query_as!(Label, "
+pub async fn get_all_item_labels(pgpool: &PgPool, item_id: &Uuid) -> Result<Vec<Label>, Error> {
+    query_as!(
+		Label,
+		"
         select id, display_name, internal_name
 		from shop.public.label
         inner join shop.public.item_label_association on label.id = item_label_association.label_id
         where item_label_association.item_id = $1
-    ", item_id)
+    ",
+		item_id
+	)
         .fetch_all(pgpool)
         .await
 }
@@ -59,7 +60,8 @@ pub async fn create_item_label_association(
     item_id: &Uuid,
     label_id: &Uuid,
 ) -> Result<PgQueryResult, Error> {
-    query!("\
+    query!(
+		"\
 		insert into shop.public.item_label_association (item_id, label_id) \
 		values ($1, $2) \
 	",
@@ -70,8 +72,13 @@ pub async fn create_item_label_association(
         .await
 }
 
-pub async fn delete_item_label_association(pgpool: &PgPool, item_id: &Uuid, label_id: &Uuid) -> Result<PgQueryResult, Error> {
-    query!("\
+pub async fn delete_item_label_association(
+    pgpool: &PgPool,
+    item_id: &Uuid,
+    label_id: &Uuid,
+) -> Result<PgQueryResult, Error> {
+    query!(
+		"\
 		delete from shop.public.item_label_association \
 		where item_id = $1 and label_id = $2 \
 	",
@@ -82,14 +89,19 @@ pub async fn delete_item_label_association(pgpool: &PgPool, item_id: &Uuid, labe
         .await
 }
 
-pub async fn get_all_item_listings(pgpool: &PgPool, item_id: &Uuid) -> Result<Vec<ListingEntity>, Error> {
-	query_as!(ListingEntity, "\
+pub async fn get_all_item_listings(
+    pgpool: &PgPool,
+    item_id: &Uuid,
+) -> Result<Vec<ListingEntity>, Error> {
+    query_as!(
+		ListingEntity,
+		"\
 		select * \
 		from shop.public.listing \
 		where item_id = $1 \
 	",
 		item_id,
 	)
-		.fetch_all(pgpool)
-		.await
+        .fetch_all(pgpool)
+        .await
 }

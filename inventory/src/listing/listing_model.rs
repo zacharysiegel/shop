@@ -1,5 +1,5 @@
 use crate::error::ShopError;
-use crate::server::JsonHttpResponse;
+use crate::object::JsonHttpResponse;
 use crate::{enum_try_from_int_with_shoperror, ShopEntity, ShopModel, ShopSerial};
 use chrono::{DateTime, Utc};
 use int_enum::IntEnum;
