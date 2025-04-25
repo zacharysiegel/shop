@@ -1,5 +1,6 @@
 :root {
     --link-color: rgb(183, 189, 248); /* Lavender (I also like Rosewater: rgb(244, 219, 214)) */
+    line-height: 1.2;
 }
 
 a {
