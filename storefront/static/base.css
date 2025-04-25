@@ -3,21 +3,15 @@
     line-height: 1.2;
 }
 
-a {
-    color: var(--link-color);
+h1, h2, h3, h4, h5, h6 {
+    margin-bottom: .5rem;
 }
-a:link {
-    color: var(--link-color);
-}
-a:visited {
-    color: var(--link-color);
-}
-a:hover {
-    color: var(--link-color);
-}
-a:active {
-    color: var(--link-color);
-}
+
+a,
+a:link,
+a:visited,
+a:hover,
+a:active,
 a:-webkit-any-link {
     color: var(--link-color);
 }

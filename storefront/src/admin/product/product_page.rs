@@ -36,6 +36,7 @@ async fn left() -> Markup {
         }
     };
     html! {
+        h2 {"All products"}
         ol {
             @for product in &product_vec {
                 li {
@@ -48,6 +49,7 @@ async fn left() -> Markup {
 
 fn right() -> Markup {
     html! {
+        h2 {"Create product"}
         "right side"
     }
 }
