@@ -69,3 +69,4 @@ impl ShopSerial for ProductSerial {
     type Model = ProductEntity;
 }
 impl JsonHttpResponse for ProductSerial {}
+impl JsonHttpResponse for Vec<ProductSerial> {}

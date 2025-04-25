@@ -4,3 +4,4 @@ mod page;
 mod item;
 mod product;
 mod split;
+mod registry;

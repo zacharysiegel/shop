@@ -5,21 +5,22 @@ mod macro_http;
 pub mod db;
 pub mod env;
 pub mod server;
+pub mod error;
+pub mod object;
 
-mod category;
-mod customer;
-mod error;
-mod inventory_location;
-mod item;
-mod item_attribute;
-mod item_audit;
-mod item_image;
-mod label;
-mod listing;
-mod marketplace;
-mod metric_counter;
-mod object;
-mod product;
-mod purchase;
+// Models
+pub mod category;
+pub mod customer;
+pub mod inventory_location;
+pub mod item;
+pub mod item_attribute;
+pub mod item_audit;
+pub mod item_image;
+pub mod label;
+pub mod listing;
+pub mod marketplace;
+pub mod metric_counter;
+pub mod product;
+pub mod purchase;
 
 pub use object::*;

@@ -4,6 +4,7 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
+inventory = { path = "../inventory", version = "*" }
 log = { version = "0.4" }
 env_logger = { version = "0.11.8" }
 actix-web = { version = "4.10" }
@@ -11,6 +12,7 @@ actix-web-static-files = { version = "4.0" }
 static-files = { version = "0.2" }
 maud = { version = "0.27", features = ["actix-web"] }
 dotenvy = { version = "0.15" }
+reqwest = { version = "0.12", features = ["json", "native-tls-vendored"] }
 
 [build-dependencies]
 static-files = "0.2"

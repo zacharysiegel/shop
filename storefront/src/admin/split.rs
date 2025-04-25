@@ -9,13 +9,19 @@ pub fn split(
             "display: flex; flex-direction: row;",
         )) {
             div style=(concat!(
-                "flex-grow: 2;"
+                "flex-basis: 65%;",
+                "flex-grow: 1;",
+                "flex-shrink: 2;",
+                "padding-right: .5rem;",
             )) {
                 (left)
             }
 
             div style=(concat!(
-                "flex-grow: 1;"
+                "flex-basis: 35%;",
+                "flex-grow: 0;",
+                "flex-shrink: 1;",
+                "padding-left: .5rem;",
             )) {
                 (right)
             }

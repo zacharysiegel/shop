@@ -5,7 +5,7 @@ use crate::item::{Item, ItemSerial};
 use crate::object::JsonHttpResponse;
 use crate::{unwrap_result_else_400, unwrap_result_else_500, ShopModel};
 use actix_web::http::StatusCode;
-use actix_web::{delete, get, post, web, HttpResponse, HttpResponseBuilder, Responder};
+use actix_web::{web, HttpResponse, HttpResponseBuilder, Responder};
 use sqlx::postgres::PgQueryResult;
 use sqlx::PgPool;
 use uuid::Uuid;
@@ -13,16 +13,27 @@ use uuid::Uuid;
 pub fn configurer(config: &mut web::ServiceConfig) {
     config.service(
         web::scope("/product")
-            .service(get_product)
-            .service(create_product)
-            .service(get_product_categories)
-            .service(create_product_category_association)
-            .service(delete_product_category_association)
-            .service(get_product_items),
+            .route("", web::get().to(get_all_products))
+            .route("", web::post().to(create_product))
+            .route("/{product_id}", web::get().to(get_product))
+            .route("/{product_id}/category", web::get().to(get_product_categories))
+            .route("/{product_id}/category/{category_id}", web::post().to(create_product_category_association))
+            .route("/{product_id}/category/{category_id}", web::delete().to(delete_product_category_association))
+            .route("/{product_id}/item", web::get().to(get_product_items))
     );
 }
 
-#[get("/{product_id}")]
+async fn get_all_products(
+    pgpool: web::Data<PgPool>,
+) -> impl Responder {
+    let product_entity_vec = unwrap_result_else_500!(product_db::get_all_products(&pgpool.into_inner()).await);
+    product_entity_vec
+        .iter()
+        .map(|model| model.to_serial())
+        .collect::<Vec<ProductSerial>>()
+        .to_http_response()
+}
+
 async fn get_product(pgpool: web::Data<PgPool>, product_id: web::Path<String>) -> impl Responder {
     let Ok(product_id) = Uuid::try_parse(product_id.into_inner().as_str()) else {
         return HttpResponseBuilder::new(StatusCode::INTERNAL_SERVER_ERROR).finish();
@@ -38,7 +49,6 @@ async fn get_product(pgpool: web::Data<PgPool>, product_id: web::Path<String>) -
 }
 
 // todo: restrict to authenticated administrator
-#[post("")]
 async fn create_product(
     pgpool: web::Data<PgPool>,
     body: web::Json<ProductSerial>,
@@ -56,7 +66,6 @@ async fn create_product(
     }
 }
 
-#[get("/{product_id}/category")]
 async fn get_product_categories(
     pgpool: web::Data<PgPool>,
     product_id: web::Path<String>,
@@ -78,7 +87,6 @@ async fn get_product_categories(
 }
 
 // todo: restrict to authenticated administrator
-#[post("/{product_id}/category/{category_id}")]
 async fn create_product_category_association(
     pgpool: web::Data<PgPool>,
     path: web::Path<(String, String)>,
@@ -100,7 +108,6 @@ async fn create_product_category_association(
     }
 }
 
-#[delete("/{product_id}/category/{category_id}")]
 async fn delete_product_category_association(
     pgpool: web::Data<PgPool>,
     path: web::Path<(String, String)>,
@@ -115,7 +122,6 @@ async fn delete_product_category_association(
     HttpResponse::Ok().body(query_result.rows_affected().to_string())
 }
 
-#[get("/{product_id}/item")]
 async fn get_product_items(
     pgpool: web::Data<PgPool>,
     product_id: web::Path<String>,

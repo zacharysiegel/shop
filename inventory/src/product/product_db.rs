@@ -5,17 +5,24 @@ use sqlx::postgres::PgQueryResult;
 use sqlx::{query, query_as, Error, PgPool};
 use uuid::Uuid;
 
+pub async fn get_all_products(pgpool: &PgPool) -> Result<Vec<ProductEntity>, Error> {
+    query_as!(ProductEntity, "\
+		select id, display_name, internal_name, upc, release_date, created, updated \
+	 	from shop.public.product \
+	")
+        .fetch_all(pgpool)
+        .await
+}
+
 pub async fn get_product(
     pgpool: &PgPool,
     product_id: &Uuid,
 ) -> Result<Option<ProductEntity>, Error> {
-    query_as!(
-		ProductEntity,
-		"\
+    query_as!(ProductEntity, "\
 		select id, display_name, internal_name, upc, release_date, created, updated \
 		from shop.public.product \
 		where id = $1 \
-		",
+	",
 		product_id
 	)
         .fetch_optional(pgpool)
