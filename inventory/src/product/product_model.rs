@@ -57,7 +57,7 @@ impl ShopModel for ProductEntity {
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct ProductSerial {
-    #[serde(skip_deserializing, default = "crate::random_uuid")]
+    #[serde(skip_deserializing, default = "crate::random_uuid")] // todo: fix client-side deserialization randomness
     pub id: Uuid,
     pub display_name: String,
     pub internal_name: String,
