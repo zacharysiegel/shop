@@ -7,13 +7,15 @@ pub fn page(content: Markup) -> Markup {
 			head {
 				meta charset="utf-8";
 				title {"Shop | Administration"}
-				link rel="stylesheet" href="/reset.css";
+				link rel="stylesheet" type="text/css" href="/reset.css";
+				link rel="stylesheet" type="text/css" href="/base.css";
 			}
 			body style=(concat!(
 				"min-height: calc(100vh - 2rem);",
 				"margin: 1rem;",
 				"font-family: monospace;",
 				"display: flex; flex-direction: column;",
+				"background-color: rgb(36, 39, 58); color: rgb(202, 211, 245);" // Catppuccin Macchiato: https://catppuccin.com/palette/
 			)) {
 				header {
 					hgroup style="margin-bottom: 1rem;" {
