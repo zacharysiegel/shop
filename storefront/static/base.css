@@ -15,3 +15,18 @@ a:active,
 a:-webkit-any-link {
     color: var(--link-color);
 }
+
+form label {
+    display: block;
+    margin-top: .5rem;
+}
+
+form label:first-child {
+    margin-top: 0;
+}
+
+form input {
+    display: block;
+    margin-top: .2rem;
+}
+

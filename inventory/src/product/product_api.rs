@@ -4,8 +4,8 @@ use crate::error::ShopError;
 use crate::item::{Item, ItemSerial};
 use crate::object::JsonHttpResponse;
 use crate::{unwrap_result_else_400, unwrap_result_else_500, ShopModel};
-use actix_web::http::StatusCode;
-use actix_web::{web, HttpResponse, HttpResponseBuilder, Responder};
+use actix_web::http::{StatusCode};
+use actix_web::{guard, web, HttpResponse, HttpResponseBuilder, Responder};
 use sqlx::postgres::PgQueryResult;
 use sqlx::PgPool;
 use uuid::Uuid;
@@ -14,12 +14,17 @@ pub fn configurer(config: &mut web::ServiceConfig) {
     config.service(
         web::scope("/product")
             .route("", web::get().to(get_all_products))
-            .route("", web::post().to(create_product))
+            .route("", web::post()
+                .guard(guard::Header("content-type", "application/json"))
+                .to(create_product_json))
+            .route("", web::post()
+                .guard(guard::Header("content-type", "multipart/form-data"))
+                .to(create_product_formdata))
             .route("/{product_id}", web::get().to(get_product))
             .route("/{product_id}/category", web::get().to(get_product_categories))
             .route("/{product_id}/category/{category_id}", web::post().to(create_product_category_association))
             .route("/{product_id}/category/{category_id}", web::delete().to(delete_product_category_association))
-            .route("/{product_id}/item", web::get().to(get_product_items))
+            .route("/{product_id}/item", web::get().to(get_product_items)),
     );
 }
 
@@ -49,11 +54,25 @@ async fn get_product(pgpool: web::Data<PgPool>, product_id: web::Path<String>) -
 }
 
 // todo: restrict to authenticated administrator
-async fn create_product(
+async fn create_product_json(
     pgpool: web::Data<PgPool>,
     body: web::Json<ProductSerial>,
 ) -> impl Responder {
-    let Ok(product) = ProductEntity::try_from_serial(&body.into_inner()) else {
+    create_product(pgpool, body.into_inner()).await
+}
+
+async fn create_product_formdata(
+    pgpool: web::Data<PgPool>,
+    body: web::Form<ProductSerial>, // todo: this type is probably wrong (intended for urlencoded)
+) -> impl Responder {
+    create_product(pgpool, body.into_inner()).await
+}
+
+async fn create_product(
+    pgpool: web::Data<PgPool>,
+    product_serial: ProductSerial,
+) -> HttpResponse {
+    let Ok(product) = ProductEntity::try_from_serial(&product_serial) else {
         return HttpResponseBuilder::new(StatusCode::BAD_REQUEST).finish();
     };
 

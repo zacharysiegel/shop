@@ -57,6 +57,7 @@ impl ShopModel for ProductEntity {
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct ProductSerial {
+    #[serde(default)] // todo: refactor others to use this so id isn't required
     pub id: Uuid,
     pub display_name: String,
     pub internal_name: String,

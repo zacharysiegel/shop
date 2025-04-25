@@ -9,6 +9,7 @@ pub fn page(content: Markup) -> Markup {
 				title {"Shop | Administration"}
 				link rel="stylesheet" type="text/css" href="/reset.css";
 				link rel="stylesheet" type="text/css" href="/base.css";
+				script src="/submit_form.js" {};
 			}
 			body style=(concat!(
 				"min-height: calc(100vh - 2rem);",

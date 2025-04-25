@@ -1,5 +1,5 @@
-use crate::admin::registry::REGISTRY;
-use crate::admin::{page, split};
+use crate::admin::{form, page, split};
+use crate::registry::REGISTRY;
 use actix_web::web;
 use actix_web::web::ServiceConfig;
 use inventory::product::ProductSerial;
@@ -20,7 +20,7 @@ async fn render() -> Markup {
 }
 
 async fn left() -> Markup {
-    let result = REGISTRY.http_client.get(REGISTRY.remote_url.clone() + "/product")
+    let result = REGISTRY.http_client.get(format!("{}{}", REGISTRY.remote_url, "/product"))
         .send()
         .await;
     let response = match result {
@@ -36,7 +36,7 @@ async fn left() -> Markup {
         }
     };
     html! {
-        h2 {"All products"}
+        h2 { "All products" }
         ol {
             @for product in &product_vec {
                 li {
@@ -49,7 +49,25 @@ async fn left() -> Markup {
 
 fn right() -> Markup {
     html! {
-        h2 {"Create product"}
-        "right side"
+        h2 { "Create product" }
+        (form::form("/product", html!{
+            label {
+                "Display name"
+                input type="text" name="display_name";
+            }
+            label {
+                "Internal name"
+                input type="text" name="internal_name";
+            }
+            label {
+                "Universal product code (optional)"
+                input type="text" name="upc";
+            }
+            label {
+                "Release date (optional)"
+                input type="date" name="release_date";
+            }
+            input type="submit";
+        }))
     }
 }
