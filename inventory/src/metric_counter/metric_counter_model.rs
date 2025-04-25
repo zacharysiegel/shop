@@ -1,8 +1,9 @@
 use crate::error::ShopError;
 use crate::object::JsonHttpResponse;
-use crate::{ShopEntity, ShopModel, ShopSerial};
+use crate::{object, ShopEntity, ShopModel, ShopSerial};
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
+
 #[derive(Debug, Clone)]
 pub struct MetricCounter {
     pub id: Uuid,
@@ -29,7 +30,7 @@ impl ShopModel for MetricCounter {
 
     fn try_from_serial(serial: &Self::Serial) -> Result<Self, ShopError> {
         Ok(MetricCounter {
-            id: serial.id.clone(),
+            id: object::random_uuid(),
             internal_name: serial.internal_name.clone(),
             object_id: serial.object_id.clone(),
             value: serial.value.clone(),
@@ -47,7 +48,6 @@ impl ShopModel for MetricCounter {
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct MetricCounterSerial {
-    #[serde(skip_deserializing, default = "crate::random_uuid")]
     pub id: Uuid,
     pub internal_name: String,
     pub object_id: Option<String>,

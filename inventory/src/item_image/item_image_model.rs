@@ -1,6 +1,6 @@
 use crate::error::ShopError;
 use crate::object::JsonHttpResponse;
-use crate::{ShopEntity, ShopModel, ShopSerial};
+use crate::{object, ShopEntity, ShopModel, ShopSerial};
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 #[derive(Debug, Clone)]
@@ -31,7 +31,7 @@ impl ShopModel for ItemImage {
 
     fn try_from_serial(serial: &Self::Serial) -> Result<Self, ShopError> {
         Ok(ItemImage {
-            id: serial.id.clone(),
+            id: object::random_uuid(),
             item_id: serial.item_id.clone(),
             uri: serial.uri.clone(),
             alt_text: serial.alt_text.clone(),
@@ -50,7 +50,6 @@ impl ShopModel for ItemImage {
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct ItemImageSerial {
-    #[serde(skip_deserializing, default = "crate::random_uuid")]
     pub id: Uuid,
     pub item_id: Uuid,
     pub uri: String,

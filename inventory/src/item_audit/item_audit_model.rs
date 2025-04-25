@@ -1,7 +1,7 @@
 use crate::error::ShopError;
 use crate::item::ItemStatus;
 use crate::object::JsonHttpResponse;
-use crate::{ShopEntity, ShopModel, ShopSerial};
+use crate::{object, ShopEntity, ShopModel, ShopSerial};
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
@@ -50,7 +50,7 @@ impl ShopModel for ItemAuditModel {
 
     fn try_from_serial(serial: &Self::Serial) -> Result<Self, ShopError> {
         Ok(ItemAuditModel {
-            id: serial.id.clone(),
+            id: object::random_uuid(),
             item_id: serial.item_id.clone(),
             status_before: ItemStatus::try_from_int_with_shoperror(serial.status_before)?,
             status_after: ItemStatus::try_from_int_with_shoperror(serial.status_after)?,

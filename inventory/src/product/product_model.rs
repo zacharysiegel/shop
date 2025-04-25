@@ -1,6 +1,6 @@
 use crate::error::ShopError;
 use crate::object::JsonHttpResponse;
-use crate::{ShopEntity, ShopModel, ShopSerial};
+use crate::{object, ShopEntity, ShopModel, ShopSerial};
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use sqlx::types::chrono;
@@ -36,7 +36,7 @@ impl ShopModel for ProductEntity {
 
     fn try_from_serial(serial: &Self::Serial) -> Result<Self, ShopError> {
         Ok(ProductEntity {
-            id: serial.id.clone(),
+            id: object::random_uuid(),
             display_name: serial.display_name.clone(),
             internal_name: serial.internal_name.clone(),
             upc: serial.upc.clone(),
@@ -57,7 +57,6 @@ impl ShopModel for ProductEntity {
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct ProductSerial {
-    #[serde(skip_deserializing, default = "crate::random_uuid")] // todo: fix client-side deserialization randomness
     pub id: Uuid,
     pub display_name: String,
     pub internal_name: String,

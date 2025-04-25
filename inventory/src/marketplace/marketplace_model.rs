@@ -1,6 +1,6 @@
 use crate::error::ShopError;
 use crate::object::JsonHttpResponse;
-use crate::{ShopEntity, ShopModel, ShopSerial};
+use crate::{object, ShopEntity, ShopModel, ShopSerial};
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 #[derive(Debug, Clone)]
@@ -29,7 +29,7 @@ impl ShopModel for MarketplaceEntity {
 
     fn try_from_serial(serial: &Self::Serial) -> Result<Self, ShopError> {
         Ok(MarketplaceEntity {
-            id: serial.id.clone(),
+            id: object::random_uuid(),
             display_name: serial.display_name.clone(),
             internal_name: serial.internal_name.clone(),
             uri: serial.uri.clone(),
@@ -47,7 +47,6 @@ impl ShopModel for MarketplaceEntity {
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct MarketplaceSerial {
-    #[serde(skip_deserializing, default = "crate::random_uuid")]
     pub id: Uuid,
     pub display_name: String,
     pub internal_name: String,

@@ -1,6 +1,6 @@
 use crate::error::ShopError;
 use crate::object::JsonHttpResponse;
-use crate::{ShopEntity, ShopModel, ShopSerial};
+use crate::{object, ShopEntity, ShopModel, ShopSerial};
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
@@ -30,7 +30,7 @@ impl ShopModel for CategoryEntity {
 
     fn try_from_serial(serial: &CategorySerial) -> Result<CategoryEntity, ShopError> {
         Ok(CategoryEntity {
-            id: serial.id.clone(),
+            id: object::random_uuid(),
             display_name: serial.display_name.clone(),
             internal_name: serial.internal_name.clone(),
             parent_id: serial.parent_id.clone(),
@@ -48,7 +48,6 @@ impl ShopModel for CategoryEntity {
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct CategorySerial {
-    #[serde(skip_deserializing, default = "crate::random_uuid")]
     pub id: Uuid,
     pub display_name: String,
     pub internal_name: String,

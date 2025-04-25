@@ -1,6 +1,6 @@
 use crate::error::ShopError;
 use crate::object::JsonHttpResponse;
-use crate::{enum_try_from_int_with_shoperror, ShopEntity, ShopModel, ShopSerial};
+use crate::{enum_try_from_int_with_shoperror, object, ShopEntity, ShopModel, ShopSerial};
 use chrono::{DateTime, Utc};
 use int_enum::IntEnum;
 use serde::{Deserialize, Serialize};
@@ -110,7 +110,7 @@ impl ShopModel for PurchaseModel {
 
     fn try_from_serial(serial: &Self::Serial) -> Result<Self, ShopError> {
         Ok(PurchaseModel {
-            id: serial.id.clone(),
+            id: object::random_uuid(),
             marketplace_id: serial.marketplace_id.clone(),
             external_id: serial.external_id.clone(),
             customer_id: serial.customer_id.clone(),
@@ -244,7 +244,6 @@ enum_try_from_int_with_shoperror!(PaymentMethod<u8>);
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct PurchaseSerial {
-    #[serde(skip_deserializing, default = "crate::random_uuid")]
     pub id: Uuid,
     pub marketplace_id: Uuid,
     pub external_id: Option<String>,
