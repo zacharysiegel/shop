@@ -50,6 +50,7 @@ impl ShopModel for ItemImage {
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct ItemImageSerial {
+    #[serde(default)]
     pub id: Uuid,
     pub item_id: Uuid,
     pub uri: String,

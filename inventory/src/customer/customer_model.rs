@@ -180,6 +180,7 @@ enum_try_from_int_with_shoperror!(CustomerStatus<u8>);
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct CustomerSerial {
+    #[serde(default)]
     pub id: Uuid,
     pub email_address: String,
     pub phone_number: Option<String>,

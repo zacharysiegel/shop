@@ -244,6 +244,7 @@ enum_try_from_int_with_shoperror!(PaymentMethod<u8>);
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct PurchaseSerial {
+    #[serde(default)]
     pub id: Uuid,
     pub marketplace_id: Uuid,
     pub external_id: Option<String>,

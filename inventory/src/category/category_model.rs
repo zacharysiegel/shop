@@ -48,6 +48,7 @@ impl ShopModel for CategoryEntity {
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct CategorySerial {
+    #[serde(default)]
     pub id: Uuid,
     pub display_name: String,
     pub internal_name: String,

@@ -48,6 +48,7 @@ impl ShopModel for MetricCounter {
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct MetricCounterSerial {
+    #[serde(default)]
     pub id: Uuid,
     pub internal_name: String,
     pub object_id: Option<String>,

@@ -47,6 +47,7 @@ impl ShopModel for MarketplaceEntity {
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct MarketplaceSerial {
+    #[serde(default)]
     pub id: Uuid,
     pub display_name: String,
     pub internal_name: String,

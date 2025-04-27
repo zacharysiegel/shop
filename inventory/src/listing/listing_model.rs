@@ -99,6 +99,7 @@ enum_try_from_int_with_shoperror!(ListingStatus<u8>);
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct ListingSerial {
+    #[serde(default)]
     pub id: Uuid,
     pub item_id: Uuid,
     pub marketplace_id: Uuid,

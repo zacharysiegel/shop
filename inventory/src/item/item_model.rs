@@ -166,6 +166,7 @@ impl ShopEntity for ItemEntity {
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct ItemSerial {
+    #[serde(default)]
     pub id: Uuid,
     pub product_id: Uuid,
     pub inventory_location_id: Uuid,

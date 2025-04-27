@@ -44,6 +44,7 @@ impl ShopModel for Label {
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct LabelSerial {
+    #[serde(default)]
     pub id: Uuid,
     pub display_name: String,
     pub internal_name: String,

@@ -87,6 +87,7 @@ impl ShopModel for ItemAuditModel {
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct ItemAuditSerial {
+    #[serde(default)]
     pub id: Uuid,
     pub item_id: Uuid,
     pub status_before: u8,
