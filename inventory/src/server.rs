@@ -5,6 +5,7 @@ pub async fn open_server(pgpool: Pool<Postgres>) -> std::io::Result<()> {
     HttpServer::new(move || {
         App::new()
             .wrap(middleware::Logger::default())
+            .wrap(middleware::NormalizePath::trim())
             .app_data(web::Data::new(pgpool.clone()))
             .default_service(web::route().to(HttpResponse::NotFound))
             .configure(crate::category::category_api::configurer)
