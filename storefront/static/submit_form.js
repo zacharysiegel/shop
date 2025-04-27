@@ -10,24 +10,21 @@ function submit_form(submit_event) {
     const form = submit_event.target;
 
     const form_data = new FormData(form, submit_event.submitter);
-    let to_delete = [];
+    const form_data_as_object = {};
     for (let entry of form_data) {
         const [key, value] = entry;
-        if (!value) {
-            to_delete.push(key);
+        if (value) {
+            form_data_as_object[key] = value;
         }
     }
-    to_delete.forEach(key => {
-        form_data.delete(key);
-    })
 
-    console.log(form_data); // todo: remove
-
+    /* By default, FormData is converted to the format "multipart/form-data". This representation
+        adds significant bloat when each field's data is encoded in UTF-8 and is generally small.
+        We convert to JSON instead. */
     const request = new XMLHttpRequest();
     request.open("POST", form.action)
-    // request.setRequestHeader("content-type", "multipart/form-data");
-    request.setRequestHeader("content-type", "multipart/form-data");
-    request.send(form_data);
+    request.setRequestHeader("content-type", "application/json");
+    request.send(JSON.stringify(form_data_as_object));
 }
 
 document.addEventListener("submit", submit_form);

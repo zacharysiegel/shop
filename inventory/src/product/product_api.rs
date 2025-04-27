@@ -17,7 +17,7 @@ pub fn configurer(config: &mut web::ServiceConfig) {
             .route("", web::post()
                 .guard(guard::Header("content-type", "application/json"))
                 .to(create_product_json))
-            .route("", web::post()
+            .route("", web::post() // This route is unused, but the pattern is left here for reference.
                 .guard(guard::Header("content-type", "multipart/form-data"))
                 .to(create_product_formdata))
             .route("/{product_id}", web::get().to(get_product))

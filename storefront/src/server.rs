@@ -19,5 +19,5 @@ pub async fn open_server() -> std::io::Result<()> {
 }
 
 fn generate_static_file_map() -> HashMap<&'static str, Resource> {
-    include!(concat!(env!("OUT_DIR"), "/generated.rs"))
+    include!(concat!(env!("OUT_DIR"), "/public.rs"))
 }
