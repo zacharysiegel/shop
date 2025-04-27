@@ -1,5 +1,4 @@
-use crate::admin::item::create_item;
-use crate::admin::structure::page;
+use crate::admin::structure::{page, split};
 use actix_web::web;
 use actix_web::web::ServiceConfig;
 use maud::{html, Markup};
@@ -12,11 +11,15 @@ pub fn configurer(config: &mut ServiceConfig) {
 
 async fn render() -> Markup {
     page::page(
-        html!(
-            div {
-                "<item page>"
-            }
-            (create_item::create_item())
-        )
+        Some("Item"),
+        split::split(left(), right())
     )
+}
+
+fn left() -> Markup {
+    html!()
+}
+
+fn right() -> Markup {
+    html!()
 }

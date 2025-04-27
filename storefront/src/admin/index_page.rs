@@ -1,11 +1,13 @@
+use crate::admin::structure::page;
 use crate::admin::{item, product};
 use actix_web::web;
 use actix_web::web::ServiceConfig;
 use maud::{html, Markup};
-use crate::admin::structure::page;
 
 pub async fn render() -> Markup {
-    page::page(html! {
+    page::page(
+        None,
+        html! {
 		div {
 			ol {
 				li { a href={(product::product_page::RELATIVE_PATH)} { "Product" } }

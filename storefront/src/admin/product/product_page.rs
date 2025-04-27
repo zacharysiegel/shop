@@ -13,11 +13,10 @@ pub fn configurer(config: &mut ServiceConfig) {
 }
 
 async fn render() -> Markup {
-    html! {
-        (page::page(
-            split::split(left().await, right())
-        ))
-    }
+    page::page(
+        Some("Product"),
+        split::split(left().await, right())
+    )
 }
 
 async fn left() -> Markup {
