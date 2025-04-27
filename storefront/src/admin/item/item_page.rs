@@ -1,4 +1,4 @@
-use crate::admin::structure::{page, split};
+use crate::admin::structure::{form, page, split};
 use actix_web::web;
 use actix_web::web::ServiceConfig;
 use maud::{html, Markup};
@@ -21,5 +21,7 @@ fn left() -> Markup {
 }
 
 fn right() -> Markup {
-    html!()
+    form::form("Create item", "/item", html! {
+        
+    })
 }

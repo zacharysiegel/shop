@@ -15,7 +15,7 @@ pub fn configurer(config: &mut ServiceConfig) {
 async fn render() -> Markup {
     page::page(
         Some("Product"),
-        split::split(left().await, right())
+        split::split(left().await, right()),
     )
 }
 
@@ -41,28 +41,25 @@ async fn left() -> Markup {
 }
 
 fn right() -> Markup {
-    html! {
-        h2 { "Create product" }
-        (form::form("/product", html!{
-            label {
-                "Display name"
-                input type="text" name="display_name";
-            }
-            label {
-                "Internal name"
-                input type="text" name="internal_name";
-            }
-            label {
-                "Universal product code (optional)"
-                input type="text" name="upc";
-            }
-            label {
-                "Release date (optional)"
-                input type="date" name="release_date";
-            }
-            input type="submit";
-        }))
-    }
+    form::form("Create product", "/product", html! {
+        label {
+            "Display name"
+            input type="text" name="display_name";
+        }
+        label {
+            "Internal name"
+            input type="text" name="internal_name";
+        }
+        label {
+            "Universal product code (optional)"
+            input type="text" name="upc";
+        }
+        label {
+            "Release date (optional)"
+            input type="date" name="release_date";
+        }
+        input type="submit";
+    })
 }
 
 // todo: create a generic api call function once we flush out the pattern
