@@ -21,24 +21,17 @@ async fn render() -> Markup {
 }
 
 async fn left() -> Markup {
-    let result = REGISTRY.http_client.get(format!("{}{}", REGISTRY.remote_url, "/product"))
-        .send()
-        .await;
-    let response = match result {
-        Ok(response) => response,
-        Err(error) => {
-            return html!((format!("Error: {:#}", error)));
-        }
+    let product_vec: Vec<ProductSerial> = match get_all_products().await {
+        Ok(vec) => vec,
+        Err(markup) => return markup,
     };
-    let product_vec = match response.json::<Vec<ProductSerial>>().await {
-        Ok(product) => product,
-        Err(error) => {
-            return html!((format!("Error: {:#}", error)));
-        }
-    };
+
     html! {
         h2 { "All products" }
         ol {
+            @if product_vec.is_empty() {
+                p { "None" }
+            }
             @for product in &product_vec {
                 li {
                     (format!("Product: {:#?}", product))
@@ -71,4 +64,24 @@ fn right() -> Markup {
             input type="submit";
         }))
     }
+}
+
+// todo: create a generic api call function once we flush out the pattern
+async fn get_all_products() -> Result<Vec<ProductSerial>, Markup> {
+    let result = REGISTRY.http_client.get(format!("{}{}", REGISTRY.remote_url, "/product"))
+        .send()
+        .await;
+    let response = match result {
+        Ok(response) => response,
+        Err(error) => {
+            return Err(html!((format!("Error: {:#}", error))));
+        }
+    };
+    let product_vec = match response.json::<Vec<ProductSerial>>().await {
+        Ok(product) => product,
+        Err(error) => {
+            return Err(html!((format!("Error: {:#}", error))));
+        }
+    };
+    Ok(product_vec)
 }

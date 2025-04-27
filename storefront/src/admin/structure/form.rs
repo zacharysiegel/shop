@@ -7,6 +7,7 @@ pub fn form(path: &str, content: Markup) -> Markup {
         form
         action=(format!("{}{}", REGISTRY.remote_url, path))
         autocomplete="off"
+        // This default encoding is overridden by submit_form.js
         enctype="application/x-www-form-urlencoded"
         method="POST"
         {
