@@ -1,7 +1,8 @@
-use crate::admin::{item, page, product};
+use crate::admin::{item, product};
 use actix_web::web;
 use actix_web::web::ServiceConfig;
 use maud::{html, Markup};
+use crate::admin::structure::page;
 
 pub async fn render() -> Markup {
     page::page(html! {

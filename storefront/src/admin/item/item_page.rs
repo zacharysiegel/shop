@@ -1,8 +1,7 @@
-use crate::admin;
 use crate::admin::item::create_item;
+use crate::admin::structure::page;
 use actix_web::web;
 use actix_web::web::ServiceConfig;
-use admin::page;
 use maud::{html, Markup};
 
 pub const RELATIVE_PATH: &str = "/admin/item";

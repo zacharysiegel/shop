@@ -14,4 +14,3 @@ pub fn form(path: &str, content: Markup) -> Markup {
         }
     }
 }
-// todo: structure directory refactor

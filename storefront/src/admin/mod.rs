@@ -1,7 +1,5 @@
 pub mod index_page;
+pub mod structure;
 
-mod page;
 mod item;
 mod product;
-mod split;
-mod form;

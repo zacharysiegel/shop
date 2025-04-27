@@ -1,4 +1,5 @@
-use crate::admin::{form, page, split};
+use crate::admin::structure::form;
+use crate::admin::structure::{page, split};
 use crate::registry::REGISTRY;
 use actix_web::web;
 use actix_web::web::ServiceConfig;
