@@ -4,7 +4,7 @@ use crate::error::ShopError;
 use crate::item::{Item, ItemSerial};
 use crate::object::JsonHttpResponse;
 use crate::{unwrap_result_else_400, unwrap_result_else_500, ShopModel};
-use actix_web::http::{StatusCode};
+use actix_web::http::StatusCode;
 use actix_web::{guard, web, HttpResponse, HttpResponseBuilder, Responder};
 use sqlx::postgres::PgQueryResult;
 use sqlx::PgPool;
@@ -17,9 +17,6 @@ pub fn configurer(config: &mut web::ServiceConfig) {
             .route("", web::post()
                 .guard(guard::Header("content-type", "application/json"))
                 .to(create_product_json))
-            .route("", web::post() // This route is unused, but the pattern is left here for reference.
-                .guard(guard::Header("content-type", "multipart/form-data"))
-                .to(create_product_formdata))
             .route("/{product_id}", web::get().to(get_product))
             .route("/{product_id}/category", web::get().to(get_product_categories))
             .route("/{product_id}/category/{category_id}", web::post().to(create_product_category_association))
@@ -57,13 +54,6 @@ async fn get_product(pgpool: web::Data<PgPool>, product_id: web::Path<String>) -
 async fn create_product_json(
     pgpool: web::Data<PgPool>,
     body: web::Json<ProductSerial>,
-) -> impl Responder {
-    create_product(pgpool, body.into_inner()).await
-}
-
-async fn create_product_formdata(
-    pgpool: web::Data<PgPool>,
-    body: web::Form<ProductSerial>, // todo: this type is probably wrong (intended for urlencoded)
 ) -> impl Responder {
     create_product(pgpool, body.into_inner()).await
 }
