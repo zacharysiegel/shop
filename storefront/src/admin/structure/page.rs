@@ -16,7 +16,7 @@ pub fn page(current_page_name: Option<&str>, content: Markup) -> Markup {
 				"margin: 1rem;",
 				"font-family: monospace;",
 				"display: flex; flex-direction: column;",
-				"background-color: rgb(36, 39, 58); color: rgb(202, 211, 245);" // Catppuccin Macchiato: https://catppuccin.com/palette/
+				"background-color: var(--color-base); color: var(--color-text);",
 			)) {
 				header {
 					hgroup style="margin-bottom: 1rem;" {
