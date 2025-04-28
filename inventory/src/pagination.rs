@@ -1,4 +1,5 @@
 use crate::error::ShopError;
+use crate::ShopEntity;
 use actix_web::guard;
 use serde::{Deserialize, Serialize};
 
@@ -100,5 +101,55 @@ impl KeysetPaginationResultForString {
             SortOrder::Descending => self.next_value.clone(),
         };
         prev_options
+    }
+
+    pub fn from_entities<EntityT>(
+        all_entities: Vec<EntityT>,
+        min_entity: Option<EntityT>,
+        max_entity: Option<EntityT>,
+        getter: fn(EntityT) -> String,
+        page_size: usize,
+        sort_order: SortOrder,
+    ) -> (Vec<EntityT>, KeysetPaginationResultForString)
+    where
+        EntityT: ShopEntity + Clone,
+    {
+        let max_value = max_entity.map(getter);
+        let min_value = min_entity.map(getter);
+        let start_value = all_entities
+            .get(0)
+            .map(|val| val.clone())
+            .map(getter);
+        let next_value = all_entities
+            .get(page_size)
+            .map(|val| val.clone())
+            .map(getter);
+
+        debug_assert!(all_entities.len() == 0 && max_value.is_none() && min_value.is_none()
+            || all_entities.len() > 0 && max_value.is_some() && min_value.is_some());
+
+        // Note: If the page is empty, all *_value objects will be none, so will all equal each other, producing false
+        let has_greater_value = match sort_order {
+            SortOrder::Ascending => next_value.is_some(),
+            SortOrder::Descending => start_value != max_value,
+        };
+        let has_lesser_value = match sort_order {
+            SortOrder::Ascending => start_value != min_value,
+            SortOrder::Descending => next_value.is_some(),
+        };
+
+        let page_size = usize::min(page_size, all_entities.len());
+        (
+            all_entities[..page_size].to_vec(),
+            KeysetPaginationResultForString {
+                page_size: page_size as u32,
+                start_value,
+                next_value,
+                max_value,
+                min_value,
+                has_greater_value,
+                has_lesser_value,
+            }
+        )
     }
 }

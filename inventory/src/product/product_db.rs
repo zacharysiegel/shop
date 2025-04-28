@@ -57,48 +57,22 @@ pub async fn get_all_products_paged_display_name(
     };
 
     let entities = query.fetch_all(pgpool).await?;
-    let max_value = query_as!(ProductEntity,
+    let max_entity = query_as!(ProductEntity,
         "select * from shop.public.product order by display_name desc limit 1")
         .fetch_optional(pgpool)
-        .await?
-        .map(|val| val.display_name);
-    let min_value = query_as!(ProductEntity,
+        .await?;
+    let min_entity = query_as!(ProductEntity,
         "select * from shop.public.product order by display_name asc limit 1")
         .fetch_optional(pgpool)
-        .await?
-        .map(|val| val.display_name);
-    let start_value = entities
-        .get(0)
-        .map(|val| val.clone().display_name);
-    let next_value = entities
-        .get(keyset_pagination_options.page_size as usize)
-        .map(|val| val.clone().display_name);
+        .await?;
 
-    debug_assert!(entities.len() == 0 && max_value.is_none() && min_value.is_none()
-        || entities.len() > 0 && max_value.is_some() && min_value.is_some());
-
-    // Note: If the page is empty, all *_value objects will be none, so will all equal each other, producing false
-    let has_greater_value = match keyset_pagination_options.sort_order {
-        SortOrder::Ascending => next_value.is_some(),
-        SortOrder::Descending => start_value != max_value,
-    };
-    let has_lesser_value = match keyset_pagination_options.sort_order {
-        SortOrder::Ascending => start_value != min_value,
-        SortOrder::Descending => next_value.is_some(),
-    };
-
-    let page_size = usize::min(keyset_pagination_options.page_size as usize, entities.len());
-    Ok((
-        entities[..page_size].to_vec(),
-        KeysetPaginationResultForString {
-            page_size: page_size as u32,
-            start_value,
-            next_value,
-            max_value,
-            min_value,
-            has_greater_value,
-            has_lesser_value,
-        }
+    Ok(KeysetPaginationResultForString::from_entities(
+        entities,
+        min_entity,
+        max_entity,
+        |val| val.display_name,
+        keyset_pagination_options.page_size as usize,
+        keyset_pagination_options.sort_order,
     ))
 }
 
