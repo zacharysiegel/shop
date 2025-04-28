@@ -1,12 +1,11 @@
 use super::*;
 use crate::category::CategoryEntity;
+use crate::has_edge_records;
 use crate::item::ItemEntity;
-use crate::pagination::{KeysetPaginationOptionsForStr, SortOrder};
+use crate::pagination::{KeysetPaginationOptionsForStr, KeysetPaginationResult, SortOrder};
 use sqlx::postgres::{PgArguments, PgQueryResult, PgRow};
 use sqlx::query::Map;
 use sqlx::{query, query_as, Error, PgPool, Postgres};
-use std::borrow::Cow;
-use std::ops::Deref;
 use uuid::Uuid;
 
 pub async fn get_all_products(pgpool: &PgPool) -> Result<Vec<ProductEntity>, Error> {
@@ -21,8 +20,9 @@ pub async fn get_all_products(pgpool: &PgPool) -> Result<Vec<ProductEntity>, Err
 pub async fn get_all_products_paged_display_name<'start_value>(
     pgpool: &PgPool,
     keyset_pagination_options: KeysetPaginationOptionsForStr<'start_value>,
-) -> Result<Vec<ProductEntity>, Error> {
-    let sort_order = keyset_pagination_options.sort_order.unwrap_or_default();
+) -> Result<(Vec<ProductEntity>, KeysetPaginationResult), Error> {
+    let sort_order: SortOrder = keyset_pagination_options.sort_order.unwrap_or_default();
+    let start_value: String = keyset_pagination_options.start_value.unwrap_or_default().to_string();
 
     let query: Map<Postgres, fn(PgRow) -> Result<ProductEntity, Error>, PgArguments> = match sort_order {
         SortOrder::Ascending => {
@@ -33,7 +33,7 @@ pub async fn get_all_products_paged_display_name<'start_value>(
         		order by display_name asc
                 limit $2
         	",
-                keyset_pagination_options.start_value.unwrap_or(Cow::from("")).deref().to_string(),
+                start_value,
                 i64::from(keyset_pagination_options.page_size.wrapping_add(1)),
             )
         }
@@ -45,13 +45,30 @@ pub async fn get_all_products_paged_display_name<'start_value>(
         		order by display_name desc
                 limit $2
         	",
-                keyset_pagination_options.start_value.unwrap_or(Cow::from("")).deref().to_string(),
+                start_value,
                 i64::from(keyset_pagination_options.page_size.wrapping_add(1)),
             )
         }
     };
 
-    query.fetch_all(pgpool).await
+    let entities = query.fetch_all(pgpool).await?;
+    let (has_previous_record, has_additional_record) = has_edge_records!(
+        pgpool,
+        query!("select * from shop.public.product where display_name < $1 limit 1", start_value),
+        query!("select * from shop.public.product where display_name > $1 limit 1", start_value),
+        entities,
+        sort_order,
+        keyset_pagination_options.page_size,
+    );
+
+    Ok((
+        entities[..(entities.len() - 1)].to_vec(),
+        KeysetPaginationResult {
+            page_size: (entities.len() - 1) as u32,
+            has_previous_record,
+            has_additional_record,
+        }
+    ))
 }
 
 pub async fn get_product(

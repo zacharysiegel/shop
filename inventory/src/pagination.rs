@@ -56,3 +56,10 @@ impl Default for KeysetPaginationOptionsForStr<'_> {
         }
     }
 }
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct KeysetPaginationResult {
+    pub page_size: u32,
+    pub has_previous_record: bool,
+    pub has_additional_record: bool,
+}

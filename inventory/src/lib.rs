@@ -1,6 +1,5 @@
 // Declarative macros (macro_rules) must be defined before use
-mod macro_enumeration;
-mod macro_http;
+mod macros;
 
 pub mod db;
 pub mod env;

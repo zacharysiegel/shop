@@ -50,12 +50,12 @@ async fn get_all_products_paged_display_name<'a>(
         unwrap_result_else_400!(query.into_inner().validated()),
     ).await;
 
-    let pagination_response = unwrap_result_else_500!(query_result);
-    pagination_response
+    let (entities, pagination_result) = unwrap_result_else_500!(query_result);
+    let entities = entities
         .iter()
         .map(|model| model.to_serial())
-        .collect::<Vec<ProductSerial>>()
-        .to_http_response()
+        .collect::<Vec<ProductSerial>>();
+    (entities, pagination_result).to_http_response()
 }
 
 async fn get_product(pgpool: web::Data<PgPool>, product_id: web::Path<String>) -> impl Responder {
