@@ -1,8 +1,12 @@
 use super::*;
 use crate::category::CategoryEntity;
 use crate::item::ItemEntity;
-use sqlx::postgres::PgQueryResult;
-use sqlx::{query, query_as, Error, PgPool};
+use crate::pagination::{KeysetPaginationOptionsForStr, SortOrder};
+use sqlx::postgres::{PgArguments, PgQueryResult, PgRow};
+use sqlx::query::Map;
+use sqlx::{query, query_as, Error, PgPool, Postgres};
+use std::borrow::Cow;
+use std::ops::Deref;
 use uuid::Uuid;
 
 pub async fn get_all_products(pgpool: &PgPool) -> Result<Vec<ProductEntity>, Error> {
@@ -12,6 +16,42 @@ pub async fn get_all_products(pgpool: &PgPool) -> Result<Vec<ProductEntity>, Err
 	")
         .fetch_all(pgpool)
         .await
+}
+
+pub async fn get_all_products_paged_display_name<'start_value>(
+    pgpool: &PgPool,
+    keyset_pagination_options: KeysetPaginationOptionsForStr<'start_value>,
+) -> Result<Vec<ProductEntity>, Error> {
+    let sort_order = keyset_pagination_options.sort_order.unwrap_or_default();
+
+    let query: Map<Postgres, fn(PgRow) -> Result<ProductEntity, Error>, PgArguments> = match sort_order {
+        SortOrder::Ascending => {
+            query_as!(ProductEntity, "\
+        		select id, display_name, internal_name, upc, release_date, created, updated
+        		from shop.public.product
+        		where display_name >= $1
+        		order by display_name asc
+                limit $2
+        	",
+                keyset_pagination_options.start_value.unwrap_or(Cow::from("")).deref().to_string(),
+                i64::from(keyset_pagination_options.page_size),
+            )
+        }
+        SortOrder::Descending => {
+            query_as!(ProductEntity, "\
+        		select id, display_name, internal_name, upc, release_date, created, updated
+        		from shop.public.product
+        		where display_name <= $1
+        		order by display_name desc
+                limit $2
+        	",
+                keyset_pagination_options.start_value.unwrap_or(Cow::from("")).deref().to_string(),
+                i64::from(keyset_pagination_options.page_size),
+            )
+        }
+    };
+
+    query.fetch_all(pgpool).await
 }
 
 pub async fn get_product(

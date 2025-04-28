@@ -3,7 +3,9 @@ use crate::category::CategorySerial;
 use crate::error::ShopError;
 use crate::item::{Item, ItemSerial};
 use crate::object::JsonHttpResponse;
+use crate::pagination::{pagination_guard, KeysetPaginationOptionsForStr};
 use crate::{unwrap_result_else_400, unwrap_result_else_500, ShopModel};
+use actix_web::guard::fn_guard;
 use actix_web::http::StatusCode;
 use actix_web::{guard, web, HttpResponse, HttpResponseBuilder, Responder};
 use sqlx::postgres::PgQueryResult;
@@ -13,6 +15,9 @@ use uuid::Uuid;
 pub fn configurer(config: &mut web::ServiceConfig) {
     config.service(
         web::scope("/product")
+            .route("", web::get()
+                .guard(fn_guard(pagination_guard))
+                .to(get_all_products_paged))
             .route("", web::get().to(get_all_products))
             .route("", web::post()
                 .guard(guard::Header("content-type", "application/json"))
@@ -30,6 +35,23 @@ async fn get_all_products(
 ) -> impl Responder {
     let product_entity_vec = unwrap_result_else_500!(product_db::get_all_products(&pgpool.into_inner()).await);
     product_entity_vec
+        .iter()
+        .map(|model| model.to_serial())
+        .collect::<Vec<ProductSerial>>()
+        .to_http_response()
+}
+
+async fn get_all_products_paged<'a>(
+    pgpool: web::Data<PgPool>,
+    query: web::Query<KeysetPaginationOptionsForStr<'a>>,
+) -> impl Responder {
+    let query_result = product_db::get_all_products_paged_display_name(
+        &pgpool.into_inner(),
+        query.into_inner(),
+    ).await;
+
+    let pagination_response = unwrap_result_else_500!(query_result);
+    pagination_response
         .iter()
         .map(|model| model.to_serial())
         .collect::<Vec<ProductSerial>>()

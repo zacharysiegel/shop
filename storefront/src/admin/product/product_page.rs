@@ -20,7 +20,7 @@ async fn render() -> Markup {
 }
 
 async fn left() -> Markup {
-    let product_vec: Vec<ProductSerial> = match get_all_products().await {
+    let product_vec: Vec<ProductSerial> = match get_product_page().await {
         Ok(vec) => vec,
         Err(markup) => return markup,
     };
@@ -60,6 +60,25 @@ fn right() -> Markup {
         }
         input type="submit";
     })
+}
+
+async fn get_product_page() -> Result<Vec<ProductSerial>, Markup> {
+    let result = REGISTRY.http_client.get(format!("{}{}", REGISTRY.remote_url, "/product"))
+        .send()
+        .await;
+    let response = match result {
+        Ok(response) => response,
+        Err(error) => {
+            return Err(html!((format!("Error: {:#}", error))));
+        }
+    };
+    let product_vec = match response.json::<Vec<ProductSerial>>().await {
+        Ok(product) => product,
+        Err(error) => {
+            return Err(html!((format!("Error: {:#}", error))));
+        }
+    };
+    Ok(product_vec)
 }
 
 // todo: create a generic api call function once we flush out the pattern

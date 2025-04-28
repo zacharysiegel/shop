@@ -7,6 +7,7 @@ pub mod env;
 pub mod server;
 pub mod error;
 pub mod object;
+pub mod pagination;
 
 // Models
 pub mod category;

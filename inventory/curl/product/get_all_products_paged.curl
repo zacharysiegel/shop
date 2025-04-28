@@ -1,0 +1,6 @@
+variable = page_size=page_size=4
+variable = start_value=start_value=e
+variable = sort_order=sort_order=desc
+
+expand-url = http://localhost:11001/product/?{{page_size}}&{{start_value}}&{{sort_order}}
+request = GET
