@@ -1,6 +1,7 @@
 use actix_web::guard;
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 use std::borrow::Cow;
+use crate::error::ShopError;
 
 pub fn pagination_guard(ctx: &guard::GuardContext) -> bool {
     ctx.head()
@@ -10,7 +11,7 @@ pub fn pagination_guard(ctx: &guard::GuardContext) -> bool {
         .contains("page_size")
 }
 
-#[derive(Debug, Clone, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum SortOrder {
     #[serde(rename = "asc")]
     Ascending,
@@ -25,7 +26,7 @@ impl Default for SortOrder {
 }
 
 /// T: Type of sorted column (as expressed in the ShopEntity implementor)
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct KeysetPaginationOptionsForStr<'start_value> {
     pub page_size: u32,
 
@@ -34,4 +35,24 @@ pub struct KeysetPaginationOptionsForStr<'start_value> {
 
     /// If none, a default is used. Default varies per table.
     pub sort_order: Option<SortOrder>,
+}
+
+impl KeysetPaginationOptionsForStr<'_> {
+    pub fn validated(self) -> Result<Self, ShopError> {
+        let will_overflow: bool = self.page_size.overflowing_add(1).1;
+        match will_overflow {
+            true => Err(ShopError { message: format!("Error validating pagination options [{:?}]", self) }),
+            false => Ok(self)
+        }
+    }
+}
+
+impl Default for KeysetPaginationOptionsForStr<'_> {
+    fn default() -> Self {
+        KeysetPaginationOptionsForStr {
+            page_size: 50,
+            start_value: None,
+            sort_order: Some(SortOrder::Ascending),
+        }
+    }
 }

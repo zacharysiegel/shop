@@ -17,7 +17,7 @@ pub fn configurer(config: &mut web::ServiceConfig) {
         web::scope("/product")
             .route("", web::get()
                 .guard(fn_guard(pagination_guard))
-                .to(get_all_products_paged))
+                .to(get_all_products_paged_display_name))
             .route("", web::get().to(get_all_products))
             .route("", web::post()
                 .guard(guard::Header("content-type", "application/json"))
@@ -41,13 +41,13 @@ async fn get_all_products(
         .to_http_response()
 }
 
-async fn get_all_products_paged<'a>(
+async fn get_all_products_paged_display_name<'a>(
     pgpool: web::Data<PgPool>,
     query: web::Query<KeysetPaginationOptionsForStr<'a>>,
 ) -> impl Responder {
     let query_result = product_db::get_all_products_paged_display_name(
         &pgpool.into_inner(),
-        query.into_inner(),
+        unwrap_result_else_400!(query.into_inner().validated()),
     ).await;
 
     let pagination_response = unwrap_result_else_500!(query_result);

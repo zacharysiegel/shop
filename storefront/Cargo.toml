@@ -13,6 +13,7 @@ static-files = { version = "0.2" }
 maud = { version = "0.27", features = ["actix-web"] }
 dotenvy = { version = "0.15" }
 reqwest = { version = "0.12", features = ["json", "native-tls-vendored"] }
+serde_urlencoded = { version = "0.7" }
 
 [build-dependencies]
 static-files = "0.2"

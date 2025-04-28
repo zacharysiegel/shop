@@ -34,7 +34,7 @@ pub async fn get_all_products_paged_display_name<'start_value>(
                 limit $2
         	",
                 keyset_pagination_options.start_value.unwrap_or(Cow::from("")).deref().to_string(),
-                i64::from(keyset_pagination_options.page_size),
+                i64::from(keyset_pagination_options.page_size.wrapping_add(1)),
             )
         }
         SortOrder::Descending => {
@@ -46,7 +46,7 @@ pub async fn get_all_products_paged_display_name<'start_value>(
                 limit $2
         	",
                 keyset_pagination_options.start_value.unwrap_or(Cow::from("")).deref().to_string(),
-                i64::from(keyset_pagination_options.page_size),
+                i64::from(keyset_pagination_options.page_size.wrapping_add(1)),
             )
         }
     };

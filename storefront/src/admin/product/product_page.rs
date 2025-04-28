@@ -5,6 +5,9 @@ use actix_web::web;
 use actix_web::web::ServiceConfig;
 use inventory::product::ProductSerial;
 use maud::{html, Markup};
+use inventory::pagination;
+use inventory::pagination::{KeysetPaginationOptionsForStr, SortOrder};
+use crate::admin::structure::error_text::error_text;
 
 pub const RELATIVE_PATH: &str = "/admin/product";
 
@@ -20,7 +23,7 @@ async fn render() -> Markup {
 }
 
 async fn left() -> Markup {
-    let product_vec: Vec<ProductSerial> = match get_product_page().await {
+    let product_vec: Vec<ProductSerial> = match get_all_products_paged_display_name().await {
         Ok(vec) => vec,
         Err(markup) => return markup,
     };
@@ -62,28 +65,18 @@ fn right() -> Markup {
     })
 }
 
-async fn get_product_page() -> Result<Vec<ProductSerial>, Markup> {
-    let result = REGISTRY.http_client.get(format!("{}{}", REGISTRY.remote_url, "/product"))
-        .send()
-        .await;
-    let response = match result {
-        Ok(response) => response,
-        Err(error) => {
-            return Err(html!((format!("Error: {:#}", error))));
-        }
+async fn get_all_products_paged_display_name() -> Result<Vec<ProductSerial>, Markup> {
+    let pagination_options = {
+        let mut pagination_options = KeysetPaginationOptionsForStr::default();
+        pagination_options.page_size = 3;
+        let pagination_options = match serde_urlencoded::to_string(pagination_options) {
+            Ok(pagination_options) => pagination_options,
+            Err(error) => return Err(error_text(error)),
+        };
+        pagination_options
     };
-    let product_vec = match response.json::<Vec<ProductSerial>>().await {
-        Ok(product) => product,
-        Err(error) => {
-            return Err(html!((format!("Error: {:#}", error))));
-        }
-    };
-    Ok(product_vec)
-}
 
-// todo: create a generic api call function once we flush out the pattern
-async fn get_all_products() -> Result<Vec<ProductSerial>, Markup> {
-    let result = REGISTRY.http_client.get(format!("{}{}", REGISTRY.remote_url, "/product"))
+    let result = REGISTRY.http_client.get(format!("{}{}?{}", REGISTRY.remote_url, "/product", pagination_options))
         .send()
         .await;
     let response = match result {
@@ -95,7 +88,7 @@ async fn get_all_products() -> Result<Vec<ProductSerial>, Markup> {
     let product_vec = match response.json::<Vec<ProductSerial>>().await {
         Ok(product) => product,
         Err(error) => {
-            return Err(html!((format!("Error: {:#}", error))));
+            return Err(error_text(error));
         }
     };
     Ok(product_vec)
