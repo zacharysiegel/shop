@@ -84,10 +84,7 @@ impl KeysetPaginationResultForString {
     pub fn create_next(&self, base_options: &KeysetPaginationOptionsForString) -> KeysetPaginationOptionsForString {
         let mut next_options = base_options.clone();
         next_options.sort_order = SortOrder::Ascending;
-        next_options.start_value = match base_options.sort_order {
-            SortOrder::Ascending => self.next_value.clone(),
-            SortOrder::Descending => base_options.start_value.clone(),
-        };
+        next_options.start_value = self.next_value.clone();
         next_options
     }
 
@@ -96,10 +93,7 @@ impl KeysetPaginationResultForString {
     pub fn create_previous(&self, base_options: &KeysetPaginationOptionsForString) -> KeysetPaginationOptionsForString {
         let mut prev_options = base_options.clone();
         prev_options.sort_order = SortOrder::Descending;
-        prev_options.start_value = match base_options.sort_order {
-            SortOrder::Ascending => base_options.start_value.clone(),
-            SortOrder::Descending => self.next_value.clone(),
-        };
+        prev_options.start_value = self.start_value.clone();
         prev_options
     }
 
@@ -108,41 +102,57 @@ impl KeysetPaginationResultForString {
         min_entity: Option<EntityT>,
         max_entity: Option<EntityT>,
         getter: fn(EntityT) -> String,
-        page_size: usize,
+        max_page_size: usize,
         sort_order: SortOrder,
     ) -> (Vec<EntityT>, KeysetPaginationResultForString)
     where
         EntityT: ShopEntity + Clone,
     {
-        let max_value = max_entity.map(getter);
-        let min_value = min_entity.map(getter);
-        let start_value = all_entities
+        let max_value: Option<String> = max_entity.map(getter);
+        let min_value: Option<String> = min_entity.map(getter);
+        let start_value: Option<String> = all_entities
             .get(0)
             .map(|val| val.clone())
             .map(getter);
-        let next_value = all_entities
-            .get(page_size)
-            .map(|val| val.clone())
-            .map(getter);
+        let next_value = if all_entities.len() <= max_page_size {
+            None
+        } else {
+            all_entities
+                .get(match sort_order {
+                    SortOrder::Ascending => all_entities.len() - 1,
+                    SortOrder::Descending => 0,
+                })
+                .map(|val| val.clone())
+                .map(getter)
+        };
 
         debug_assert!(all_entities.len() == 0 && max_value.is_none() && min_value.is_none()
             || all_entities.len() > 0 && max_value.is_some() && min_value.is_some());
 
         // Note: If the page is empty, all *_value objects will be none, so will all equal each other, producing false
-        let has_greater_value = match sort_order {
+        let has_greater_value: bool = match sort_order {
             SortOrder::Ascending => next_value.is_some(),
             SortOrder::Descending => start_value != max_value,
         };
-        let has_lesser_value = match sort_order {
+        let has_lesser_value: bool = match sort_order {
             SortOrder::Ascending => start_value != min_value,
             SortOrder::Descending => next_value.is_some(),
         };
 
-        let page_size = usize::min(page_size, all_entities.len());
+        let page: Vec<EntityT> = if all_entities.len() <= max_page_size {
+            all_entities
+        } else {
+            debug_assert!(all_entities.len() == max_page_size.wrapping_add(1));
+            match sort_order {
+                SortOrder::Ascending => all_entities[0..max_page_size].to_vec(),
+                SortOrder::Descending => all_entities[1..max_page_size + 1].to_vec(),
+            }
+        };
+        let page_size = page.len() as u32;
         (
-            all_entities[..page_size].to_vec(),
+            page,
             KeysetPaginationResultForString {
-                page_size: page_size as u32,
+                page_size,
                 start_value,
                 next_value,
                 max_value,

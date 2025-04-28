@@ -56,12 +56,12 @@ pub async fn get_all_products_paged_display_name(
         }
     };
 
-    let entities = query.fetch_all(pgpool).await?;
-    let max_entity = query_as!(ProductEntity,
+    let entities: Vec<ProductEntity> = query.fetch_all(pgpool).await?;
+    let max_entity: Option<ProductEntity> = query_as!(ProductEntity,
         "select * from shop.public.product order by display_name desc limit 1")
         .fetch_optional(pgpool)
         .await?;
-    let min_entity = query_as!(ProductEntity,
+    let min_entity: Option<ProductEntity> = query_as!(ProductEntity,
         "select * from shop.public.product order by display_name asc limit 1")
         .fetch_optional(pgpool)
         .await?;
