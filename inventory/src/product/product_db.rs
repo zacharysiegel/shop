@@ -1,8 +1,7 @@
 use super::*;
 use crate::category::CategoryEntity;
-use crate::has_edge_records;
 use crate::item::ItemEntity;
-use crate::pagination::{KeysetPaginationOptionsForStr, KeysetPaginationResult, SortOrder};
+use crate::pagination::{KeysetPaginationOptionsForString, KeysetPaginationResultForString, SortOrder};
 use sqlx::postgres::{PgArguments, PgQueryResult, PgRow};
 use sqlx::query::Map;
 use sqlx::{query, query_as, Error, PgPool, Postgres};
@@ -17,14 +16,15 @@ pub async fn get_all_products(pgpool: &PgPool) -> Result<Vec<ProductEntity>, Err
         .await
 }
 
-pub async fn get_all_products_paged_display_name<'start_value>(
+pub async fn get_all_products_paged_display_name(
     pgpool: &PgPool,
-    keyset_pagination_options: KeysetPaginationOptionsForStr<'start_value>,
-) -> Result<(Vec<ProductEntity>, KeysetPaginationResult), Error> {
-    let sort_order: SortOrder = keyset_pagination_options.sort_order.unwrap_or_default();
+    keyset_pagination_options: KeysetPaginationOptionsForString,
+) -> Result<(Vec<ProductEntity>, KeysetPaginationResultForString), Error> {
     let start_value: String = keyset_pagination_options.start_value.unwrap_or_default().to_string();
 
-    let query: Map<Postgres, fn(PgRow) -> Result<ProductEntity, Error>, PgArguments> = match sort_order {
+    /* This function always returns records in ascending order on the ordered column, but we must alternate
+        between ascending and descending in order to move forward and backward between pages. */
+    let query: Map<Postgres, fn(PgRow) -> Result<ProductEntity, Error>, PgArguments> = match keyset_pagination_options.sort_order {
         SortOrder::Ascending => {
             query_as!(ProductEntity, "\
         		select id, display_name, internal_name, upc, release_date, created, updated
@@ -39,11 +39,16 @@ pub async fn get_all_products_paged_display_name<'start_value>(
         }
         SortOrder::Descending => {
             query_as!(ProductEntity, "\
-        		select id, display_name, internal_name, upc, release_date, created, updated
-        		from shop.public.product
-        		where display_name <= $1
-        		order by display_name desc
-                limit $2
+                with page as (
+                    select id, display_name, internal_name, upc, release_date, created, updated
+                    from shop.public.product
+                    where display_name < $1
+                    order by display_name desc
+                    limit $2
+                )
+                select id, display_name, internal_name, upc, release_date, created, updated
+                from page
+                order by display_name asc
         	",
                 start_value,
                 i64::from(keyset_pagination_options.page_size.wrapping_add(1)),
@@ -52,21 +57,47 @@ pub async fn get_all_products_paged_display_name<'start_value>(
     };
 
     let entities = query.fetch_all(pgpool).await?;
-    let (has_previous_record, has_additional_record) = has_edge_records!(
-        pgpool,
-        query!("select * from shop.public.product where display_name < $1 limit 1", start_value),
-        query!("select * from shop.public.product where display_name > $1 limit 1", start_value),
-        entities,
-        sort_order,
-        keyset_pagination_options.page_size,
-    );
+    let max_value = query_as!(ProductEntity,
+        "select * from shop.public.product order by display_name desc limit 1")
+        .fetch_optional(pgpool)
+        .await?
+        .map(|val| val.display_name);
+    let min_value = query_as!(ProductEntity,
+        "select * from shop.public.product order by display_name asc limit 1")
+        .fetch_optional(pgpool)
+        .await?
+        .map(|val| val.display_name);
+    let start_value = entities
+        .get(0)
+        .map(|val| val.clone().display_name);
+    let next_value = entities
+        .get(keyset_pagination_options.page_size as usize)
+        .map(|val| val.clone().display_name);
 
+    debug_assert!(entities.len() == 0 && max_value.is_none() && min_value.is_none()
+        || entities.len() > 0 && max_value.is_some() && min_value.is_some());
+
+    // Note: If the page is empty, all *_value objects will be none, so will all equal each other, producing false
+    let has_greater_value = match keyset_pagination_options.sort_order {
+        SortOrder::Ascending => next_value.is_some(),
+        SortOrder::Descending => start_value != max_value,
+    };
+    let has_lesser_value = match keyset_pagination_options.sort_order {
+        SortOrder::Ascending => start_value != min_value,
+        SortOrder::Descending => next_value.is_some(),
+    };
+
+    let page_size = usize::min(keyset_pagination_options.page_size as usize, entities.len());
     Ok((
-        entities[..(entities.len() - 1)].to_vec(),
-        KeysetPaginationResult {
-            page_size: (entities.len() - 1) as u32,
-            has_previous_record,
-            has_additional_record,
+        entities[..page_size].to_vec(),
+        KeysetPaginationResultForString {
+            page_size: page_size as u32,
+            start_value,
+            next_value,
+            max_value,
+            min_value,
+            has_greater_value,
+            has_lesser_value,
         }
     ))
 }

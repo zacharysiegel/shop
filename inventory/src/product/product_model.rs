@@ -1,6 +1,6 @@
 use crate::error::ShopError;
 use crate::object::JsonHttpResponse;
-use crate::pagination::KeysetPaginationResult;
+use crate::pagination::KeysetPaginationResultForString;
 use crate::{object, ShopEntity, ShopModel, ShopSerial};
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
@@ -71,4 +71,4 @@ impl ShopSerial for ProductSerial {
 }
 impl JsonHttpResponse for ProductSerial {}
 impl JsonHttpResponse for Vec<ProductSerial> {}
-impl JsonHttpResponse for (Vec<ProductSerial>, KeysetPaginationResult) {}
+impl JsonHttpResponse for (Vec<ProductSerial>, KeysetPaginationResultForString) {}

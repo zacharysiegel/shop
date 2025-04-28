@@ -3,7 +3,7 @@ use crate::category::CategorySerial;
 use crate::error::ShopError;
 use crate::item::{Item, ItemSerial};
 use crate::object::JsonHttpResponse;
-use crate::pagination::{pagination_guard, KeysetPaginationOptionsForStr};
+use crate::pagination::{pagination_guard, KeysetPaginationOptionsForString};
 use crate::{unwrap_result_else_400, unwrap_result_else_500, ShopModel};
 use actix_web::guard::fn_guard;
 use actix_web::http::StatusCode;
@@ -41,9 +41,9 @@ async fn get_all_products(
         .to_http_response()
 }
 
-async fn get_all_products_paged_display_name<'a>(
+async fn get_all_products_paged_display_name(
     pgpool: web::Data<PgPool>,
-    query: web::Query<KeysetPaginationOptionsForStr<'a>>,
+    query: web::Query<KeysetPaginationOptionsForString>,
 ) -> impl Responder {
     let query_result = product_db::get_all_products_paged_display_name(
         &pgpool.into_inner(),

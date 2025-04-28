@@ -2,34 +2,51 @@ use crate::admin::structure::error_text::error_text;
 use crate::admin::structure::form;
 use crate::admin::structure::{page, split};
 use crate::registry::REGISTRY;
-use actix_web::web;
 use actix_web::web::ServiceConfig;
-use inventory::pagination::{KeysetPaginationOptionsForStr, KeysetPaginationResult};
+use actix_web::{guard, web};
+use inventory::pagination::{pagination_guard, KeysetPaginationOptionsForString, KeysetPaginationResultForString};
 use inventory::product::ProductSerial;
 use maud::{html, Markup};
 
 pub const RELATIVE_PATH: &str = "/admin/product";
 
 pub fn configurer(config: &mut ServiceConfig) {
-    config.route("/product", web::get().to(render));
+    config
+        .route("/product",
+               web::get()
+                   .guard(guard::fn_guard(pagination_guard))
+                   .to(handle_paginated))
+        .route("/product", web::get().to(handle_unpaginated))
+    ;
 }
 
-async fn render() -> Markup {
+async fn handle_unpaginated() -> Markup {
+    render(None).await
+}
+
+async fn handle_paginated(
+    query: web::Query<KeysetPaginationOptionsForString>,
+) -> Markup {
+    render(Some(query.into_inner())).await
+}
+
+async fn render(pagination_options: Option<KeysetPaginationOptionsForString>) -> Markup {
     page::page(
         Some("Product"),
-        split::split(left().await, right()),
+        split::split(left(pagination_options).await, right()),
     )
 }
 
-async fn left() -> Markup {
-    let (product_vec, pagination_result) = match get_all_products_paged_display_name().await {
+async fn left(pagination_options: Option<KeysetPaginationOptionsForString>) -> Markup {
+    let pagination_options = pagination_options.unwrap_or_default();
+    let (product_vec, pagination_result) = match get_all_products_paged_display_name(&pagination_options).await {
         Ok(response) => response,
         Err(markup) => return markup,
     };
 
     html! {
         h2 { "Products" }
-        (pagination_control(pagination_result))
+        (pagination_control(&pagination_options, &pagination_result))
         ol {
             @if product_vec.is_empty() {
                 p { "None" }
@@ -40,20 +57,41 @@ async fn left() -> Markup {
                 }
             }
         }
+        (pagination_control(&pagination_options, &pagination_result))
     }
 }
 
-fn pagination_control(pagination_result: KeysetPaginationResult) -> Markup {
+fn pagination_control(pagination_options: &KeysetPaginationOptionsForString, pagination_result: &KeysetPaginationResultForString) -> Markup {
+    let next_page_params = {
+        let options = pagination_result.create_next(pagination_options);
+        match serde_urlencoded::to_string(options) {
+            Ok(val) => val,
+            Err(error) => return error_text(error),
+        }
+    };
+
+    let previous_page_params = {
+        let options = pagination_result.create_previous(pagination_options);
+        match serde_urlencoded::to_string(options) {
+            Ok(val) => val,
+            Err(error) => return error_text(error),
+        }
+    };
+
     html! {
         div style=(concat!(
             "display: flex; flex-direction: row; justify-content: center; align-items: center;",
-            "margin-bottom: 1rem;",
+            "margin: 1rem 0;",
         )) {
-            button disabled[!pagination_result.has_previous_record] { "<--" }
+            a href=(format!("{}/?{}", RELATIVE_PATH, previous_page_params)) {
+                button disabled[!pagination_result.has_lesser_value] { "<--" }
+            }
             span style=(concat!("margin: 0 1rem;")) {
                 (format!("Showing {} entries", pagination_result.page_size))
             }
-            button disabled[!pagination_result.has_additional_record] { "-->" }
+            a href=(format!("{}/?{}", RELATIVE_PATH, next_page_params)) {
+                button disabled[!pagination_result.has_greater_value] { "-->" }
+            }
         }
     }
 }
@@ -80,10 +118,8 @@ fn right() -> Markup {
     })
 }
 
-async fn get_all_products_paged_display_name() -> Result<(Vec<ProductSerial>, KeysetPaginationResult), Markup> {
-    let pagination_options = {
-        let mut pagination_options = KeysetPaginationOptionsForStr::default();
-        pagination_options.page_size = 3;
+async fn get_all_products_paged_display_name(pagination_options: &KeysetPaginationOptionsForString) -> Result<(Vec<ProductSerial>, KeysetPaginationResultForString), Markup> {
+    let query_params = {
         let pagination_options = match serde_urlencoded::to_string(pagination_options) {
             Ok(pagination_options) => pagination_options,
             Err(error) => return Err(error_text(error)),
@@ -91,7 +127,7 @@ async fn get_all_products_paged_display_name() -> Result<(Vec<ProductSerial>, Ke
         pagination_options
     };
 
-    let result = REGISTRY.http_client.get(format!("{}{}?{}", REGISTRY.remote_url, "/product", pagination_options))
+    let result = REGISTRY.http_client.get(format!("{}{}?{}", REGISTRY.remote_url, "/product", query_params))
         .send()
         .await;
 
@@ -101,7 +137,7 @@ async fn get_all_products_paged_display_name() -> Result<(Vec<ProductSerial>, Ke
             return Err(error_text(error));
         }
     };
-    match response.json::<(Vec<ProductSerial>, KeysetPaginationResult)>().await {
+    match response.json::<(Vec<ProductSerial>, KeysetPaginationResultForString)>().await {
         Ok(deserialized) => Ok(deserialized),
         Err(error) => Err(error_text(error)),
     }
