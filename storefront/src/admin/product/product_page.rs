@@ -39,11 +39,7 @@ async fn render(pagination_options: Option<KeysetPaginationOptionsForString>) ->
 }
 
 async fn left(pagination_options: Option<KeysetPaginationOptionsForString>) -> Markup {
-    let pagination_options = {
-        let mut x = pagination_options.unwrap_or_default();
-        x.max_page_size = 2;
-        x
-    };
+    let pagination_options = pagination_options.unwrap_or_default();
     let (product_vec, pagination_result) = match get_all_products_paged_display_name(&pagination_options).await {
         Ok(response) => response,
         Err(markup) => return markup,
