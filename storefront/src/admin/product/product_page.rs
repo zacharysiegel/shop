@@ -7,6 +7,7 @@ use actix_web::{guard, web};
 use inventory::pagination::{pagination_guard, Direction, KeysetPaginationOptionsForString, KeysetPaginationResultForString};
 use inventory::product::ProductSerial;
 use maud::{html, Markup};
+use crate::url_encoded_pagination_options_else_err;
 
 pub const RELATIVE_PATH: &str = "/admin/product";
 
@@ -66,21 +67,12 @@ async fn left(pagination_options: Option<KeysetPaginationOptionsForString>) -> M
 }
 
 fn pagination_control(pagination_options: &KeysetPaginationOptionsForString, pagination_result: &KeysetPaginationResultForString) -> Markup {
-    let next_page_params = {
-        let options = pagination_result.create(&Direction::Ascending, &pagination_options.max_page_size);
-        match serde_urlencoded::to_string(options) {
-            Ok(val) => val,
-            Err(error) => return error_text(error),
-        }
-    };
-
-    let previous_page_params = {
-        let options = pagination_result.create(&Direction::Descending, &pagination_options.max_page_size);
-        match serde_urlencoded::to_string(options) {
-            Ok(val) => val,
-            Err(error) => return error_text(error),
-        }
-    };
+    let next_page_params = url_encoded_pagination_options_else_err!(
+        pagination_result.create(&Direction::Ascending, &pagination_options.max_page_size)
+    );
+    let previous_page_params = url_encoded_pagination_options_else_err!(
+        pagination_result.create(&Direction::Descending, &pagination_options.max_page_size)
+    );
 
     html! {
         div style=(concat!(
