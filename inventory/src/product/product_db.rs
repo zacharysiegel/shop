@@ -1,7 +1,7 @@
 use super::*;
 use crate::category::CategoryEntity;
 use crate::item::ItemEntity;
-use crate::pagination::{KeysetPaginationOptionsForString, KeysetPaginationResultForString, SortOrder};
+use crate::pagination::{Direction, KeysetPaginationOptionsForString, KeysetPaginationResultForString};
 use sqlx::postgres::{PgArguments, PgQueryResult, PgRow};
 use sqlx::query::Map;
 use sqlx::{query, query_as, Error, PgPool, Postgres};
@@ -20,12 +20,17 @@ pub async fn get_all_products_paged_display_name(
     pgpool: &PgPool,
     keyset_pagination_options: KeysetPaginationOptionsForString,
 ) -> Result<(Vec<ProductEntity>, KeysetPaginationResultForString), Error> {
+    let limit: u32 = if keyset_pagination_options.start_value.is_none() {
+        keyset_pagination_options.max_page_size
+    } else {
+        keyset_pagination_options.max_page_size.saturating_add(1)
+    };
     let start_value: String = keyset_pagination_options.start_value.unwrap_or_default().to_string();
 
     /* This function always returns records in ascending order on the ordered column, but we must alternate
         between ascending and descending in order to move forward and backward between pages. */
-    let query: Map<Postgres, fn(PgRow) -> Result<ProductEntity, Error>, PgArguments> = match keyset_pagination_options.sort_order {
-        SortOrder::Ascending => {
+    let query: Map<Postgres, fn(PgRow) -> Result<ProductEntity, Error>, PgArguments> = match keyset_pagination_options.direction {
+        Direction::Ascending => {
             query_as!(ProductEntity, "\
         		select id, display_name, internal_name, upc, release_date, created, updated
         		from shop.public.product
@@ -34,15 +39,15 @@ pub async fn get_all_products_paged_display_name(
                 limit $2
         	",
                 start_value,
-                i64::from(keyset_pagination_options.page_size.wrapping_add(1)),
+                i64::from(limit),
             )
         }
-        SortOrder::Descending => {
+        Direction::Descending => {
             query_as!(ProductEntity, "\
                 with page as (
                     select id, display_name, internal_name, upc, release_date, created, updated
                     from shop.public.product
-                    where display_name < $1
+                    where display_name <= $1
                     order by display_name desc
                     limit $2
                 )
@@ -51,28 +56,27 @@ pub async fn get_all_products_paged_display_name(
                 order by display_name asc
         	",
                 start_value,
-                i64::from(keyset_pagination_options.page_size.wrapping_add(1)),
+                i64::from(limit),
             )
         }
     };
 
     let entities: Vec<ProductEntity> = query.fetch_all(pgpool).await?;
-    let max_entity: Option<ProductEntity> = query_as!(ProductEntity,
+    let relation_max_entity: Option<ProductEntity> = query_as!(ProductEntity,
         "select * from shop.public.product order by display_name desc limit 1")
         .fetch_optional(pgpool)
         .await?;
-    let min_entity: Option<ProductEntity> = query_as!(ProductEntity,
+    let relation_min_entity: Option<ProductEntity> = query_as!(ProductEntity,
         "select * from shop.public.product order by display_name asc limit 1")
         .fetch_optional(pgpool)
         .await?;
 
     Ok(KeysetPaginationResultForString::from_entities(
         entities,
-        min_entity,
-        max_entity,
+        relation_min_entity,
+        relation_max_entity,
         |val| val.display_name,
-        keyset_pagination_options.page_size as usize,
-        keyset_pagination_options.sort_order,
+        keyset_pagination_options.max_page_size as usize,
     ))
 }
 

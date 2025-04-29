@@ -1,4 +1,3 @@
-use crate::error::ShopError;
 use crate::ShopEntity;
 use actix_web::guard;
 use serde::{Deserialize, Serialize};
@@ -12,49 +11,38 @@ pub fn pagination_guard(ctx: &guard::GuardContext) -> bool {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub enum SortOrder {
+pub enum Direction {
     #[serde(rename = "asc")]
     Ascending,
     #[serde(rename = "desc")]
     Descending,
 }
 
-impl Default for SortOrder {
+impl Default for Direction {
     fn default() -> Self {
-        SortOrder::Ascending
+        Direction::Ascending
     }
 }
 
-/// T: Type of sorted column (as expressed in the ShopEntity implementor)
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct KeysetPaginationOptionsForString {
     /// Maximum number of elements in a returned page.
-    /// Maximum allowed value is u32::MAX - 1
-    pub page_size: u32,
-
-    /// If none, returns the first page
-    pub start_value: Option<String>,
-
-    /// If none, a default is used. Default varies per table.
-    pub sort_order: SortOrder,
+    pub max_page_size: u32,
+    /// Ascend or descend in the relation from your current position.
+    pub direction: Direction,
+    /// If ascending, this is the preceding element to the desired page.
+    /// If descending, this is the maximal element in the desired page.
+    /// If none, returns the first page.
+    pub start_value: Option<String>, // todo: what happens with None + Descending?
 }
-
-impl KeysetPaginationOptionsForString {
-    pub fn validated(self) -> Result<Self, ShopError> {
-        let will_overflow: bool = self.page_size.overflowing_add(1).1;
-        match will_overflow {
-            true => Err(ShopError { message: format!("Error validating pagination options [{:?}]", self) }),
-            false => Ok(self)
-        }
-    }
-}
+// todo: validation
 
 impl Default for KeysetPaginationOptionsForString {
     fn default() -> Self {
         KeysetPaginationOptionsForString {
-            page_size: 50,
+            max_page_size: 50,
+            direction: Direction::Ascending,
             start_value: None,
-            sort_order: SortOrder::Ascending,
         }
     }
 }
@@ -62,14 +50,12 @@ impl Default for KeysetPaginationOptionsForString {
 #[derive(Debug, Serialize, Deserialize)]
 pub struct KeysetPaginationResultForString {
     pub page_size: u32,
-    /// The first element in the returned page.
-    pub start_value: Option<String>,
-    /// The next element which would be returned after the end of the returned page.
-    pub next_value: Option<String>,
+    pub l_value: Option<String>,
+    pub r_value: Option<String>,
     /// The maximum value for the entire table.
-    pub max_value: Option<String>,
+    pub relation_max_value: Option<String>,
     /// The minimum value for the entire table.
-    pub min_value: Option<String>,
+    pub relation_min_value: Option<String>,
     /// True iff min_value is less than the minimum value in the current page.
     /// This comparison should be performed by the DBMS.
     pub has_lesser_value: bool,
@@ -79,84 +65,96 @@ pub struct KeysetPaginationResultForString {
 }
 
 impl KeysetPaginationResultForString {
-    /// From this result object and the options object used for the latest request,
-    /// construct a new options object to request the "next" page.
-    pub fn create_next(&self, base_options: &KeysetPaginationOptionsForString) -> KeysetPaginationOptionsForString {
-        let mut next_options = base_options.clone();
-        next_options.sort_order = SortOrder::Ascending;
-        next_options.start_value = self.next_value.clone();
-        next_options
+    pub fn create(&self, direction: &Direction, max_page_size: &u32) -> KeysetPaginationOptionsForString {
+        KeysetPaginationOptionsForString {
+            max_page_size: max_page_size.clone(),
+            direction: direction.clone(),
+            start_value: match direction {
+                Direction::Ascending => self.r_value.clone(),
+                Direction::Descending => self.l_value.clone(),
+            },
+        }
     }
 
-    /// From this result object and the options object used for the latest request,
-    /// construct a new options object to request the "previous" page.
-    pub fn create_previous(&self, base_options: &KeysetPaginationOptionsForString) -> KeysetPaginationOptionsForString {
-        let mut prev_options = base_options.clone();
-        prev_options.sort_order = SortOrder::Descending;
-        prev_options.start_value = self.start_value.clone();
-        prev_options
-    }
-
+    /// entities: This vector should be retrieved from the DBMS in ascending sorted order.
     pub fn from_entities<EntityT>(
-        all_entities: Vec<EntityT>,
-        min_entity: Option<EntityT>,
-        max_entity: Option<EntityT>,
+        entities: Vec<EntityT>,
+        relation_min_entity: Option<EntityT>,
+        relation_max_entity: Option<EntityT>,
         getter: fn(EntityT) -> String,
         max_page_size: usize,
-        sort_order: SortOrder,
     ) -> (Vec<EntityT>, KeysetPaginationResultForString)
     where
         EntityT: ShopEntity + Clone,
     {
-        let max_value: Option<String> = max_entity.map(getter);
-        let min_value: Option<String> = min_entity.map(getter);
-        let start_value: Option<String> = all_entities
-            .get(0)
-            .map(|val| val.clone())
-            .map(getter);
-        let next_value = if all_entities.len() <= max_page_size {
-            None
-        } else {
-            all_entities
-                .get(match sort_order {
-                    SortOrder::Ascending => all_entities.len() - 1,
-                    SortOrder::Descending => 0,
-                })
-                .map(|val| val.clone())
-                .map(getter)
-        };
+        let relation_max_value: Option<String> = relation_max_entity.map(getter);
+        let relation_min_value: Option<String> = relation_min_entity.map(getter);
+        debug_assert!(
+            entities.len() == 0 && relation_max_value.is_none() && relation_min_value.is_none()
+                || entities.len() > 0 && relation_max_value.is_some() && relation_min_value.is_some()
+        );
 
-        debug_assert!(all_entities.len() == 0 && max_value.is_none() && min_value.is_none()
-            || all_entities.len() > 0 && max_value.is_some() && min_value.is_some());
+        let l_value: Option<String> = {
+            if entities.len() == 0 {
+                None
+            } else {
+                let first_value = entities.get(0)
+                    .map(|val| val.clone())
+                    .map(getter);
+                debug_assert!(first_value.is_some()); // Vector is not empty.
 
-        // Note: If the page is empty, all *_value objects will be none, so will all equal each other, producing false
-        let has_greater_value: bool = match sort_order {
-            SortOrder::Ascending => next_value.is_some(),
-            SortOrder::Descending => start_value != max_value,
-        };
-        let has_lesser_value: bool = match sort_order {
-            SortOrder::Ascending => start_value != min_value,
-            SortOrder::Descending => next_value.is_some(),
-        };
-
-        let page: Vec<EntityT> = if all_entities.len() <= max_page_size {
-            all_entities
-        } else {
-            debug_assert!(all_entities.len() == max_page_size.wrapping_add(1));
-            match sort_order {
-                SortOrder::Ascending => all_entities[0..max_page_size].to_vec(),
-                SortOrder::Descending => all_entities[1..max_page_size + 1].to_vec(),
+                if entities.len() == max_page_size + 1 {
+                    first_value
+                } else {
+                    // Vector has been truncated. It is at the edge of the relation.
+                    if first_value == relation_min_value {
+                        None
+                    } else {
+                        first_value
+                    }
+                }
             }
         };
-        let page_size = page.len() as u32;
+        let r_value: Option<String> = {
+            if entities.len() == 0 {
+                None
+            } else {
+                let last_value = entities.get(entities.len() - 1)
+                    .map(|val| val.clone())
+                    .map(getter);
+                debug_assert!(last_value.is_some()); // Vector is not empty.
+
+                if last_value == relation_max_value {
+                    None
+                } else {
+                    last_value
+                }
+            }
+        };
+
+        let has_greater_value: bool = r_value.is_some();
+        let has_lesser_value: bool = l_value.is_some();
+
+        let page: Vec<EntityT> = if entities.len() == max_page_size + 1 {
+            entities[1..].to_vec()
+        } else {
+            // Page is truncated
+            if l_value.is_some() {
+                entities[1..].to_vec()
+            } else {
+                entities[..].to_vec()
+            }
+        };
+        let page_size: u32 = page.len() as u32;
+
         (
             page,
             KeysetPaginationResultForString {
                 page_size,
-                start_value,
-                next_value,
-                max_value,
-                min_value,
+                l_value,
+                r_value,
+                relation_max_value,
+                relation_min_value,
                 has_greater_value,
                 has_lesser_value,
             }

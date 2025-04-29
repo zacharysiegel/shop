@@ -4,7 +4,7 @@ use crate::admin::structure::{page, split};
 use crate::registry::REGISTRY;
 use actix_web::web::ServiceConfig;
 use actix_web::{guard, web};
-use inventory::pagination::{pagination_guard, KeysetPaginationOptionsForString, KeysetPaginationResultForString};
+use inventory::pagination::{pagination_guard, Direction, KeysetPaginationOptionsForString, KeysetPaginationResultForString};
 use inventory::product::ProductSerial;
 use maud::{html, Markup};
 
@@ -40,7 +40,7 @@ async fn render(pagination_options: Option<KeysetPaginationOptionsForString>) ->
 async fn left(pagination_options: Option<KeysetPaginationOptionsForString>) -> Markup {
     let pagination_options = {
         let mut x = pagination_options.unwrap_or_default();
-        x.page_size = 2;
+        x.max_page_size = 2;
         x
     };
     let (product_vec, pagination_result) = match get_all_products_paged_display_name(&pagination_options).await {
@@ -67,7 +67,7 @@ async fn left(pagination_options: Option<KeysetPaginationOptionsForString>) -> M
 
 fn pagination_control(pagination_options: &KeysetPaginationOptionsForString, pagination_result: &KeysetPaginationResultForString) -> Markup {
     let next_page_params = {
-        let options = pagination_result.create_next(pagination_options);
+        let options = pagination_result.create(&Direction::Ascending, &pagination_options.max_page_size);
         match serde_urlencoded::to_string(options) {
             Ok(val) => val,
             Err(error) => return error_text(error),
@@ -75,7 +75,7 @@ fn pagination_control(pagination_options: &KeysetPaginationOptionsForString, pag
     };
 
     let previous_page_params = {
-        let options = pagination_result.create_previous(pagination_options);
+        let options = pagination_result.create(&Direction::Descending, &pagination_options.max_page_size);
         match serde_urlencoded::to_string(options) {
             Ok(val) => val,
             Err(error) => return error_text(error),
