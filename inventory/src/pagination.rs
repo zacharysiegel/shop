@@ -1,6 +1,8 @@
+use std::cmp::PartialEq;
 use crate::ShopEntity;
 use actix_web::guard;
 use serde::{Deserialize, Serialize};
+use crate::error::ShopError;
 
 pub fn pagination_guard(ctx: &guard::GuardContext) -> bool {
     ctx.head()
@@ -10,7 +12,7 @@ pub fn pagination_guard(ctx: &guard::GuardContext) -> bool {
         .contains("page_size")
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub enum Direction {
     #[serde(rename = "asc")]
     Ascending,
@@ -33,9 +35,24 @@ pub struct KeysetPaginationOptionsForString {
     /// If ascending, this is the preceding element to the desired page.
     /// If descending, this is the maximal element in the desired page.
     /// If none, returns the first page.
-    pub start_value: Option<String>, // todo: what happens with None + Descending?
+    pub start_value: Option<String>,
 }
-// todo: validation
+
+impl KeysetPaginationOptionsForString {
+    pub fn validated(self) -> Result<Self, ShopError> {
+        if self.max_page_size.overflowing_add(1).1 {
+            return Err(ShopError { message: format!("Maximum page size exceeds maximum value; [{}]", u32::MAX - 1) });
+        } else if self.max_page_size == 0 {
+            return Err(ShopError { message: "Maximum page size cannot be zero;".to_string() });
+        }
+        
+        if (self.start_value.is_none() && self.direction == Direction::Descending) {
+            return Err(ShopError { message: "Unspecified start value cannot request a descending page;".to_string() });
+        }
+
+        Ok(self)
+    }
+}
 
 impl Default for KeysetPaginationOptionsForString {
     fn default() -> Self {
