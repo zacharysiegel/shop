@@ -1,3 +1,4 @@
+use inventory::environment::RuntimeEnvironment;
 use log::LevelFilter;
 use sqlx::{Pool, Postgres};
 
@@ -10,6 +11,8 @@ async fn main() -> Result<(), std::io::Error> {
         .filter_module("actix_server", LevelFilter::Debug)
         .filter_module("actix_web::middleware::logger", LevelFilter::Warn)
         .init();
+
+    log::info!("Runtime environment: {:?}", RuntimeEnvironment::default());
 
     let pgpool: Pool<Postgres> = inventory::db::sqlx_connect().await?;
     inventory::server::open_server(pgpool).await

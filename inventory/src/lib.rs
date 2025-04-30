@@ -1,13 +1,6 @@
 // Declarative macros (macro_rules) must be defined before use
 mod macros;
 
-pub mod db;
-pub mod env;
-pub mod server;
-pub mod error;
-pub mod object;
-pub mod pagination;
-
 // Models
 pub mod category;
 pub mod customer;
@@ -22,5 +15,13 @@ pub mod marketplace;
 pub mod metric_counter;
 pub mod product;
 pub mod purchase;
+
+pub mod db;
+pub mod env;
+pub mod server;
+pub mod error;
+pub mod object;
+pub mod pagination;
+pub mod environment;
 
 pub use object::*;
