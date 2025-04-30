@@ -27,7 +27,7 @@ async fn left() -> Markup {
 
     html! {
         h2 { "All categories" }
-        ol {
+        ol .tree {
             @if elements.is_empty() {
                 p { "None" }
             }

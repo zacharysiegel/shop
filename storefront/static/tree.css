@@ -1,0 +1,60 @@
+.tree,
+.tree ol,
+.tree ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.tree ol,
+.tree ul {
+    margin-left: 0.4em;
+    position: relative;
+}
+
+.tree ol ol,
+.tree ul ul {
+    margin-left: .3em;
+}
+
+.tree ol:before,
+.tree ul:before {
+    content: "";
+    display: block;
+    width: 0;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    border-left: 1px solid;
+}
+
+.tree li {
+    margin: 0;
+    padding: 0 0.8em;
+    line-height: 2em;
+    font-weight: 700;
+    position: relative;
+}
+
+.tree ol li:before,
+.tree ul li:before {
+    content: "";
+    display: block;
+    width: 10px;
+    height: 0;
+    border-top: 1px solid;
+    margin-top: -1px;
+    position: absolute;
+    top: 1em;
+    left: 0;
+}
+
+.tree ol li:last-child:before,
+.tree ul li:last-child:before {
+    /* Same as background. Covers trailing vertical border on the last list item. */
+    background: var(--color-base);
+    height: auto;
+    top: 1em;
+    bottom: 0;
+}

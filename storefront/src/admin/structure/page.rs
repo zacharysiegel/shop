@@ -9,6 +9,7 @@ pub fn page(current_page_name: Option<&str>, content: Markup) -> Markup {
 				title {"Shop | Administration"}
 				link rel="stylesheet" type="text/css" href="/reset.css";
 				link rel="stylesheet" type="text/css" href="/base.css";
+				link rel="stylesheet" type="text/css" href="/tree.css";
 				script src="/submit_form.js" {};
 			}
 			body style=(concat!(
