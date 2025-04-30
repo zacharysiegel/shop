@@ -72,7 +72,6 @@ async fn left(pagination_options: Option<KeysetPaginationOptionsForString>) -> M
 fn right() -> Markup {
     html! {
         (create_form())
-        hr style=("margin: 1rem 0") {}
         (delete_form())
     }
 }
@@ -102,6 +101,7 @@ fn create_form() -> Markup {
 fn delete_form() -> Markup {
     html! {
         div #(DELETE_FORM_CONTAINER_ID) style=(concat!("display: none;")) {
+            hr style=("margin: 1rem 0") {}
             (form::form("Delete product", "undefined", Method::DELETE, html! {
                 label {
                     "ID"
@@ -149,7 +149,7 @@ fn activate_form_script(id: &Uuid) -> String {
     format!(r#"
         const form_container = document.getElementById("{0}");
         form_container.style.display = "block";
-        const form = form_container.firstChild.lastChild;
+        const form = form_container.lastChild.lastChild;
         form.action = "{1}{2}{3}";
         form.id.value = "{3}";
     "#,
