@@ -22,7 +22,7 @@ function submit_form(submit_event) {
         adds significant bloat when each field's data is encoded in UTF-8 and is generally small.
         We convert to JSON instead. */
     const request = new XMLHttpRequest();
-    request.open("POST", form.action)
+    request.open(form.dataset["method"], form.action)
     request.setRequestHeader("content-type", "application/json");
     request.send(JSON.stringify(form_data_as_object));
 }

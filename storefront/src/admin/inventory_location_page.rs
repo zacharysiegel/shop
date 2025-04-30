@@ -4,6 +4,7 @@ use actix_web::web;
 use actix_web::web::ServiceConfig;
 use inventory::inventory_location::InventoryLocationSerial;
 use maud::{html, Markup};
+use reqwest::Method;
 
 pub const RELATIVE_PATH: &str = "/admin/inventory_location";
 
@@ -36,7 +37,7 @@ async fn left() -> Markup {
 }
 
 fn right() -> Markup {
-    form::form("Create inventory location", "/inventory_location", html! {
+    form::form("Create inventory location", "/inventory_location", Method::POST, html! {
         label {
             "Display name"
             input type="text" name="display_name";

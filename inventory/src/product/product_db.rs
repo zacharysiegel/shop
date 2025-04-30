@@ -95,6 +95,20 @@ pub async fn get_product(
         .await
 }
 
+pub async fn delete_product(
+    pgpool: &PgPool,
+    product_id: &Uuid,
+) -> Result<PgQueryResult, Error> {
+    query!("
+        delete from shop.public.product
+        where id = $1
+    ",
+        product_id,
+    )
+        .execute(pgpool)
+        .await
+}
+
 pub async fn get_product_categories(
     pgpool: &PgPool,
     product_id: &Uuid,

@@ -23,6 +23,7 @@ pub fn configurer(config: &mut web::ServiceConfig) {
                 .guard(guard::Header("content-type", "application/json"))
                 .to(create_product_json))
             .route("/{product_id}", web::get().to(get_product))
+            .route("/{product_id}", web::delete().to(delete_product))
             .route("/{product_id}/category", web::get().to(get_product_categories))
             .route("/{product_id}/category/{category_id}", web::post().to(create_product_category_association))
             .route("/{product_id}/category/{category_id}", web::delete().to(delete_product_category_association))
@@ -70,6 +71,15 @@ async fn get_product(pgpool: web::Data<PgPool>, product_id: web::Path<String>) -
     product
         .map(|product| product.to_serial().to_http_response())
         .unwrap_or(HttpResponseBuilder::new(StatusCode::INTERNAL_SERVER_ERROR).finish())
+}
+
+async fn delete_product(
+    pgpool: web::Data<PgPool>,
+    product_id: web::Path<String>,
+) -> impl Responder {
+    let product_id = unwrap_result_else_400!(Uuid::try_parse(product_id.into_inner().as_str()));
+    let query_result = unwrap_result_else_500!(product_db::delete_product(&pgpool, &product_id).await);
+    HttpResponse::Ok().body(query_result.rows_affected().to_string())
 }
 
 // todo: restrict to authenticated administrator

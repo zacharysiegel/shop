@@ -3,14 +3,18 @@ use crate::admin::api::wrapped_get;
 use crate::admin::structure::error_text::error_text;
 use crate::admin::structure::form;
 use crate::admin::structure::{page, split};
+use crate::registry::REGISTRY;
 use actix_web::web::ServiceConfig;
 use actix_web::{guard, web};
 use admin::structure::pagination_control::pagination_control;
 use inventory::pagination::{pagination_guard, KeysetPaginationOptionsForString, KeysetPaginationResultForString};
 use inventory::product::ProductSerial;
 use maud::{html, Markup};
+use reqwest::Method;
+use uuid::Uuid;
 
 pub const RELATIVE_PATH: &str = "/admin/product";
+pub const DELETE_FORM_CONTAINER_ID: &str = "delete_form_container";
 
 pub fn configurer(config: &mut ServiceConfig) {
     config
@@ -66,7 +70,15 @@ async fn left(pagination_options: Option<KeysetPaginationOptionsForString>) -> M
 }
 
 fn right() -> Markup {
-    form::form("Create product", "/product", html! {
+    html! {
+        (create_form())
+        hr style=("margin: 1rem 0") {}
+        (delete_form())
+    }
+}
+
+fn create_form() -> Markup {
+    form::form("Create product", "/product", Method::POST, html! {
         label {
             "Display name"
             input type="text" name="display_name";
@@ -87,7 +99,22 @@ fn right() -> Markup {
     })
 }
 
-const HEADINGS: [&str; 5] = ["id", "display_name", "internal_name", "upc", "release_date"];
+fn delete_form() -> Markup {
+    html! {
+        div #(DELETE_FORM_CONTAINER_ID) style=(concat!("display: none;")) {
+            (form::form("Delete product", "undefined", Method::DELETE, html! {
+                label {
+                    "ID"
+                    input type="text" name="id" disabled[true];
+                }
+                input type="submit";
+                button onclick=(cancel_form_script()) { "Cancel" }
+            }))
+        }
+    }
+}
+
+const HEADINGS: [&str; 6] = ["id", "display_name", "internal_name", "upc", "release_date", "actions"];
 
 fn table(elements: Vec<ProductSerial>) -> Markup {
     html! {
@@ -106,9 +133,39 @@ fn table(elements: Vec<ProductSerial>) -> Markup {
                         td { (format!("{:?}", element.upc)) }
                         td { (format!("{:?}", element.release_date)) }
                         // todo: actions column (e.g. create item, delete, modify)
+                        td {
+                            button
+                                style="margin: .2rem;"
+                                onclick=(activate_form_script(&element.id)) {"Delete"}
+                        }
                     }
                 }
             }
         }
     }
+}
+
+fn activate_form_script(id: &Uuid) -> String {
+    format!(r#"
+        const form_container = document.getElementById("{0}");
+        form_container.style.display = "block";
+        const form = form_container.firstChild.lastChild;
+        form.action = "{1}{2}{3}";
+        form.id.value = "{3}";
+    "#,
+            DELETE_FORM_CONTAINER_ID,
+            REGISTRY.remote_url,
+            "/product/",
+            id.to_string(),
+    ).to_string()
+}
+
+fn cancel_form_script() -> String {
+    format!(r#"
+        event.preventDefault();
+        const form_container = document.getElementById("{}");
+        form_container.style.display = "none";
+    "#,
+            DELETE_FORM_CONTAINER_ID,
+    ).to_string()
 }

@@ -2,6 +2,7 @@ use crate::admin::structure::{form, page, split};
 use actix_web::web;
 use actix_web::web::ServiceConfig;
 use maud::{html, Markup};
+use reqwest::Method;
 
 pub const RELATIVE_PATH: &str = "/admin/item";
 
@@ -21,7 +22,7 @@ fn left() -> Markup {
 }
 
 fn right() -> Markup {
-    form::form("Create item", "/item", html! {
+    form::form("Create item", "/item", Method::POST, html! {
         
     })
 }

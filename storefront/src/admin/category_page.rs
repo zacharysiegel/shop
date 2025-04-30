@@ -4,6 +4,7 @@ use actix_web::web;
 use actix_web::web::ServiceConfig;
 use inventory::category::CategorySerial;
 use maud::{html, Markup};
+use reqwest::Method;
 
 pub const RELATIVE_PATH: &str = "/admin/category";
 
@@ -36,7 +37,7 @@ async fn left() -> Markup {
 }
 
 fn right() -> Markup {
-    form::form("Create category", "/category", html! {
+    form::form("Create category", "/category", Method::POST, html! {
         label {
             "Display name"
             input type="text" name="display_name";
