@@ -1,8 +1,8 @@
 use crate::admin;
+use crate::admin::api::wrapped_get;
 use crate::admin::structure::error_text::error_text;
 use crate::admin::structure::form;
 use crate::admin::structure::{page, split};
-use crate::registry::REGISTRY;
 use actix_web::web::ServiceConfig;
 use actix_web::{guard, web};
 use admin::structure::pagination_control::pagination_control;
@@ -41,7 +41,14 @@ async fn render(pagination_options: Option<KeysetPaginationOptionsForString>) ->
 
 async fn left(pagination_options: Option<KeysetPaginationOptionsForString>) -> Markup {
     let pagination_options = pagination_options.unwrap_or_default();
-    let (product_vec, pagination_result) = match get_all_products_paged_display_name(&pagination_options).await {
+    let query_params = match serde_urlencoded::to_string(&pagination_options) {
+        Ok(pagination_options) => pagination_options,
+        Err(error) => return error_text(error),
+    };
+
+    let (product_vec, pagination_result) = match wrapped_get::<(Vec<ProductSerial>, KeysetPaginationResultForString)>(
+        format!("/product?{}", query_params).as_str()
+    ).await {
         Ok(response) => response,
         Err(markup) => return markup,
     };
@@ -83,28 +90,4 @@ fn right() -> Markup {
         }
         input type="submit";
     })
-}
-
-async fn get_all_products_paged_display_name(
-    pagination_options: &KeysetPaginationOptionsForString,
-) -> Result<(Vec<ProductSerial>, KeysetPaginationResultForString), Markup> {
-    let query_params = match serde_urlencoded::to_string(pagination_options) {
-        Ok(pagination_options) => pagination_options,
-        Err(error) => return Err(error_text(error)),
-    };
-
-    let result = REGISTRY.http_client.get(format!("{}{}?{}", REGISTRY.remote_url, "/product", query_params))
-        .send()
-        .await;
-
-    let response = match result {
-        Ok(response) => response,
-        Err(error) => {
-            return Err(error_text(error));
-        }
-    };
-    match response.json::<(Vec<ProductSerial>, KeysetPaginationResultForString)>().await {
-        Ok(deserialized) => Ok(deserialized),
-        Err(error) => Err(error_text(error)),
-    }
 }

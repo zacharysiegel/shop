@@ -1,5 +1,5 @@
+use crate::admin::api::wrapped_get;
 use crate::admin::structure::{form, page, split};
-use crate::registry::REGISTRY;
 use actix_web::web;
 use actix_web::web::ServiceConfig;
 use inventory::category::CategorySerial;
@@ -20,7 +20,7 @@ async fn render() -> Markup {
 
 
 async fn left() -> Markup {
-    let elements: Vec<CategorySerial> = match get_all_categories().await {
+    let elements: Vec<CategorySerial> = match wrapped_get("/category").await {
         Ok(elements) => elements,
         Err(markup) => return markup,
     };
@@ -56,25 +56,4 @@ fn right() -> Markup {
         }
         input type="submit";
     })
-}
-
-// todo: create a generic api call function once we flush out the pattern
-async fn get_all_categories() -> Result<Vec<CategorySerial>, Markup> {
-    let result = REGISTRY.http_client
-        .get(format!("{}{}", REGISTRY.remote_url, "/category"))
-        .send()
-        .await;
-    let response = match result {
-        Ok(response) => response,
-        Err(error) => {
-            return Err(html!((format!("Error: {:#}", error))));
-        }
-    };
-    let vec = match response.json::<Vec<CategorySerial>>().await {
-        Ok(element) => element,
-        Err(error) => {
-            return Err(html!((format!("Error: {:#}", error))));
-        }
-    };
-    Ok(vec)
 }

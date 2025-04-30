@@ -1,5 +1,6 @@
 pub mod index_page;
 pub mod structure;
+pub mod api;
 
 mod category_page;
 mod product_page;
