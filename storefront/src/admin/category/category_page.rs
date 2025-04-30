@@ -42,7 +42,19 @@ async fn left() -> Markup {
 
 fn right() -> Markup {
     form::form("Create category", "/category", html! {
-
+        label {
+            "Display name"
+            input type="text" name="display_name";
+        }
+        label {
+            "Internal name"
+            input type="text" name="internal_name";
+        }
+        label {
+            "Parent ID (optional)"
+            input type="text" name="parent_id";
+        }
+        input type="submit";
     })
 }
 
