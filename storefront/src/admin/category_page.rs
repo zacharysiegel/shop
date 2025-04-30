@@ -27,15 +27,10 @@ async fn left() -> Markup {
 
     html! {
         h2 { "All categories" }
-        ol {
-            @if elements.is_empty() {
-                p { "None" }
-            }
-            @for element in &elements {
-                li {
-                    (format!("{:#?}", element))
-                }
-            }
+        @if elements.is_empty() {
+            p { "None" }
+        } @else {
+            (table(elements))
         }
     }
 }
@@ -56,4 +51,27 @@ fn right() -> Markup {
         }
         input type="submit";
     })
+}
+
+const HEADINGS: [&str; 4] = ["id", "display_name", "internal_name", "parent_id"];
+fn table(elements: Vec<CategorySerial>) -> Markup {
+    html! {
+        table {
+            thead {
+                @for heading in HEADINGS {
+                    th { (heading) }
+                }
+            }
+            tbody {
+                @for element in elements {
+                    tr {
+                        td { (element.id) }
+                        td { (element.display_name) }
+                        td { (element.internal_name) }
+                        td { (format!("{:?}", element.parent_id)) }
+                    }
+                }
+            }
+        }
+    }
 }
