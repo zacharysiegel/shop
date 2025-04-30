@@ -1,5 +1,3 @@
-mod macro_pagination;
-
 pub mod index_page;
 pub mod structure;
 

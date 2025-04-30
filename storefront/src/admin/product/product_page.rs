@@ -85,13 +85,12 @@ fn right() -> Markup {
     })
 }
 
-async fn get_all_products_paged_display_name(pagination_options: &KeysetPaginationOptionsForString) -> Result<(Vec<ProductSerial>, KeysetPaginationResultForString), Markup> {
-    let query_params = {
-        let pagination_options = match serde_urlencoded::to_string(pagination_options) {
-            Ok(pagination_options) => pagination_options,
-            Err(error) => return Err(error_text(error)),
-        };
-        pagination_options
+async fn get_all_products_paged_display_name(
+    pagination_options: &KeysetPaginationOptionsForString,
+) -> Result<(Vec<ProductSerial>, KeysetPaginationResultForString), Markup> {
+    let query_params = match serde_urlencoded::to_string(pagination_options) {
+        Ok(pagination_options) => pagination_options,
+        Err(error) => return Err(error_text(error)),
     };
 
     let result = REGISTRY.http_client.get(format!("{}{}?{}", REGISTRY.remote_url, "/product", query_params))

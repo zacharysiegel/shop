@@ -1,5 +1,6 @@
-use std::io;
 use log::LevelFilter;
+use std::io;
+use storefront::registry::RuntimeEnvironment;
 
 #[actix_web::main]
 async fn main() -> Result<(), impl std::error::Error> {
@@ -10,6 +11,8 @@ async fn main() -> Result<(), impl std::error::Error> {
         .filter_module("actix_server", LevelFilter::Debug)
         .filter_module("actix_web::middleware::logger", LevelFilter::Warn)
         .init();
+
+    log::info!("Runtime environment: {:?}", RuntimeEnvironment::default());
 
     storefront::server::open_server().await
 }

@@ -1,6 +1,14 @@
-use crate::url_encoded_pagination_options_else_err;
 use inventory::pagination::{Direction, KeysetPaginationOptionsForString, KeysetPaginationResultForString};
 use maud::{html, Markup};
+
+macro_rules! url_encoded_pagination_options_else_err {
+    ($options:expr$(,)?) => {
+        match ::serde_urlencoded::to_string($options) {
+            ::std::result::Result::Ok(val) => val,
+            ::std::result::Result::Err(error) => return $crate::admin::structure::error_text::error_text(error),
+        }
+    };
+}
 
 pub fn pagination_control(
     relative_path: &str,

@@ -16,7 +16,7 @@ pub static REGISTRY: LazyLock<Registry> = LazyLock::new(|| {
     }
 });
 
-#[derive(PartialEq)]
+#[derive(Debug, PartialEq)]
 pub enum RuntimeEnvironment {
     Local = 0,
     Stage,
