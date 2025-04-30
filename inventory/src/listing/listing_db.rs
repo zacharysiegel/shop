@@ -40,4 +40,4 @@ pub async fn get_listing(
         .await
 }
 
-// todo: figure out pagination in Postgres for a get_all_marketplace_listings(_page) query
+// todo: Paginated get_all_marketplace_listings(_page) query
