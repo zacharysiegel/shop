@@ -2707,6 +2707,7 @@ version = "0.1.0"
 dependencies = [
  "actix-web",
  "actix-web-static-files",
+ "chrono",
  "dotenvy",
  "env_logger",
  "inventory",
@@ -2716,6 +2717,7 @@ dependencies = [
  "serde",
  "serde_urlencoded",
  "static-files",
+ "uuid",
 ]
 
 [[package]]

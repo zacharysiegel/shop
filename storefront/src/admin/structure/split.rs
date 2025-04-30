@@ -13,6 +13,7 @@ pub fn split(
                 "flex-grow: 1;",
                 "flex-shrink: 2;",
                 "padding-right: .5rem;",
+                "overflow-x: auto;"
             )) {
                 (left)
             }

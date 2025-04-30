@@ -56,15 +56,10 @@ async fn left(pagination_options: Option<KeysetPaginationOptionsForString>) -> M
     html! {
         h2 { "Products" }
         (pagination_control(RELATIVE_PATH, &pagination_options, &pagination_result))
-        ol {
-            @if product_vec.is_empty() {
-                p { "None" }
-            }
-            @for product in &product_vec {
-                li {
-                    (format!("Product: {:#?}", product))
-                }
-            }
+        @if product_vec.is_empty() {
+            p { "None" }
+        } @else {
+            (table(product_vec))
         }
         (pagination_control(RELATIVE_PATH, &pagination_options, &pagination_result))
     }
@@ -90,4 +85,29 @@ fn right() -> Markup {
         }
         input type="submit";
     })
+}
+
+const HEADINGS: [&str; 5] = ["id", "display_name", "internal_name", "upc", "release_date"];
+
+fn table(elements: Vec<ProductSerial>) -> Markup {
+    html! {
+        table {
+            thead {
+                @for heading in HEADINGS {
+                    th { (heading) }
+                }
+            }
+            tbody {
+                @for element in elements {
+                    tr {
+                        td { (element.id) }
+                        td { (element.display_name) }
+                        td { (element.internal_name) }
+                        td { (format!("{:?}", element.upc)) }
+                        td { (format!("{:?}", element.release_date)) }
+                    }
+                }
+            }
+        }
+    }
 }
