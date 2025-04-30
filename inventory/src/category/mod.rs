@@ -1,4 +1,4 @@
-pub(crate) mod category_db; // todo: refactor other modules to reduce visibility of db stuff
+pub(crate) mod category_db;
 
 pub mod category_api;
 pub mod category_model;
