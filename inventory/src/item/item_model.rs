@@ -40,7 +40,7 @@ pub enum ItemCondition {
 }
 
 impl ItemCondition {
-    fn to_serial(&self) -> &'static str {
+    pub fn to_serial(&self) -> &'static str {
         match self {
             ItemCondition::Inapplicable => "inapplicable",
             ItemCondition::BrandNew => "brand_new",

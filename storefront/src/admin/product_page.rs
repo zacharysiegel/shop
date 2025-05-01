@@ -7,10 +7,12 @@ use crate::registry::REGISTRY;
 use actix_web::web::ServiceConfig;
 use actix_web::{guard, web};
 use admin::structure::pagination_control::pagination_control;
+use inventory::item::ItemCondition;
 use inventory::pagination::{pagination_guard, KeysetPaginationOptionsForString, KeysetPaginationResultForString};
 use inventory::product::ProductSerial;
 use maud::{html, Markup};
 use reqwest::Method;
+use strum::VariantArray;
 use uuid::Uuid;
 
 pub const RELATIVE_PATH: &str = "/admin/product";
@@ -133,8 +135,15 @@ fn create_item_form() -> Markup {
                 }
                 label {
                     "Condition"
-                    input type="select" name="condition";
-                    // todo: get select options from db
+                    select style="display: block;" name="condition" {
+                        option value="" { "_Required"}
+                        @for variant in ItemCondition::VARIANTS {
+                            option value=(variant.clone() as u8) {
+                                (format!("{:?}", variant))
+                            }
+                        }
+                    }
+                    // todo: get select options from type
                 }
                 label {
                     "Price (cents)"
@@ -220,10 +229,10 @@ fn activate_create_item_form_script(element_id: &str, product_id: &Uuid) -> Stri
         form.action = "{}{}";
         form.product_id.value = "{}";
     "#,
-        element_id,
-        REGISTRY.remote_url,
-        "/item",
-        product_id,
+            element_id,
+            REGISTRY.remote_url,
+            "/item",
+            product_id,
     ).to_string()
 }
 
