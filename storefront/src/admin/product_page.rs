@@ -167,7 +167,7 @@ async fn create_item_form() -> Markup {
                 }
                 label {
                     "Note"
-                    input type="textarea" name="note";
+                    textarea name="note" rows="3" wrap="soft" {};
                 }
                 label {
                     "Acquisition date & time (UTC)"
