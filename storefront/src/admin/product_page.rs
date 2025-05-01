@@ -132,11 +132,8 @@ fn table(elements: Vec<ProductSerial>) -> Markup {
                         td { (element.internal_name) }
                         td { (format!("{:?}", element.upc)) }
                         td { (format!("{:?}", element.release_date)) }
-                        // todo: actions column (e.g. create item, delete, modify)
                         td {
-                            button
-                                style="margin: .2rem;"
-                                onclick=(activate_form_script(&element.id)) {"Delete"}
+                            button style="margin: .2rem;" onclick=(activate_form_script(&element.id)) { "Delete" }
                         }
                     }
                 }
