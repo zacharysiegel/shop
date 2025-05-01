@@ -1,4 +1,5 @@
 use crate::registry::REGISTRY;
+use chrono::{DateTime, Utc};
 use maud::{html, Markup};
 use reqwest::Method;
 
@@ -19,4 +20,11 @@ pub fn form(heading: &str, path: &str, method: Method, content: Markup) -> Marku
             }
         }
     }
+}
+
+pub fn get_current_datetime_string() -> String {
+    let datetime: DateTime<Utc> = Utc::now();
+    let string: String = datetime.to_rfc3339();
+    let end_index: usize = string.find("T").unwrap_or(string.len() - 6) + 6;
+    string[0..end_index].to_string()
 }

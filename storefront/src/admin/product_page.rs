@@ -14,7 +14,10 @@ use reqwest::Method;
 use uuid::Uuid;
 
 pub const RELATIVE_PATH: &str = "/admin/product";
-pub const DELETE_FORM_CONTAINER_ID: &str = "delete_form_container";
+
+const HEADINGS: [&str; 6] = ["id", "display_name", "internal_name", "upc", "release_date", "actions"];
+const DELETE_FORM_CONTAINER_ID: &str = "delete_form_container";
+const CREATE_ITEM_FORM_CONTAINER_ID: &str = "create_item_form_container";
 
 pub fn configurer(config: &mut ServiceConfig) {
     config
@@ -73,6 +76,7 @@ fn right() -> Markup {
     html! {
         (create_form())
         (delete_form())
+        (create_item_form())
     }
 }
 
@@ -101,20 +105,70 @@ fn create_form() -> Markup {
 fn delete_form() -> Markup {
     html! {
         div #(DELETE_FORM_CONTAINER_ID) style=(concat!("display: none;")) {
-            hr style=("margin: 1rem 0") {}
-            (form::form("Delete product", "undefined", Method::DELETE, html! {
+            hr {}
+            (form::form("Delete product", "js", Method::DELETE, html! {
                 label {
                     "ID"
                     input type="text" name="id" disabled[true];
                 }
                 input type="submit";
-                button onclick=(cancel_form_script()) { "Cancel" }
+                button onclick=(cancel_form_script(DELETE_FORM_CONTAINER_ID)) { "Cancel" }
             }))
         }
     }
 }
 
-const HEADINGS: [&str; 6] = ["id", "display_name", "internal_name", "upc", "release_date", "actions"];
+fn create_item_form() -> Markup {
+    html! {
+        div #(CREATE_ITEM_FORM_CONTAINER_ID) style=(concat!("display: none;")) {
+            hr {}
+            (form::form("Create item", "js", Method::POST, html! {
+                label {
+                    "Product ID"
+                    input type="text" name="product_id" disabled[true];
+                }
+                label {
+                    "Inventory location ID"
+                    input type="text" name="inventory_location_id";
+                }
+                label {
+                    "Condition"
+                    input type="select" name="condition";
+                    // todo: get select options from db
+                }
+                label {
+                    "Price (cents)"
+                    input type="number" name="price_cents";
+                }
+                label {
+                    "Priority"
+                    input type="number" name="priority" value="0";
+                }
+                label {
+                    "Note"
+                    input type="textarea" name="note";
+                }
+                label {
+                    "Acquisition date & time (UTC)"
+                    input type="datetime-local" name="acquisition_datetime" value=(form::get_current_datetime_string());
+                }
+                label {
+                    "Acquisition price (cents)"
+                    input type="number" name="acquisition_price_cents";
+                }
+                label {
+                    "Acquisition location"
+                    input type="text" name="acquisition_location";
+                }
+                input type="hidden" name="status" value="1";
+                input type="hidden" name="created" value=(form::get_current_datetime_string());
+                input type="hidden" name="updated" value=(form::get_current_datetime_string());
+                input type="submit";
+                button onclick=(cancel_form_script(CREATE_ITEM_FORM_CONTAINER_ID)) { "Cancel" }
+            }))
+        }
+    }
+}
 
 fn table(elements: Vec<ProductSerial>) -> Markup {
     html! {
@@ -133,7 +187,8 @@ fn table(elements: Vec<ProductSerial>) -> Markup {
                         td { (format!("{:?}", element.upc)) }
                         td { (format!("{:?}", element.release_date)) }
                         td {
-                            button style="margin: .2rem;" onclick=(activate_form_script(&element.id)) { "Delete" }
+                            button onclick=(activate_create_item_form_script(CREATE_ITEM_FORM_CONTAINER_ID, &element.id)) { "Create item" }
+                            button onclick=(activate_delete_form_script(DELETE_FORM_CONTAINER_ID, &element.id)) { "Delete" }
                         }
                     }
                 }
@@ -142,7 +197,7 @@ fn table(elements: Vec<ProductSerial>) -> Markup {
     }
 }
 
-fn activate_form_script(id: &Uuid) -> String {
+fn activate_delete_form_script(element_id: &str, product_id: &Uuid) -> String {
     format!(r#"
         const form_container = document.getElementById("{0}");
         form_container.style.display = "block";
@@ -150,19 +205,34 @@ fn activate_form_script(id: &Uuid) -> String {
         form.action = "{1}{2}{3}";
         form.id.value = "{3}";
     "#,
-            DELETE_FORM_CONTAINER_ID,
+            element_id,
             REGISTRY.remote_url,
             "/product/",
-            id.to_string(),
+            product_id.to_string(),
     ).to_string()
 }
 
-fn cancel_form_script() -> String {
+fn activate_create_item_form_script(element_id: &str, product_id: &Uuid) -> String {
+    format!(r#"
+        const form_container = document.getElementById("{}");
+        form_container.style.display = "block";
+        const form = form_container.lastChild.lastChild;
+        form.action = "{}{}";
+        form.product_id.value = "{}";
+    "#,
+        element_id,
+        REGISTRY.remote_url,
+        "/item",
+        product_id,
+    ).to_string()
+}
+
+fn cancel_form_script(element_id: &str) -> String {
     format!(r#"
         event.preventDefault();
         const form_container = document.getElementById("{}");
         form_container.style.display = "none";
     "#,
-            DELETE_FORM_CONTAINER_ID,
+            element_id,
     ).to_string()
 }
