@@ -1,9 +1,9 @@
 use crate::error::ShopError;
 use crate::object::JsonHttpResponse;
-use crate::{enum_try_from_int_with_shoperror, object, ShopEntity, ShopModel, ShopSerial};
+use crate::{try_from_repr, object, ShopEntity, ShopModel, ShopSerial};
 use chrono::{DateTime, Utc};
-use int_enum::IntEnum;
 use serde::{Deserialize, Serialize};
+use strum::FromRepr;
 use uuid::Uuid;
 
 #[derive(Debug)]
@@ -54,7 +54,7 @@ impl ShopModel for ListingModel {
             item_id: serial.item_id.clone(),
             marketplace_id: serial.marketplace_id.clone(),
             uri: serial.uri.clone(),
-            status: ListingStatus::try_from_int_with_shoperror(serial.status.clone())?,
+            status: ListingStatus::try_from_repr(serial.status.clone())?,
             created: serial.created.clone(),
             updated: serial.updated.clone(),
         })
@@ -78,14 +78,14 @@ impl ShopModel for ListingModel {
             item_id: entity.item_id.clone(),
             marketplace_id: entity.marketplace_id.clone(),
             uri: entity.uri.clone(),
-            status: ListingStatus::try_from_int_with_shoperror(entity.status.clone() as u8)?,
+            status: ListingStatus::try_from_repr(entity.status.clone() as u8)?,
             created: entity.created.clone(),
             updated: entity.updated.clone(),
         })
     }
 }
 
-#[derive(Debug, Clone, IntEnum)]
+#[derive(Debug, Clone, FromRepr)]
 #[repr(u8)]
 pub enum ListingStatus {
     Draft = 0,
@@ -95,7 +95,7 @@ pub enum ListingStatus {
     Cancelled,
 }
 
-enum_try_from_int_with_shoperror!(ListingStatus<u8>);
+try_from_repr!(ListingStatus<u8>);
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct ListingSerial {

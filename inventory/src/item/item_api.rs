@@ -1,3 +1,4 @@
+use std::mem::transmute;
 use super::*;
 use crate::item_audit::{item_audit_db, ItemAuditModel, ItemAuditSerial};
 use crate::item_image::ItemImageSerial;
@@ -30,7 +31,8 @@ pub fn configurer(config: &mut web::ServiceConfig) {
                 web::get().to(get_all_item_item_audits),
             )
             .route("/{item_id}/listing", web::get().to(get_all_item_listings)),
-    );
+    )
+        .route("/item_condition", web::get().to(get_all_item_conditions));
 }
 
 // todo: refactor to use unwrap_http macros
@@ -166,4 +168,8 @@ async fn get_all_item_listings(
     }
 
     listing_serial_vec.to_http_response()
+}
+
+async fn get_all_item_conditions() -> impl Responder {
+    HttpResponseBuilder::new(StatusCode::OK).finish()
 }

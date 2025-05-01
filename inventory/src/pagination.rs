@@ -45,7 +45,7 @@ impl KeysetPaginationOptionsForString {
         } else if self.max_page_size == 0 {
             return Err(ShopError { message: "Maximum page size cannot be zero;".to_string() });
         }
-        
+
         if self.start_value.is_none() && self.direction == Direction::Descending {
             return Err(ShopError { message: "Unspecified start value cannot request a descending page;".to_string() });
         }

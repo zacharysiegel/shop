@@ -1,9 +1,9 @@
 use crate::error::ShopError;
 use crate::object::JsonHttpResponse;
-use crate::{enum_try_from_int_with_shoperror, object, ShopEntity, ShopModel, ShopSerial};
+use crate::{object, try_from_repr, ShopEntity, ShopModel, ShopSerial};
 use chrono::{DateTime, Utc};
-use int_enum::IntEnum;
 use serde::{Deserialize, Serialize};
+use strum::FromRepr;
 use uuid::Uuid;
 
 #[derive(Debug)]
@@ -116,16 +116,16 @@ impl ShopModel for PurchaseModel {
             customer_id: serial.customer_id.clone(),
             contact_email_address: serial.contact_email_address.clone(),
             listing_id: serial.listing_id.clone(),
-            status: PurchaseStatus::try_from_int_with_shoperror(serial.status.clone())?,
+            status: PurchaseStatus::try_from_repr(serial.status.clone())?,
             cost_subtotal_cents: serial.cost_subtotal_cents.clone(),
             cost_tax_cents: serial.cost_tax_cents.clone(),
             cost_shipping_cents: serial.cost_shipping_cents.clone(),
             cost_discount_cents: serial.cost_discount_cents.clone(),
             seller_cost_total_cents: serial.seller_cost_total_cents.clone(),
-            shipping_method: ShippingMethod::try_from_int_with_shoperror(
+            shipping_method: ShippingMethod::try_from_repr(
                 serial.shipping_method.clone(),
             )?,
-            payment_method: PaymentMethod::try_from_int_with_shoperror(
+            payment_method: PaymentMethod::try_from_repr(
                 serial.payment_method.clone(),
             )?,
             note: serial.note.clone(),
@@ -184,16 +184,16 @@ impl ShopModel for PurchaseModel {
             customer_id: entity.customer_id.clone(),
             contact_email_address: entity.contact_email_address.clone(),
             listing_id: entity.listing_id.clone(),
-            status: PurchaseStatus::try_from_int_with_shoperror(entity.status.clone() as u8)?,
+            status: PurchaseStatus::try_from_repr(entity.status.clone() as u8)?,
             cost_subtotal_cents: entity.cost_subtotal_cents.clone(),
             cost_tax_cents: entity.cost_tax_cents.clone(),
             cost_shipping_cents: entity.cost_shipping_cents.clone(),
             cost_discount_cents: entity.cost_discount_cents.clone(),
             seller_cost_total_cents: entity.seller_cost_total_cents.clone(),
-            shipping_method: ShippingMethod::try_from_int_with_shoperror(
+            shipping_method: ShippingMethod::try_from_repr(
                 entity.shipping_method.clone() as u8,
             )?,
-            payment_method: PaymentMethod::try_from_int_with_shoperror(
+            payment_method: PaymentMethod::try_from_repr(
                 entity.payment_method.clone() as u8,
             )?,
             note: entity.note.clone(),
@@ -213,25 +213,25 @@ impl ShopModel for PurchaseModel {
     }
 }
 
-#[derive(Debug, Clone, IntEnum)]
+#[derive(Debug, Clone, FromRepr)]
 #[repr(u8)]
 pub enum PurchaseStatus {
     Fulfilled = 0,
     Cancelled,
 }
 
-enum_try_from_int_with_shoperror!(PurchaseStatus<u8>);
+try_from_repr!(PurchaseStatus<u8>);
 
-#[derive(Debug, Clone, IntEnum)]
+#[derive(Debug, Clone, FromRepr)]
 #[repr(u8)]
 pub enum ShippingMethod {
     Pickup = 0,
     Shipping,
 }
 
-enum_try_from_int_with_shoperror!(ShippingMethod<u8>);
+try_from_repr!(ShippingMethod<u8>);
 
-#[derive(Debug, Clone, IntEnum)]
+#[derive(Debug, Clone, FromRepr)]
 #[repr(u8)]
 pub enum PaymentMethod {
     Cash = 0,
@@ -240,7 +240,7 @@ pub enum PaymentMethod {
     Debit,
 }
 
-enum_try_from_int_with_shoperror!(PaymentMethod<u8>);
+try_from_repr!(PaymentMethod<u8>);
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct PurchaseSerial {

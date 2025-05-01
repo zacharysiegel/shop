@@ -5,7 +5,10 @@ use rand::prelude::ThreadRng;
 use rand::RngCore;
 use serde::Serialize;
 use std::fmt::Debug;
+use std::iter::Step;
+use std::mem::transmute;
 use uuid::Uuid;
+use crate::item::ItemCondition;
 
 pub fn random_uuid() -> Uuid {
     let mut rng: ThreadRng = rand::rng();

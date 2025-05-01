@@ -1,9 +1,9 @@
 use crate::error::ShopError;
 use crate::object::JsonHttpResponse;
-use crate::{enum_try_from_int_with_shoperror, object, ShopEntity, ShopModel, ShopSerial};
+use crate::{object, try_from_repr, ShopEntity, ShopModel, ShopSerial};
 use chrono::{DateTime, Utc};
-use int_enum::IntEnum;
 use serde::{Deserialize, Serialize};
+use strum::{EnumIter, FromRepr};
 use uuid::Uuid;
 
 #[derive(Debug)]
@@ -27,7 +27,7 @@ pub struct Item {
 
 /// Variants inspired by Ebay: https://www.ebay.com/help/selling/listings/creating-managing-listings/item-conditions-category.
 /// See the "Movies & TV, Music, Video Games" section.
-#[derive(IntEnum, Debug, Clone)] // todo: Reimplement this myself and remove the int-enum dependency
+#[derive(Debug, Clone, FromRepr, EnumIter)]
 #[repr(u8)]
 pub enum ItemCondition {
     Inapplicable = 0,
@@ -39,9 +39,9 @@ pub enum ItemCondition {
     Digital,
 }
 
-enum_try_from_int_with_shoperror!(ItemCondition<u8>);
+try_from_repr!(ItemCondition<u8>);
 
-#[derive(IntEnum, Debug, Clone)]
+#[derive(Debug, Clone, FromRepr, EnumIter)]
 #[repr(u8)]
 pub enum ItemStatus {
     /// Item is only partially constructed and expects modifications before publishing
@@ -64,7 +64,7 @@ pub enum ItemStatus {
     Received,
 }
 
-enum_try_from_int_with_shoperror!(ItemStatus<u8>);
+try_from_repr!(ItemStatus<u8>);
 
 impl ShopModel for Item {
     type Entity = ItemEntity;
@@ -93,8 +93,8 @@ impl ShopModel for Item {
             id: object::random_uuid(),
             product_id: serial.product_id.clone(),
             inventory_location_id: serial.inventory_location_id.clone(),
-            condition: ItemCondition::try_from_int_with_shoperror(serial.condition)?,
-            status: ItemStatus::try_from_int_with_shoperror(serial.status)?,
+            condition: ItemCondition::try_from_repr(serial.condition)?,
+            status: ItemStatus::try_from_repr(serial.status)?,
             price_cents: serial.price_cents.clone(),
             priority: serial.priority.clone(),
             note: serial.note.clone(),
@@ -129,8 +129,8 @@ impl ShopModel for Item {
             id: entity.id.clone(),
             product_id: entity.product_id.clone(),
             inventory_location_id: entity.inventory_location_id.clone(),
-            condition: ItemCondition::try_from_int_with_shoperror(entity.condition as u8)?,
-            status: ItemStatus::try_from_int_with_shoperror(entity.status as u8)?,
+            condition: ItemCondition::try_from_repr(entity.condition as u8)?,
+            status: ItemStatus::try_from_repr(entity.status as u8)?,
             price_cents: 0,
             priority: 0,
             note: None,
