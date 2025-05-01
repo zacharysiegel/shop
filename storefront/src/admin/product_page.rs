@@ -206,6 +206,7 @@ fn table(elements: Vec<ProductSerial>) -> Markup {
     }
 }
 
+// These scripts could be defined as global functions in a .js file instead
 fn activate_delete_form_script(element_id: &str, product_id: &Uuid) -> String {
     format!(r#"
         const form_container = document.getElementById("{0}");
