@@ -7,6 +7,7 @@ use crate::registry::REGISTRY;
 use actix_web::web::ServiceConfig;
 use actix_web::{guard, web};
 use admin::structure::pagination_control::pagination_control;
+use inventory::inventory_location::InventoryLocationSerial;
 use inventory::item::ItemCondition;
 use inventory::pagination::{pagination_guard, KeysetPaginationOptionsForString, KeysetPaginationResultForString};
 use inventory::product::ProductSerial;
@@ -44,7 +45,7 @@ async fn handle_paginated(
 async fn render(pagination_options: Option<KeysetPaginationOptionsForString>) -> Markup {
     page::page(
         Some("Product"),
-        split::split(left(pagination_options).await, right()),
+        split::split(left(pagination_options).await, right().await),
     )
 }
 
@@ -74,11 +75,11 @@ async fn left(pagination_options: Option<KeysetPaginationOptionsForString>) -> M
     }
 }
 
-fn right() -> Markup {
+async fn right() -> Markup {
     html! {
         (create_form())
         (delete_form())
-        (create_item_form())
+        (create_item_form().await)
     }
 }
 
@@ -120,7 +121,14 @@ fn delete_form() -> Markup {
     }
 }
 
-fn create_item_form() -> Markup {
+async fn create_item_form() -> Markup {
+    let inventory_location_vec = match wrapped_get::<Vec<InventoryLocationSerial>>(
+        "/inventory_location"
+    ).await {
+        Ok(response) => response,
+        Err(markup) => return markup,
+    };
+
     html! {
         div #(CREATE_ITEM_FORM_CONTAINER_ID) style=(concat!("display: none;")) {
             hr {}
@@ -130,13 +138,18 @@ fn create_item_form() -> Markup {
                     input type="text" name="product_id" disabled[true];
                 }
                 label {
-                    "Inventory location ID"
-                    input type="text" name="inventory_location_id";
+                    "Inventory location"
+                    select name="inventory_location_id" {
+                        option value="" { "_required " }
+                        @for inventory_location in inventory_location_vec {
+                            option value=(inventory_location.id.to_string()) { (inventory_location.display_name) }
+                        }
+                    }
                 }
                 label {
                     "Condition"
                     select style="display: block;" name="condition" {
-                        option value="" { "_Required"}
+                        option value="" { "_required"}
                         @for variant in ItemCondition::VARIANTS {
                             option value=(variant.clone() as u8) {
                                 (format!("{:?}", variant))

@@ -57,7 +57,9 @@ form label:first-child {
     margin-top: 0;
 }
 
-form input {
+form input,
+form select,
+form textarea {
     display: block;
     margin-top: .2rem;
 }
