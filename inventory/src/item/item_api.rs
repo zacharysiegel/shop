@@ -1,4 +1,3 @@
-use std::mem::transmute;
 use super::*;
 use crate::item_audit::{item_audit_db, ItemAuditModel, ItemAuditSerial};
 use crate::item_image::ItemImageSerial;
@@ -171,5 +170,6 @@ async fn get_all_item_listings(
 }
 
 async fn get_all_item_conditions() -> impl Responder {
-    HttpResponseBuilder::new(StatusCode::OK).finish()
+    let body: String = ItemCondition::get_json_spec();
+    HttpResponseBuilder::new(StatusCode::OK).body(body)
 }

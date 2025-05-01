@@ -10,7 +10,7 @@ actix-web = { version = "4" }
 sqlx = { version = "0.8", features = ["postgres", "macros", "uuid", "chrono", "runtime-tokio", "tls-native-tls"] }
 dotenvy = { version = "0.15" }
 serde = { version = "1.0" }
-serde_json = { version = "1.0" }
+serde_json = { version = "1.0", features = ["preserve_order"] }
 rand = "0.9.1"
 chrono = { version = "0.4", features = ["serde", "now"] }
 uuid = { version = "1.16", features = ["serde"] }
