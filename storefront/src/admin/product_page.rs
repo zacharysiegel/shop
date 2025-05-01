@@ -143,7 +143,6 @@ fn create_item_form() -> Markup {
                             }
                         }
                     }
-                    // todo: get select options from type
                 }
                 label {
                     "Price (cents)"
