@@ -83,6 +83,33 @@ async fn right() -> Markup {
     }
 }
 
+fn table(elements: Vec<ProductSerial>) -> Markup {
+    html! {
+        table {
+            thead {
+                @for heading in HEADINGS {
+                    th { (heading) }
+                }
+            }
+            tbody {
+                @for element in elements {
+                    tr {
+                        td { (element.id) }
+                        td { (element.display_name) }
+                        td { (element.internal_name) }
+                        td { (format!("{:?}", element.upc)) }
+                        td { (format!("{:?}", element.release_date)) }
+                        td {
+                            button onclick=(activate_create_item_form_script(CREATE_ITEM_FORM_CONTAINER_ID, &element.id)) { "Create item" }
+                            button onclick=(activate_delete_form_script(DELETE_FORM_CONTAINER_ID, &element.id)) { "Delete" }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
 fn create_form() -> Markup {
     form::form("Create product", "/product", Method::POST, html! {
         label {
@@ -187,33 +214,6 @@ async fn create_item_form() -> Markup {
                 input type="submit";
                 button onclick=(cancel_form_script(CREATE_ITEM_FORM_CONTAINER_ID)) { "Cancel" }
             }))
-        }
-    }
-}
-
-fn table(elements: Vec<ProductSerial>) -> Markup {
-    html! {
-        table {
-            thead {
-                @for heading in HEADINGS {
-                    th { (heading) }
-                }
-            }
-            tbody {
-                @for element in elements {
-                    tr {
-                        td { (element.id) }
-                        td { (element.display_name) }
-                        td { (element.internal_name) }
-                        td { (format!("{:?}", element.upc)) }
-                        td { (format!("{:?}", element.release_date)) }
-                        td {
-                            button onclick=(activate_create_item_form_script(CREATE_ITEM_FORM_CONTAINER_ID, &element.id)) { "Create item" }
-                            button onclick=(activate_delete_form_script(DELETE_FORM_CONTAINER_ID, &element.id)) { "Delete" }
-                        }
-                    }
-                }
-            }
         }
     }
 }
