@@ -48,6 +48,11 @@ a:-webkit-any-link {
     color: var(--color-lavender);
 }
 
+button,
+input[type="submit"] {
+    cursor: pointer;
+}
+
 form label {
     display: block;
     margin-top: .5rem;
