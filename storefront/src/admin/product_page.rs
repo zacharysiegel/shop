@@ -1,5 +1,6 @@
 use crate::admin;
 use crate::admin::api::wrapped_get;
+use crate::admin::item_page;
 use crate::admin::structure::error_text::error_text;
 use crate::admin::structure::form;
 use crate::admin::structure::{page, split};
@@ -16,7 +17,7 @@ use reqwest::Method;
 use strum::VariantArray;
 use uuid::Uuid;
 
-pub const RELATIVE_PATH: &str = "/admin/product";
+pub const RELATIVE_PATH: &'static str = "/admin/product";
 
 const HEADINGS: [&str; 6] = ["id", "display_name", "internal_name", "upc", "release_date", "actions"];
 const DELETE_FORM_CONTAINER_ID: &str = "delete_form_container";
@@ -44,7 +45,7 @@ async fn handle_paginated(
 
 async fn render(pagination_options: Option<KeysetPaginationOptionsForString>) -> Markup {
     page::page(
-        Some("Product"),
+        &vec!((RELATIVE_PATH, "Product")),
         split::split(left(pagination_options).await, right().await),
     )
 }
@@ -100,6 +101,7 @@ fn table(elements: Vec<ProductSerial>) -> Markup {
                         td { (format!("{:?}", element.upc)) }
                         td { (format!("{:?}", element.release_date)) }
                         td {
+                            a href=(item_page::RELATIVE_PATH.replace("{product_id}", element.id.to_string().as_str())) { button { "View items" } }
                             button onclick=(activate_create_item_form_script(CREATE_ITEM_FORM_CONTAINER_ID, &element.id)) { "Create item" }
                             button onclick=(activate_delete_form_script(DELETE_FORM_CONTAINER_ID, &element.id)) { "Delete" }
                         }

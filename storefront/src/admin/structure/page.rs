@@ -1,6 +1,8 @@
 use maud::{html, Markup, DOCTYPE};
 
-pub fn page(current_page_name: Option<&str>, content: Markup) -> Markup {
+pub type PageInfo<'a> = (&'a str, &'a str);
+
+pub fn page(current_page_branch: &Vec<PageInfo>, content: Markup) -> Markup {
     html! {
 		(DOCTYPE)
 		html {
@@ -22,7 +24,7 @@ pub fn page(current_page_name: Option<&str>, content: Markup) -> Markup {
 				header {
 					hgroup style="margin-bottom: 1rem;" {
 						h1 { "Shop administration" }
-						(breadcrumb(current_page_name))
+						(breadcrumb(&current_page_branch))
 					}
 				}
 				main style=("flex-grow: 1;") {
@@ -33,13 +35,13 @@ pub fn page(current_page_name: Option<&str>, content: Markup) -> Markup {
 	}
 }
 
-fn breadcrumb(current_page_name: Option<&str>) -> Markup {
+fn breadcrumb(current_page_branch: &Vec<PageInfo>) -> Markup {
     html! {
 		p {
 			a href="/admin" { "Home" }
-			@if let Some(current_page_name) = current_page_name {
-			" / "
-			a href="" { (current_page_name) }
+			@for (path, name) in current_page_branch {
+				" / "
+				a href=(path) { (name) }
 			}
 		}
 	}

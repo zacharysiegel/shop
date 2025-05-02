@@ -14,7 +14,7 @@ pub fn configurer(config: &mut ServiceConfig) {
 
 async fn render() -> Markup {
     page::page(
-        Some("Inventory location"),
+        &vec!((RELATIVE_PATH, "Inventory location")),
         split::split(left().await, right()),
     )
 }
