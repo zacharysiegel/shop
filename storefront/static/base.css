@@ -51,6 +51,11 @@ a:-webkit-any-link {
 button,
 input[type="submit"] {
     cursor: pointer;
+    background-color: var(--color-subtext-1);
+    border-style: none;
+    border-radius: 2px;
+    box-shadow: 0 0 3px 0 #000000;
+    padding: .2rem .5rem;
 }
 
 form label {
