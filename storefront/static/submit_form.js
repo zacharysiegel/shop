@@ -12,8 +12,18 @@ function submit_form(submit_event) {
     const form_data = new FormData(form, submit_event.submitter);
     const form_data_as_object = {};
     for (let entry of form_data) {
-        const [key, value] = entry;
+        let [key, value] = entry;
         if (value) {
+            const intValue = Number(value);
+            if (!isNaN(intValue)) {
+                value = intValue;
+            }
+
+            const dateValue = Date.parse(value);
+            if (typeof value === 'string' && !isNaN(dateValue)) {
+                value = new Date(dateValue).toISOString();
+            }
+
             form_data_as_object[key] = value;
         }
     }
