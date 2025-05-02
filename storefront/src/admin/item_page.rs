@@ -8,9 +8,10 @@ use inventory::item::ItemSerial;
 use inventory::product::ProductSerial;
 use maud::{html, Markup};
 use reqwest::Method;
+use inventory::inventory_location::InventoryLocationSerial;
 
 pub const RELATIVE_PATH: &str = "/admin/product/{product_id}/item";
-pub const HEADINGS: [&str; 5] = ["id", "inventory location", "condition", "status", "price (\u{00A2})"];
+pub const HEADINGS: [&str; 6] = ["id", "location", "condition", "status", "price (\u{00A2})", "actions"];
 
 pub fn configurer(config: &mut ServiceConfig) {
     config
@@ -44,7 +45,7 @@ async fn left(product_id: &String) -> Markup {
         @if item_vec.is_empty() {
             p { "None" }
         } @else {
-            (table(&item_vec))
+            (table(&item_vec).await)
         }
     )
 }
@@ -55,7 +56,11 @@ fn right() -> Markup {
     })
 }
 
-fn table(elements: &Vec<ItemSerial>) -> Markup {
+async fn table(elements: &Vec<ItemSerial>) -> Markup {
+    let inventory_location_vec = unwrap_result_else_markup!(
+        wrapped_get::<Vec<InventoryLocationSerial>>("/inventory_location").await
+    );
+
     html! {
         table {
             thead {
@@ -67,13 +72,25 @@ fn table(elements: &Vec<ItemSerial>) -> Markup {
                 @for element in elements {
                     tr {
                         td { (element.id) }
-                        td { (element.inventory_location_id) } // todo: get display_name
+                        td { (inventory_location_markup(&inventory_location_vec, &element)) }
                         td { (element.condition) } // todo: get readable value (debug?)
                         td { (element.status) } // todo: get readable value
                         td { (element.price_cents) }
+                        td { }
                     }
                 }
             }
         }
     }
+}
+
+fn inventory_location_markup(inventory_location_vec: &Vec<InventoryLocationSerial>, item: &ItemSerial) -> Markup {
+    let inventory_location: &InventoryLocationSerial = match inventory_location_vec
+        .iter()
+        .find(|location| location.id.eq(&item.inventory_location_id)) {
+        Some(value) => value,
+        None => return html! {""},
+    };
+
+    html! { (inventory_location.display_name) }
 }
