@@ -183,7 +183,7 @@ async fn create_item_form() -> Markup {
                     }
                 }
                 label {
-                    "Price (cents)"
+                    "Price (\u{00A2})"
                     input type="number" name="price_cents";
                 }
                 label {
@@ -199,7 +199,7 @@ async fn create_item_form() -> Markup {
                     input type="datetime-local" name="acquisition_datetime" value=(form::get_current_datetime_string());
                 }
                 label {
-                    "Acquisition price (cents)"
+                    "Acquisition price (\u{00A2})"
                     input type="number" name="acquisition_price_cents";
                 }
                 label {
