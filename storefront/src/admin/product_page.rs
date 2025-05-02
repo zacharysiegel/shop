@@ -1,10 +1,10 @@
-use crate::admin;
 use crate::admin::api::wrapped_get;
 use crate::admin::item_page;
 use crate::admin::structure::error_text::error_text;
 use crate::admin::structure::form;
 use crate::admin::structure::{page, split};
 use crate::registry::REGISTRY;
+use crate::{admin, unwrap_result_else_markup};
 use actix_web::web::ServiceConfig;
 use actix_web::{guard, web};
 use admin::structure::pagination_control::pagination_control;
@@ -57,12 +57,11 @@ async fn left(pagination_options: Option<KeysetPaginationOptionsForString>) -> M
         Err(error) => return error_text(error),
     };
 
-    let (product_vec, pagination_result) = match wrapped_get::<(Vec<ProductSerial>, KeysetPaginationResultForString)>(
-        format!("/product?{}", query_params).as_str()
-    ).await {
-        Ok(response) => response,
-        Err(markup) => return markup,
-    };
+    let (product_vec, pagination_result) = unwrap_result_else_markup!(
+        wrapped_get::<(Vec<ProductSerial>, KeysetPaginationResultForString)>(
+            format!("/product?{}", query_params).as_str()
+        ).await
+    );
 
     html! {
         h2 { "Products" }
@@ -151,12 +150,9 @@ fn delete_form() -> Markup {
 }
 
 async fn create_item_form() -> Markup {
-    let inventory_location_vec = match wrapped_get::<Vec<InventoryLocationSerial>>(
-        "/inventory_location"
-    ).await {
-        Ok(response) => response,
-        Err(markup) => return markup,
-    };
+    let inventory_location_vec = unwrap_result_else_markup!(
+        wrapped_get::<Vec<InventoryLocationSerial>>("/inventory_location").await
+    );
 
     html! {
         div #(CREATE_ITEM_FORM_CONTAINER_ID) style=(concat!("display: none;")) {

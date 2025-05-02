@@ -1,5 +1,6 @@
 use crate::admin::api::wrapped_get;
 use crate::admin::structure::{form, page, split};
+use crate::unwrap_result_else_markup;
 use actix_web::web;
 use actix_web::web::ServiceConfig;
 use inventory::category::CategorySerial;
@@ -21,10 +22,9 @@ async fn render() -> Markup {
 
 
 async fn left() -> Markup {
-    let elements: Vec<CategorySerial> = match wrapped_get("/category").await {
-        Ok(elements) => elements,
-        Err(markup) => return markup,
-    };
+    let elements: Vec<CategorySerial> = unwrap_result_else_markup!(
+        wrapped_get("/category").await
+    );
 
     html! {
         h2 { "All categories" }

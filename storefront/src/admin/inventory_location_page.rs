@@ -1,5 +1,6 @@
 use crate::admin::api::wrapped_get;
 use crate::admin::structure::{form, page, split};
+use crate::unwrap_result_else_markup;
 use actix_web::web;
 use actix_web::web::ServiceConfig;
 use inventory::inventory_location::InventoryLocationSerial;
@@ -21,10 +22,9 @@ async fn render() -> Markup {
 
 
 async fn left() -> Markup {
-    let elements: Vec<InventoryLocationSerial> = match wrapped_get("/inventory_location").await {
-        Ok(elements) => elements,
-        Err(markup) => return markup,
-    };
+    let elements: Vec<InventoryLocationSerial> = unwrap_result_else_markup!(
+        wrapped_get("/inventory_location").await
+    );
 
     html! {
         h2 { "All inventory locations" }
