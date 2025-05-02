@@ -160,7 +160,7 @@ async fn create_item_form() -> Markup {
             (form::form("Create item", "js", Method::POST, html! {
                 label {
                     "Product ID"
-                    input type="text" name="product_id" disabled[true];
+                    input type="text" name="product_id" readonly[true];
                 }
                 label {
                     "Inventory location"
