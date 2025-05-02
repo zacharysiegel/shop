@@ -1,14 +1,15 @@
 use crate::admin::api::wrapped_get;
 use crate::admin::product_page;
+use crate::admin::structure::error_text::error_text;
 use crate::admin::structure::{form, page, split};
 use crate::unwrap_result_else_markup;
 use actix_web::web;
 use actix_web::web::ServiceConfig;
-use inventory::item::ItemSerial;
+use inventory::inventory_location::InventoryLocationSerial;
+use inventory::item::{ItemCondition, ItemSerial, ItemStatus};
 use inventory::product::ProductSerial;
 use maud::{html, Markup};
 use reqwest::Method;
-use inventory::inventory_location::InventoryLocationSerial;
 
 pub const RELATIVE_PATH: &str = "/admin/product/{product_id}/item";
 pub const HEADINGS: [&str; 6] = ["id", "location", "condition", "status", "price (\u{00A2})", "actions"];
@@ -73,8 +74,14 @@ async fn table(elements: &Vec<ItemSerial>) -> Markup {
                     tr {
                         td { (element.id) }
                         td { (inventory_location_markup(&inventory_location_vec, &element)) }
-                        td { (element.condition) } // todo: get readable value (debug?)
-                        td { (element.status) } // todo: get readable value
+                        td { (match ItemCondition::try_from_repr(element.condition) {
+                            Ok(variant) => format!("{:?}", variant),
+                            Err(error) => Markup::into_string(error_text(error)),
+                        }) }
+                        td { (match ItemStatus::try_from_repr(element.status) {
+                            Ok(variant) => format!("{:?}", variant),
+                            Err(error) => Markup::into_string(error_text(error)),
+                        }) }
                         td { (element.price_cents) }
                         td { }
                     }
