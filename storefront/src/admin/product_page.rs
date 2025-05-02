@@ -1,5 +1,5 @@
 use crate::admin::api::wrapped_get;
-use crate::admin::item_page;
+use crate::admin::{item_page, reactivity};
 use crate::admin::structure::error_text::error_text;
 use crate::admin::structure::form;
 use crate::admin::structure::{page, split};
@@ -143,7 +143,7 @@ fn delete_form() -> Markup {
                     input type="text" name="id" disabled[true];
                 }
                 input type="submit";
-                button onclick=(cancel_form_script(DELETE_FORM_CONTAINER_ID)) { "Cancel" }
+                button onclick=(reactivity::hide_element_handler(DELETE_FORM_CONTAINER_ID)) { "Cancel" }
             }))
         }
     }
@@ -210,7 +210,7 @@ async fn create_item_form() -> Markup {
                 input type="hidden" name="created" value=(form::get_current_datetime_string());
                 input type="hidden" name="updated" value=(form::get_current_datetime_string());
                 input type="submit";
-                button onclick=(cancel_form_script(CREATE_ITEM_FORM_CONTAINER_ID)) { "Cancel" }
+                button onclick=(reactivity::hide_element_handler(CREATE_ITEM_FORM_CONTAINER_ID)) { "Cancel" }
             }))
         }
     }
@@ -244,15 +244,5 @@ fn activate_create_item_form_script(element_id: &str, product_id: &Uuid) -> Stri
             REGISTRY.remote_url,
             "/item",
             product_id,
-    ).to_string()
-}
-
-fn cancel_form_script(element_id: &str) -> String {
-    format!(r#"
-        event.preventDefault();
-        const form_container = document.getElementById("{}");
-        form_container.style.display = "none";
-    "#,
-            element_id,
     ).to_string()
 }

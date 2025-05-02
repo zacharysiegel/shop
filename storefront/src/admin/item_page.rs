@@ -1,5 +1,5 @@
 use crate::admin::api::wrapped_get;
-use crate::admin::product_page;
+use crate::admin::{product_page, reactivity};
 use crate::admin::structure::error_text::error_text;
 use crate::admin::structure::{form, page, split};
 use crate::unwrap_result_else_markup;
@@ -12,7 +12,9 @@ use maud::{html, Markup};
 use reqwest::Method;
 
 pub const RELATIVE_PATH: &str = "/admin/product/{product_id}/item";
-pub const HEADINGS: [&str; 6] = ["id", "location", "condition", "status", "price (\u{00A2})", "actions"];
+/// U+00A2 is the "cent" sign.
+const HEADINGS: [&str; 6] = ["id", "location", "condition", "status", "price (\u{00A2})", "actions"];
+const ITEM_DETAILS_CONTAINER_ID: &str = "item_details_container";
 
 pub fn configurer(config: &mut ServiceConfig) {
     config
@@ -52,9 +54,7 @@ async fn left(product_id: &String) -> Markup {
 }
 
 fn right() -> Markup {
-    form::form("Create item", "/item", Method::POST, html! {
-        
-    })
+    (item_details())
 }
 
 async fn table(elements: &Vec<ItemSerial>) -> Markup {
@@ -83,7 +83,9 @@ async fn table(elements: &Vec<ItemSerial>) -> Markup {
                             Err(error) => Markup::into_string(error_text(error)),
                         }) }
                         td { (element.price_cents) }
-                        td { }
+                        td {
+                            button onclick=(reactivity::activate_element_handler(ITEM_DETAILS_CONTAINER_ID)) { "Details" }
+                        }
                     }
                 }
             }
@@ -91,10 +93,77 @@ async fn table(elements: &Vec<ItemSerial>) -> Markup {
     }
 }
 
+fn item_details() -> Markup {
+    html! {
+        div #(ITEM_DETAILS_CONTAINER_ID) style="display: none;" {
+            h2 { "Item details" }
+            table {
+                tbody {
+                    tr {
+                        td { "id" }
+                        td {  }
+                    }
+                    tr {
+                        td { "product_id" }
+                        td {  }
+                    }
+                    tr {
+                        td { "inventory_location_id" }
+                        td {  }
+                    }
+                    tr {
+                        td { "condition" }
+                        td {  }
+                    }
+                    tr {
+                        td { "status" }
+                        td {  }
+                    }
+                    tr {
+                        td { "price_cents" }
+                        td {  }
+                    }
+                    tr {
+                        td { "priority" }
+                        td {  }
+                    }
+                    tr {
+                        td { "note" }
+                        td {  }
+                    }
+                    tr {
+                        td { "acquisition_datetime" }
+                        td {  }
+                    }
+                    tr {
+                        td { "acquisition_price_cents" }
+                        td {  }
+                    }
+                    tr {
+                        td { "acquisition_location" }
+                        td {  }
+                    }
+                    tr {
+                        td { "created" }
+                        td {  }
+                    }
+                    tr {
+                        td { "updated" }
+                        td {  }
+                    }
+                }
+            }
+            button style="padding-top: .5rem;"
+                onclick=(reactivity::hide_element_handler(ITEM_DETAILS_CONTAINER_ID)) { "Close" }
+        }
+    }
+}
+
 fn inventory_location_markup(inventory_location_vec: &Vec<InventoryLocationSerial>, item: &ItemSerial) -> Markup {
     let inventory_location: &InventoryLocationSerial = match inventory_location_vec
         .iter()
-        .find(|location| location.id.eq(&item.inventory_location_id)) {
+        .find(|location| location.id.eq(&item.inventory_location_id))
+    {
         Some(value) => value,
         None => return html! {""},
     };

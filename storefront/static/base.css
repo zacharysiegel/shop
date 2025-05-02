@@ -69,14 +69,14 @@ form textarea {
     margin-top: .2rem;
 }
 
-table thead tr th {
-    text-align: left;
-    padding: 0 1rem 0 0;
+table {
+    border-collapse: collapse;
 }
 
+table thead tr th,
 table tbody tr td {
     text-align: left;
-    padding: 0 1rem 0 0;
+    padding: .2rem 1rem .2rem 0;
 }
 
 table button {
