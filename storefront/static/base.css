@@ -69,7 +69,8 @@ form label:first-child {
 
 form input,
 form select,
-form textarea {
+form textarea,
+form button {
     display: block;
     margin-top: .2rem;
 }
