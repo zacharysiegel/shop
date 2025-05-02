@@ -69,7 +69,7 @@ async fn left(pagination_options: Option<KeysetPaginationOptionsForString>) -> M
         @if product_vec.is_empty() {
             p { "None" }
         } @else {
-            (table(product_vec))
+            (table(&product_vec))
         }
         (pagination_control(RELATIVE_PATH, &pagination_options, &pagination_result))
     }
@@ -83,7 +83,7 @@ async fn right() -> Markup {
     }
 }
 
-fn table(elements: Vec<ProductSerial>) -> Markup {
+fn table(elements: &Vec<ProductSerial>) -> Markup {
     html! {
         table {
             thead {

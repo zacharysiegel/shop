@@ -27,7 +27,7 @@ async fn left() -> Markup {
     );
 
     html! {
-        h2 { "All inventory locations" }
+        h2 { "Inventory locations" }
         @if elements.is_empty() {
             p { "None" }
         } @else {

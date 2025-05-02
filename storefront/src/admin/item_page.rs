@@ -10,6 +10,7 @@ use maud::{html, Markup};
 use reqwest::Method;
 
 pub const RELATIVE_PATH: &str = "/admin/product/{product_id}/item";
+pub const HEADINGS: [&str; 5] = ["id", "inventory location", "condition", "status", "price (\u{00A2})"];
 
 pub fn configurer(config: &mut ServiceConfig) {
     config
@@ -39,7 +40,12 @@ async fn left(product_id: &String) -> Markup {
     );
 
     html!(
-        h2 { "Items for product \"\"" }
+        h2 { (format!("Items for product \"{}\"", product.display_name)) }
+        @if item_vec.is_empty() {
+            p { "None" }
+        } @else {
+            (table(&item_vec))
+        }
     )
 }
 
@@ -47,4 +53,27 @@ fn right() -> Markup {
     form::form("Create item", "/item", Method::POST, html! {
         
     })
+}
+
+fn table(elements: &Vec<ItemSerial>) -> Markup {
+    html! {
+        table {
+            thead {
+                @for heading in HEADINGS {
+                    th { (heading) }
+                }
+            }
+            tbody {
+                @for element in elements {
+                    tr {
+                        td { (element.id) }
+                        td { (element.inventory_location_id) } // todo: get display_name
+                        td { (element.condition) } // todo: get readable value (debug?)
+                        td { (element.status) } // todo: get readable value
+                        td { (element.price_cents) }
+                    }
+                }
+            }
+        }
+    }
 }
