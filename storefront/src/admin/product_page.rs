@@ -19,7 +19,7 @@ use uuid::Uuid;
 
 pub const RELATIVE_PATH: &'static str = "/admin/product";
 
-const HEADINGS: [&str; 6] = ["id", "display_name \u{23F6}", "internal_name", "upc", "release_date", "actions"];
+const HEADINGS: [&str; 6] = ["id", "display_name ⏶", "internal_name", "upc", "release_date", "actions"];
 const DELETE_FORM_CONTAINER_ID: &str = "delete_form_container";
 const CREATE_ITEM_FORM_CONTAINER_ID: &str = "create_item_form_container";
 
@@ -84,8 +84,8 @@ async fn right() -> Markup {
 }
 
 fn table(elements: &Vec<ProductSerial>) -> Markup {
-    // Ascending sort: U+23F6
-    // Descending sort: U+23F7
+    // Ascending sort: U+23F6 (⏶)
+    // Descending sort: U+23F7 (⏷)
     html! {
         table {
             thead {
@@ -102,7 +102,9 @@ fn table(elements: &Vec<ProductSerial>) -> Markup {
                         td { (format!("{:?}", element.upc)) }
                         td { (format!("{:?}", element.release_date)) }
                         td {
-                            a href=(item_page::RELATIVE_PATH.replace("{product_id}", element.id.to_string().as_str())) { button { "View items" } }
+                            a href=(item_page::RELATIVE_PATH.replace("{product_id}", element.id.to_string().as_str()))
+                                target="_blank" rel="noopener"
+                                { button { "View items" } }
                             button onclick=(activate_create_item_form_script(CREATE_ITEM_FORM_CONTAINER_ID, &element.id)) { "Create item" }
                             button onclick=(activate_delete_form_script(DELETE_FORM_CONTAINER_ID, &element.id)) { "Delete" }
                         }
