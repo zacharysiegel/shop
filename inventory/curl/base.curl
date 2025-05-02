@@ -4,4 +4,4 @@ variable = scheme=http
 expand-variable = base_url={{scheme}}://{{host}}:{{port}}
 variable = "h_json=Content-Type: application/json"
 
--i
+--include

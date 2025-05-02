@@ -2704,6 +2704,7 @@ dependencies = [
  "maud",
  "reqwest",
  "serde",
+ "serde_json",
  "serde_urlencoded",
  "static-files",
  "strum",

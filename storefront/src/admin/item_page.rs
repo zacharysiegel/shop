@@ -1,7 +1,7 @@
 use crate::admin::api::wrapped_get;
-use crate::admin::{product_page, reactivity};
 use crate::admin::structure::error_text::error_text;
-use crate::admin::structure::{form, page, split};
+use crate::admin::structure::{page, split};
+use crate::admin::{product_page, reactivity};
 use crate::unwrap_result_else_markup;
 use actix_web::web;
 use actix_web::web::ServiceConfig;
@@ -9,12 +9,12 @@ use inventory::inventory_location::InventoryLocationSerial;
 use inventory::item::{ItemCondition, ItemSerial, ItemStatus};
 use inventory::product::ProductSerial;
 use maud::{html, Markup};
-use reqwest::Method;
 
 pub const RELATIVE_PATH: &str = "/admin/product/{product_id}/item";
 /// U+00A2 is the "cent" sign.
 const HEADINGS: [&str; 6] = ["id", "location", "condition", "status", "price (\u{00A2})", "actions"];
 const ITEM_DETAILS_CONTAINER_ID: &str = "item_details_container";
+const ITEM_DETAIL_ID_PREFIX: &str = "item_detail_";
 
 pub fn configurer(config: &mut ServiceConfig) {
     config
@@ -84,7 +84,7 @@ async fn table(elements: &Vec<ItemSerial>) -> Markup {
                         }) }
                         td { (element.price_cents) }
                         td {
-                            button onclick=(reactivity::activate_element_handler(ITEM_DETAILS_CONTAINER_ID)) { "Details" }
+                            button onclick=(activate_item_details_script(element)) { "Details" }
                         }
                     }
                 }
@@ -100,60 +100,73 @@ fn item_details() -> Markup {
             table {
                 tbody {
                     tr {
-                        td { "id" }
-                        td {  }
+                        @let field = "id";
+                        td { (field) }
+                        td #(String::from(ITEM_DETAIL_ID_PREFIX) + (field)) {  }
                     }
                     tr {
-                        td { "product_id" }
-                        td {  }
+                        @let field = "product_id";
+                        td { (field) }
+                        td #(String::from(ITEM_DETAIL_ID_PREFIX) + field) {  }
                     }
                     tr {
-                        td { "inventory_location_id" }
-                        td {  }
+                        @let field = "inventory_location_id";
+                        td { (field) }
+                        td #(String::from(ITEM_DETAIL_ID_PREFIX) + field) {  }
                     }
                     tr {
-                        td { "condition" }
-                        td {  }
+                        @let field = "condition";
+                        td { (field) }
+                        td #(String::from(ITEM_DETAIL_ID_PREFIX) + field) {  }
                     }
                     tr {
-                        td { "status" }
-                        td {  }
+                        @let field = "status";
+                        td { (field) }
+                        td #(String::from(ITEM_DETAIL_ID_PREFIX) + field) {  }
                     }
                     tr {
-                        td { "price_cents" }
-                        td {  }
+                        @let field = "price_cents";
+                        td { (field) }
+                        td #(String::from(ITEM_DETAIL_ID_PREFIX) + field) {  }
                     }
                     tr {
-                        td { "priority" }
-                        td {  }
+                        @let field = "priority";
+                        td { (field) }
+                        td #(String::from(ITEM_DETAIL_ID_PREFIX) + field) {  }
                     }
                     tr {
-                        td { "note" }
-                        td {  }
+                        @let field = "note";
+                        td { (field) }
+                        td #(String::from(ITEM_DETAIL_ID_PREFIX) + field) {  }
                     }
                     tr {
-                        td { "acquisition_datetime" }
-                        td {  }
+                        @let field = "acquisition_datetime";
+                        td { (field) }
+                        td #(String::from(ITEM_DETAIL_ID_PREFIX) + field) {  }
                     }
                     tr {
-                        td { "acquisition_price_cents" }
-                        td {  }
+                        @let field = "acquisition_price_cents";
+                        td { (field) }
+                        td #(String::from(ITEM_DETAIL_ID_PREFIX) + field) {  }
                     }
                     tr {
-                        td { "acquisition_location" }
-                        td {  }
+                        @let field = "acquisition_location";
+                        td { (field) }
+                        td #(String::from(ITEM_DETAIL_ID_PREFIX) + field) {  }
                     }
                     tr {
-                        td { "created" }
-                        td {  }
+                        @let field = "created";
+                        td { (field) }
+                        td #(String::from(ITEM_DETAIL_ID_PREFIX) + field) {  }
                     }
                     tr {
-                        td { "updated" }
-                        td {  }
+                        @let field = "updated";
+                        td { (field) }
+                        td #(String::from(ITEM_DETAIL_ID_PREFIX) + field) {  }
                     }
                 }
             }
-            button style="padding-top: .5rem;"
+            button style="margin-top: .5rem;"
                 onclick=(reactivity::hide_element_handler(ITEM_DETAILS_CONTAINER_ID)) { "Close" }
         }
     }
@@ -169,4 +182,25 @@ fn inventory_location_markup(inventory_location_vec: &Vec<InventoryLocationSeria
     };
 
     html! { (inventory_location.display_name) }
+}
+
+fn activate_item_details_script(item: &ItemSerial) -> String {
+    let json: String = match serde_json::to_string(item) {
+        Ok(value) => value,
+        Err(error) => return format!(r#"console.err("Error serializing value", {:?}, {:#});"#, item, error).to_string(),
+    };
+
+    let value_setter: String = format!(r#"
+        const item = JSON.parse('{}');
+        for (let [key, value] of Object.entries(item)) {{
+            const element = document.getElementById("{}" + key);
+            element.innerText = value;
+        }}
+    "#, json, ITEM_DETAIL_ID_PREFIX);
+
+    {
+        let mut script: String = reactivity::activate_element_handler(ITEM_DETAILS_CONTAINER_ID);
+        script.push_str(&value_setter);
+        script
+    }
 }

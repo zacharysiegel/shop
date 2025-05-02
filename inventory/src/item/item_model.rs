@@ -146,14 +146,14 @@ impl ShopModel for Item {
             inventory_location_id: entity.inventory_location_id.clone(),
             condition: ItemCondition::try_from_repr(entity.condition as u8)?,
             status: ItemStatus::try_from_repr(entity.status as u8)?,
-            price_cents: 0,
-            priority: 0,
-            note: None,
-            acquisition_datetime: Default::default(),
-            acquisition_price_cents: None,
-            acquisition_location: None,
-            created: Default::default(),
-            updated: Default::default(),
+            price_cents: entity.price_cents.clone() as u32,
+            priority: entity.priority.clone(),
+            note: entity.note.clone(),
+            acquisition_datetime: entity.acquisition_datetime.clone(),
+            acquisition_price_cents: entity.acquisition_price_cents.clone().map(|v| v as u32),
+            acquisition_location: entity.acquisition_location.clone(),
+            created: entity.created.clone(),
+            updated: entity.updated.clone(),
         })
     }
 }
