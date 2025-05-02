@@ -1,8 +1,8 @@
 use crate::admin::api::wrapped_get;
-use crate::admin::{item_page, reactivity};
 use crate::admin::structure::error_text::error_text;
 use crate::admin::structure::form;
 use crate::admin::structure::{page, split};
+use crate::admin::{item_page, reactivity};
 use crate::registry::REGISTRY;
 use crate::{admin, unwrap_result_else_markup};
 use actix_web::web::ServiceConfig;
@@ -218,31 +218,23 @@ async fn create_item_form() -> Markup {
 
 // These scripts could be defined as global functions in a .js file instead
 fn activate_delete_form_script(element_id: &str, product_id: &Uuid) -> String {
-    format!(r#"
-        const form_container = document.getElementById("{0}");
-        form_container.style.display = "block";
-        const form = form_container.lastChild.lastChild;
-        form.action = "{1}{2}{3}";
-        form.id.value = "{3}";
-    "#,
-            element_id,
-            REGISTRY.remote_url,
-            "/product/",
-            product_id.to_string(),
-    ).to_string()
+    let activate_form: String = reactivity::activate_element_handler(element_id);
+    // activate_element_handler defines the "element" const
+    let modify_form = format!(r#"
+        const form = element.lastChild.lastChild;
+        form.action = "{0}/procuct/{1}";
+        form.id.value = "{1}";
+    "#, REGISTRY.remote_url, product_id.to_string());
+    activate_form + &modify_form
 }
 
 fn activate_create_item_form_script(element_id: &str, product_id: &Uuid) -> String {
-    format!(r#"
-        const form_container = document.getElementById("{}");
-        form_container.style.display = "block";
-        const form = form_container.lastChild.lastChild;
-        form.action = "{}{}";
+    let activate_form: String = reactivity::activate_element_handler(element_id);
+    // activate_element_handler defines the "element" const
+    let modify_form: String = format!(r#"
+        const form = element.lastChild.lastChild;
+        form.action = "{}/item";
         form.product_id.value = "{}";
-    "#,
-            element_id,
-            REGISTRY.remote_url,
-            "/item",
-            product_id,
-    ).to_string()
+    "#, REGISTRY.remote_url, product_id);
+    activate_form + &modify_form
 }

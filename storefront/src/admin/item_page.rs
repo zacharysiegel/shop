@@ -54,7 +54,7 @@ async fn left(product_id: &String) -> Markup {
 }
 
 fn right() -> Markup {
-    (item_details())
+    item_details()
 }
 
 async fn table(elements: &Vec<ItemSerial>) -> Markup {
