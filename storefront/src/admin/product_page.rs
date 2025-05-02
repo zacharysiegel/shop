@@ -105,8 +105,8 @@ fn table(elements: &Vec<ProductSerial>) -> Markup {
                             a href=(item_page::RELATIVE_PATH.replace("{product_id}", element.id.to_string().as_str()))
                                 target="_blank" rel="noopener"
                                 { button { "View items" } }
-                            button onclick=(activate_create_item_form_script(CREATE_ITEM_FORM_CONTAINER_ID, &element.id)) { "Create item" }
                             button onclick=(activate_delete_form_script(DELETE_FORM_CONTAINER_ID, &element.id)) { "Delete" }
+                            button onclick=(activate_create_item_form_script(CREATE_ITEM_FORM_CONTAINER_ID, &element.id)) { "Create item" }
                         }
                     }
                 }
@@ -147,8 +147,8 @@ fn delete_form() -> Markup {
                     input type="text" name="id" disabled[true];
                 }
                 input type="submit";
-                button onclick=(reactivity::hide_element_handler(DELETE_FORM_CONTAINER_ID)) { "Cancel" }
             }))
+            button onclick=(reactivity::hide_element_handler(DELETE_FORM_CONTAINER_ID)) { "Cancel" }
         }
     }
 }
@@ -214,8 +214,8 @@ async fn create_item_form() -> Markup {
                 input type="hidden" name="created" value=(form::get_current_datetime_string());
                 input type="hidden" name="updated" value=(form::get_current_datetime_string());
                 input type="submit";
-                button onclick=(reactivity::hide_element_handler(CREATE_ITEM_FORM_CONTAINER_ID)) { "Cancel" }
             }))
+            button onclick=(reactivity::hide_element_handler(CREATE_ITEM_FORM_CONTAINER_ID)) { "Cancel" }
         }
     }
 }
@@ -225,7 +225,7 @@ fn activate_delete_form_script(element_id: &str, product_id: &Uuid) -> String {
     let activate_form: String = reactivity::activate_element_handler(element_id);
     // activate_element_handler defines the "element" const
     let modify_form = format!(r#"
-        const form = element.lastChild.lastChild;
+        const form = element.children[1].lastChild;
         form.action = "{0}/procuct/{1}";
         form.id.value = "{1}";
     "#, REGISTRY.remote_url, product_id.to_string());
@@ -236,7 +236,7 @@ fn activate_create_item_form_script(element_id: &str, product_id: &Uuid) -> Stri
     let activate_form: String = reactivity::activate_element_handler(element_id);
     // activate_element_handler defines the "element" const
     let modify_form: String = format!(r#"
-        const form = element.lastChild.lastChild;
+        const form = element.children[1].lastChild;
         form.action = "{}/item";
         form.product_id.value = "{}";
     "#, REGISTRY.remote_url, product_id);
