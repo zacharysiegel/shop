@@ -4,6 +4,7 @@ use crate::registry::REGISTRY;
 use serde::Serialize;
 use std::fmt::Debug;
 
+/// Produces the `element` variable which binds to the found element at the given identifier
 pub fn activate_element_handler(element_id: &str) -> String {
     format!(r#"
         event.preventDefault();
@@ -14,6 +15,7 @@ pub fn activate_element_handler(element_id: &str) -> String {
     ).to_string()
 }
 
+/// Produces the `element` variable which binds to the found element at the given identifier
 pub fn hide_element_handler(element_id: &str) -> String {
     format!(r#"
         event.preventDefault();
