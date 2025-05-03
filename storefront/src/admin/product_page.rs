@@ -1,5 +1,5 @@
 use crate::admin::api::wrapped_get;
-use crate::admin::structure::error_text::{error_markup, error_text};
+use crate::admin::structure::error_text::error_markup;
 use crate::admin::structure::form;
 use crate::admin::structure::{page, split};
 use crate::admin::{item_page, reactivity};
@@ -225,7 +225,7 @@ async fn category_details() -> Markup {
         div #(CATEGORY_DETAIL_CONTAINER_ID) style=(concat!("display: none;")) {
             hr {}
             h2 { "Categories" }
-            ul style="list-style: none;" {}
+            section {}
             // todo: form to create association
         }
     }
@@ -258,16 +258,17 @@ async fn activate_categories_script(element_id: &str, product: &ProductSerial) -
     let json: String = serde_json::to_string(&category_vec).unwrap();
 
     let activate: String = reactivity::activate_element_handler(element_id);
-    let inject: String = format!(r#"
+    let inject: String = format!(
+        r#"
         const categories = JSON.parse('{}');
-        const ul = element.getElementsByTagName("ul")[0];
-        ul.replaceChildren();
+        const section = element.getElementsByTagName("section")[0];
+        section.replaceChildren();
         for (category of categories) {{
-            const li = document.createElement('li');
-            li.innerText = category.display_name;
-            ul.appendChild(li);
+            const div = document.createElement('div');
+            div.innerText = category.display_name;
+            section.appendChild(div);
         }}
-    "#,
+        "#,
         json,
     );
 
