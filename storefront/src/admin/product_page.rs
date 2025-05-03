@@ -89,8 +89,10 @@ fn table(elements: &Vec<ProductSerial>) -> Markup {
     html! {
         table {
             thead {
-                @for heading in HEADINGS {
-                    th { (heading) }
+                tr {
+                    @for heading in HEADINGS {
+                        th { (heading) }
+                    }
                 }
             }
             tbody {
@@ -102,7 +104,8 @@ fn table(elements: &Vec<ProductSerial>) -> Markup {
                         td { (format!("{:?}", element.upc)) }
                         td { (format!("{:?}", element.release_date)) }
                         td {
-                            a href=(item_page::RELATIVE_PATH.replace("{product_id}", element.id.to_string().as_str()))
+                            a
+                                href=(item_page::RELATIVE_PATH.replace("{product_id}", element.id.to_string().as_str()))
                                 target="_blank" rel="noopener"
                                 { button { "View items" } }
                             button onclick=(activate_delete_form_script(DELETE_FORM_CONTAINER_ID, &element.id)) { "Delete" }

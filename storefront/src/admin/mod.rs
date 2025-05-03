@@ -8,3 +8,4 @@ mod category_page;
 mod product_page;
 mod item_page;
 mod inventory_location_page;
+mod listing_page;

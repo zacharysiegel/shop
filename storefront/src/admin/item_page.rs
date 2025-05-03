@@ -1,21 +1,22 @@
 use crate::admin::api::wrapped_get;
 use crate::admin::structure::error_text::error_text;
 use crate::admin::structure::{form, page, split};
-use crate::admin::{product_page, reactivity};
+use crate::admin::{listing_page, product_page, reactivity};
 use crate::unwrap_result_else_markup;
 use actix_web::web;
 use actix_web::web::ServiceConfig;
 use inventory::inventory_location::InventoryLocationSerial;
 use inventory::item::{ItemCondition, ItemSerial, ItemStatus};
 use inventory::listing::ListingStatus;
+use inventory::marketplace::MarketplaceSerial;
 use inventory::product::ProductSerial;
 use maud::{html, Markup};
 use reqwest::Method;
 use serde_json::{json, Map, Value};
 use strum::VariantArray;
-use inventory::marketplace::MarketplaceSerial;
 
 pub const RELATIVE_PATH: &str = "/admin/product/{product_id}/item";
+
 /// U+00A2 is the "cent" sign.
 const HEADINGS: [&str; 6] = ["id", "location", "condition", "status", "price (\u{00A2})", "actions"];
 const ITEM_DETAILS_CONTAINER_ID: &str = "item_details_container";
@@ -39,12 +40,12 @@ async fn render(
         ),
         split::split(
             left(&product_id).await,
-            right().await
+            right().await,
         ),
     )
 }
 
-async fn left(product_id: &String) -> Markup {
+async fn left(product_id: &str) -> Markup {
     let product: ProductSerial = unwrap_result_else_markup!(
         wrapped_get::<ProductSerial>(&format!("/product/{}", product_id)).await
     );
@@ -70,7 +71,7 @@ async fn right() -> Markup {
 }
 
 async fn table(elements: &Vec<ItemSerial>) -> Markup {
-    let inventory_location_vec = unwrap_result_else_markup!(
+    let inventory_location_vec: Vec<InventoryLocationSerial> = unwrap_result_else_markup!(
         wrapped_get::<Vec<InventoryLocationSerial>>("/inventory_location").await
     );
 
@@ -97,6 +98,13 @@ async fn table(elements: &Vec<ItemSerial>) -> Markup {
                         td { (element.price_cents) }
                         td {
                             button onclick=(activate_item_details_script(element)) { "Details" }
+                            a
+                                href=(listing_page::RELATIVE_PATH
+                                    .replace("{product_id}", &element.product_id.to_string())
+                                    .replace("{item_id}", &element.id.to_string())
+                                )
+                                target="_blank" rel="noopener"
+                                { button { "View listings" } }
                             button onclick=(activate_item_create_listing_script(element)) { "Create listing" }
                         }
                     }

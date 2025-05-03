@@ -1,5 +1,5 @@
 use crate::admin::structure::page;
-use crate::admin::{category_page, inventory_location_page, item_page, product_page};
+use crate::admin::{category_page, inventory_location_page, item_page, listing_page, product_page};
 use actix_web::web;
 use actix_web::web::ServiceConfig;
 use maud::{html, Markup};
@@ -27,7 +27,8 @@ pub fn configurer(config: &mut ServiceConfig) -> () {
             .configure(item_page::configurer)
             .configure(product_page::configurer)
             .configure(category_page::configurer)
-			.configure(inventory_location_page::configurer)
+            .configure(inventory_location_page::configurer)
+            .configure(listing_page::configurer)
         )
     ;
 }
