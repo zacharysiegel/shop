@@ -10,13 +10,14 @@ use inventory::item::{ItemCondition, ItemSerial, ItemStatus};
 use inventory::product::ProductSerial;
 use maud::{html, Markup};
 use reqwest::Method;
+use serde_json::{json, Map, Value};
 
 pub const RELATIVE_PATH: &str = "/admin/product/{product_id}/item";
 /// U+00A2 is the "cent" sign.
 const HEADINGS: [&str; 6] = ["id", "location", "condition", "status", "price (\u{00A2})", "actions"];
 const ITEM_DETAILS_CONTAINER_ID: &str = "item_details_container";
 const ITEM_DETAIL_ID_PREFIX: &str = "item_detail_";
-const PURCHASE_FORM_CONTAINER_ID: &str = "purchase_form_container";
+const CREATE_LISTING_FORM_CONTAINER_ID: &str = "create_listing_form_container";
 
 pub fn configurer(config: &mut ServiceConfig) {
     config
@@ -58,7 +59,7 @@ async fn left(product_id: &String) -> Markup {
 fn right() -> Markup {
     html! {
         (item_details())
-        (purchase_form())
+        (create_listing_form())
     }
 }
 
@@ -90,7 +91,7 @@ async fn table(elements: &Vec<ItemSerial>) -> Markup {
                         td { (element.price_cents) }
                         td {
                             button onclick=(activate_item_details_script(element)) { "Details" }
-                            button onclick=(activate_item_purchase_script(element)) { "Log purchase" }
+                            button onclick=(activate_item_create_listing_script(element)) { "Create listing" }
                         }
                     }
                 }
@@ -178,11 +179,15 @@ fn item_details() -> Markup {
     }
 }
 
-fn purchase_form() -> Markup {
+fn create_listing_form() -> Markup {
     html! {
-        div #(PURCHASE_FORM_CONTAINER_ID) style=(concat!("display: none;")) {
+        div #(CREATE_LISTING_FORM_CONTAINER_ID) style=(concat!("display: none;")) {
             hr {}
-            (form::form("Purchase", "/purchase", Method::POST, html! {
+            (form::form("Create listing", "/listing", Method::POST, html! {
+                label {
+                    "item_id"
+                    input type="text" readonly[true] name="item_id";
+                }
                 label {
                     "marketplace_id"
                     input type="text" name="marketplace_id";
@@ -190,7 +195,7 @@ fn purchase_form() -> Markup {
                 // todo
                 input type="submit";
             }))
-            button onclick=(reactivity::hide_element_handler(PURCHASE_FORM_CONTAINER_ID)) { "Close" }
+            button onclick=(reactivity::hide_element_handler(CREATE_LISTING_FORM_CONTAINER_ID)) { "Close" }
         }
     }
 }
@@ -221,13 +226,16 @@ fn activate_item_details_script(item: &ItemSerial) -> String {
         }}
     "#, json, ITEM_DETAIL_ID_PREFIX);
 
-    {
-        let mut script: String = reactivity::activate_element_handler(ITEM_DETAILS_CONTAINER_ID);
-        script.push_str(&value_setter);
-        script
-    }
+    let mut script: String = reactivity::activate_element_handler(ITEM_DETAILS_CONTAINER_ID);
+    script.push_str(&value_setter);
+    script
 }
 
-fn activate_item_purchase_script(item: &ItemSerial) -> String {
-    reactivity::activate_element_handler(PURCHASE_FORM_CONTAINER_ID)
+fn activate_item_create_listing_script(item: &ItemSerial) -> String {
+    let mut json_map: Map<String, Value> = Map::with_capacity(1);
+    json_map.insert(String::from("item_id"), json!(item.id));
+
+    let mut script = reactivity::activate_element_handler(CREATE_LISTING_FORM_CONTAINER_ID);
+    script.push_str(&reactivity::update_form_script_from_serialize("/listing", &json_map));
+    script
 }

@@ -225,7 +225,7 @@ fn activate_delete_form_script(element_id: &str, product_id: &Uuid) -> String {
     let activate_form: String = reactivity::activate_element_handler(element_id);
     // activate_element_handler defines the "element" const
     let modify_form = format!(r#"
-        const form = element.children[1].lastChild;
+        const form = element.getElementsByTagName("form")[0];
         form.action = "{0}/procuct/{1}";
         form.id.value = "{1}";
     "#, REGISTRY.remote_url, product_id.to_string());
@@ -236,7 +236,7 @@ fn activate_create_item_form_script(element_id: &str, product_id: &Uuid) -> Stri
     let activate_form: String = reactivity::activate_element_handler(element_id);
     // activate_element_handler defines the "element" const
     let modify_form: String = format!(r#"
-        const form = element.children[1].lastChild;
+        const form = element.getElementsByTagName("form")[0];
         form.action = "{}/item";
         form.product_id.value = "{}";
     "#, REGISTRY.remote_url, product_id);
