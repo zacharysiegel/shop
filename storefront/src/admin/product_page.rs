@@ -233,6 +233,11 @@ async fn category_details() -> Markup {
             hr {}
             (form::form("Add category", "js", Method::POST, html! {
                 label {
+                    // Placed here for UX, not actually consumed in the HTTP request
+                    "Product ID"
+                    input type="text" name="id" readonly[true];
+                }
+                label {
                     "Category"
                     select name="category_id" {
                         option value="" { "_required " }
@@ -280,6 +285,7 @@ async fn activate_categories_script(element_id: &str, product: &ProductSerial) -
         const categories = JSON.parse('{}');
         const section = element.getElementsByTagName("section")[0];
         section.replaceChildren();
+        if (categories.length === 0) section.innerText = "None";
         for (category of categories) {{
             const div = document.createElement('div');
             div.innerText = category.display_name;
@@ -288,7 +294,7 @@ async fn activate_categories_script(element_id: &str, product: &ProductSerial) -
         }}"#,
         serde_json::to_string(&product_categories).unwrap(),
     );
-    let modify_form: String = reactivity::update_form_action(&format!("/product/{}/category", product.id));
+    let modify_form: String = reactivity::update_form_from_serialize(&format!("/product/{}/category", product.id), product);
 
     activate + &inject + &modify_form
 }
