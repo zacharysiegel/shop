@@ -213,21 +213,8 @@ fn inventory_location_markup(inventory_location_vec: &Vec<InventoryLocationSeria
 }
 
 fn activate_item_details_script(item: &ItemSerial) -> String {
-    let json: String = match serde_json::to_string(item) {
-        Ok(value) => value,
-        Err(error) => return format!(r#"console.err("Error serializing value", {:?}, {:#});"#, item, error).to_string(),
-    };
-
-    let value_setter: String = format!(r#"
-        const item = JSON.parse('{}');
-        for (let [key, value] of Object.entries(item)) {{
-            const element = document.getElementById("{}" + key);
-            element.innerText = value;
-        }}
-    "#, json, ITEM_DETAIL_ID_PREFIX);
-
     let mut script: String = reactivity::activate_element_handler(ITEM_DETAILS_CONTAINER_ID);
-    script.push_str(&value_setter);
+    script.push_str(&reactivity::set_content_by_prefix_from_serialize(ITEM_DETAIL_ID_PREFIX, item));
     script
 }
 
@@ -236,6 +223,6 @@ fn activate_item_create_listing_script(item: &ItemSerial) -> String {
     json_map.insert(String::from("item_id"), json!(item.id));
 
     let mut script = reactivity::activate_element_handler(CREATE_LISTING_FORM_CONTAINER_ID);
-    script.push_str(&reactivity::update_form_script_from_serialize("/listing", &json_map));
+    script.push_str(&reactivity::update_form_from_serialize("/listing", &json_map));
     script
 }
