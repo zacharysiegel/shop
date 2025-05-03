@@ -107,7 +107,7 @@ async fn table(elements: &Vec<ListingSerial>) -> Markup {
                         td { (format!("{:?}", element.status)) }
                         td {
                             button onclick=(activate_listing_details_script(&element)) { "Details" }
-                            button onclick=(reactivity::activate_element_handler(LISTING_UPDATE_CONTAINER_ID)) { "Update" }
+                            button onclick=(activate_listing_update_form_script(&element)) { "Update" }
                         }
                     }
                 }
@@ -247,7 +247,13 @@ fn listing_update() -> Markup {
 }
 
 fn activate_listing_details_script(listing: &ListingSerial) -> String {
-    let mut script: String = reactivity::activate_element_handler(LISTING_DETAILS_CONTAINER_ID);
-    script.push_str(&reactivity::set_content_by_prefix_from_serialize(LISTING_DETAIL_ID_PREFIX, listing));
-    script
+    let activate: String = reactivity::activate_element_handler(LISTING_DETAILS_CONTAINER_ID);
+    let modify: String = reactivity::set_content_by_prefix_from_serialize(LISTING_DETAIL_ID_PREFIX, listing);
+    activate + &modify
+}
+
+fn activate_listing_update_form_script(listing: &ListingSerial) -> String {
+    let activate: String = reactivity::activate_element_handler(LISTING_UPDATE_CONTAINER_ID);
+    let modify: String = reactivity::update_form_from_serialize(&format!("/listing/{}", listing.id), listing);
+    activate + &modify
 }
