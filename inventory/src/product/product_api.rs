@@ -4,7 +4,7 @@ use crate::error::ShopError;
 use crate::item::{Item, ItemSerial};
 use crate::object::JsonHttpResponse;
 use crate::pagination::{pagination_guard, KeysetPaginationOptionsForString};
-use crate::{unwrap_result_else_400, unwrap_result_else_500, ShopModel};
+use crate::{unwrap_option_else_404, unwrap_result_else_400, unwrap_result_else_500, ShopModel};
 use actix_web::guard::fn_guard;
 use actix_web::http::StatusCode;
 use actix_web::{guard, web, HttpResponse, HttpResponseBuilder, Responder};
@@ -25,7 +25,8 @@ pub fn configurer(config: &mut web::ServiceConfig) {
             .route("/{product_id}", web::get().to(get_product))
             .route("/{product_id}", web::delete().to(delete_product))
             .route("/{product_id}/category", web::get().to(get_product_categories))
-            .route("/{product_id}/category/{category_id}", web::post().to(create_product_category_association))
+            .route("/{product_id}/category", web::post().to(create_product_category_association_body))
+            .route("/{product_id}/category/{category_id}", web::post().to(create_product_category_association_path))
             .route("/{product_id}/category/{category_id}", web::delete().to(delete_product_category_association))
             .route("/{product_id}/item", web::get().to(get_product_items)),
     );
@@ -127,16 +128,34 @@ async fn get_product_categories(
         .to_http_response()
 }
 
-// todo: restrict to authenticated administrator
-async fn create_product_category_association(
+async fn create_product_category_association_body(
+    pgpool: web::Data<PgPool>,
+    product_id: web::Path<String>,
+    body: web::Json<serde_json::Map<String, serde_json::Value>>,
+) -> impl Responder {
+    let body = body.into_inner();
+    let category_id: &serde_json::Value = unwrap_option_else_404!(body.get("category_id"));
+    let category_id: &str = unwrap_option_else_404!(category_id.as_str());
+    create_product_category_association(&pgpool, &product_id.into_inner(), &category_id).await
+}
+
+async fn create_product_category_association_path(
     pgpool: web::Data<PgPool>,
     path: web::Path<(String, String)>,
 ) -> impl Responder {
     let (product_id, category_id) = path.into_inner();
-    let Ok(product_id) = Uuid::try_parse(product_id.as_str()) else {
+    create_product_category_association(&pgpool, &product_id, &category_id).await
+}
+
+async fn create_product_category_association(
+    pgpool: &PgPool,
+    product_id: &str,
+    category_id: &str,
+) -> HttpResponse {
+    let Ok(product_id) = Uuid::try_parse(product_id) else {
         return HttpResponseBuilder::new(StatusCode::INTERNAL_SERVER_ERROR).finish();
     };
-    let Ok(category_id) = Uuid::try_parse(category_id.as_str()) else {
+    let Ok(category_id) = Uuid::try_parse(category_id) else {
         return HttpResponseBuilder::new(StatusCode::INTERNAL_SERVER_ERROR).finish();
     };
 

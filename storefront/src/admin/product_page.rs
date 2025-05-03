@@ -221,12 +221,29 @@ async fn create_item_form() -> Markup {
 }
 
 async fn category_details() -> Markup {
+    let all_categories: Vec<CategorySerial> = unwrap_result_else_markup!(
+        wrapped_get::<Vec<CategorySerial>>("/category").await
+    );
+
     html! {
         div #(CATEGORY_DETAIL_CONTAINER_ID) style=(concat!("display: none;")) {
             hr {}
             h2 { "Categories" }
             section {}
-            // todo: form to create association
+            hr {}
+            (form::form("Add category", "js", Method::POST, html! {
+                label {
+                    "Category"
+                    select name="category_id" {
+                        option value="" { "_required " }
+                        @for category in all_categories {
+                            option value=(category.id) { (category.display_name) }
+                        }
+                    }
+                }
+                input type="submit";
+            }))
+            button onclick=(reactivity::hide_element_handler(CATEGORY_DETAIL_CONTAINER_ID)) { "Close" }
         }
     }
 }
@@ -249,17 +266,17 @@ fn activate_create_item_form_script(element_id: &str, product: &ProductSerial) -
 }
 
 async fn activate_categories_script(element_id: &str, product: &ProductSerial) -> String {
-    let category_vec: Vec<CategorySerial> = match wrapped_get::<Vec<CategorySerial>>(
+    let product_categories: Vec<CategorySerial> = match wrapped_get::<Vec<CategorySerial>>(
         &format!("/product/{}/category", product.id)
     ).await {
         Ok(value) => value,
         Err(markup) => return Markup::into_string(markup)
     };
-    let json: String = serde_json::to_string(&category_vec).unwrap();
 
     let activate: String = reactivity::activate_element_handler(element_id);
+    // todo: use HTML <template> for inner div
     let inject: String = format!(
-        r#"
+        r#"{{
         const categories = JSON.parse('{}');
         const section = element.getElementsByTagName("section")[0];
         section.replaceChildren();
@@ -268,9 +285,10 @@ async fn activate_categories_script(element_id: &str, product: &ProductSerial) -
             div.innerText = category.display_name;
             section.appendChild(div);
         }}
-        "#,
-        json,
+        }}"#,
+        serde_json::to_string(&product_categories).unwrap(),
     );
+    let modify_form: String = reactivity::update_form_action(&format!("/product/{}/category", product.id));
 
-    activate + &inject
+    activate + &inject + &modify_form
 }
