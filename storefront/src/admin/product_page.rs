@@ -3,7 +3,6 @@ use crate::admin::structure::error_text::error_text;
 use crate::admin::structure::form;
 use crate::admin::structure::{page, split};
 use crate::admin::{item_page, reactivity};
-use crate::registry::REGISTRY;
 use crate::{admin, unwrap_result_else_markup};
 use actix_web::web::ServiceConfig;
 use actix_web::{guard, web};
@@ -14,6 +13,7 @@ use inventory::pagination::{pagination_guard, KeysetPaginationOptionsForString, 
 use inventory::product::ProductSerial;
 use maud::{html, Markup};
 use reqwest::Method;
+use serde_json::json;
 use uuid::Uuid;
 
 pub const RELATIVE_PATH: &'static str = "/admin/product";
@@ -106,7 +106,7 @@ fn table(elements: &Vec<ProductSerial>) -> Markup {
                             a
                                 href=(item_page::RELATIVE_PATH.replace("{product_id}", element.id.to_string().as_str()))
                                 { button { "View items" } }
-                            button onclick=(activate_delete_form_script(DELETE_FORM_CONTAINER_ID, &element.id)) { "Delete" }
+                            button onclick=(activate_delete_form_script(DELETE_FORM_CONTAINER_ID, &element)) { "Delete" }
                             button onclick=(activate_create_item_form_script(CREATE_ITEM_FORM_CONTAINER_ID, &element.id)) { "Create item" }
                         }
                     }
@@ -218,24 +218,18 @@ async fn create_item_form() -> Markup {
 }
 
 // These scripts could be defined as global functions in a .js file instead
-fn activate_delete_form_script(element_id: &str, product_id: &Uuid) -> String {
+fn activate_delete_form_script(element_id: &str, product: &ProductSerial) -> String {
     let activate_form: String = reactivity::activate_element_handler(element_id);
-    // activate_element_handler defines the "element" const
-    let modify_form = format!(r#"
-        const form = element.getElementsByTagName("form")[0];
-        form.action = "{0}/procuct/{1}";
-        form.id.value = "{1}";
-    "#, REGISTRY.remote_url, product_id.to_string());
-    activate_form + &modify_form
+    let update_form: String = reactivity::update_form_from_serialize("/item", product);
+    activate_form + &update_form
 }
 
 fn activate_create_item_form_script(element_id: &str, product_id: &Uuid) -> String {
     let activate_form: String = reactivity::activate_element_handler(element_id);
-    // activate_element_handler defines the "element" const
-    let modify_form: String = format!(r#"
-        const form = element.getElementsByTagName("form")[0];
-        form.action = "{}/item";
-        form.product_id.value = "{}";
-    "#, REGISTRY.remote_url, product_id);
+    let modify_form: String = {
+        let mut json_map = serde_json::Map::with_capacity(1);
+        json_map.insert(String::from("product_id"), json!(product_id));
+        reactivity::update_form_from_serialize("/item", &json_map)
+    };
     activate_form + &modify_form
 }

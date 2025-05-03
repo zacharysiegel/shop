@@ -118,7 +118,7 @@ async fn table(elements: &Vec<ItemSerial>) -> Markup {
                                     .replace("{item_id}", &element.id.to_string())
                                 )
                                 { button { "View listings" } }
-                            button onclick=(activate_item_create_listing_script(element)) { "Create listing" }
+                            button onclick=(activate_create_listing_script(element)) { "Create listing" }
                         }
                     }
                 }
@@ -205,7 +205,7 @@ fn activate_item_details_script(item: &ItemSerial) -> String {
     script
 }
 
-fn activate_item_create_listing_script(item: &ItemSerial) -> String {
+fn activate_create_listing_script(item: &ItemSerial) -> String {
     let mut json_map: Map<String, Value> = Map::with_capacity(1);
     json_map.insert(String::from("item_id"), json!(item.id));
 
