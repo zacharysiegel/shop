@@ -9,6 +9,7 @@ pub fn page(current_page_branch: &Vec<PageInfo>, content: Markup) -> Markup {
 			head {
 				meta charset="utf-8";
 				title {"Shop | Administration"}
+				link rel="icon" href="/favicon.svg";
 				link rel="stylesheet" type="text/css" href="/reset.css";
 				link rel="stylesheet" type="text/css" href="/base.css";
 				link rel="stylesheet" type="text/css" href="/tree.css";

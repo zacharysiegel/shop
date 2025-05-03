@@ -108,6 +108,7 @@ fn table(elements: &Vec<ProductSerial>) -> Markup {
                                 { button { "View items" } }
                             button onclick=(activate_delete_form_script(DELETE_FORM_CONTAINER_ID, &element)) { "Delete" }
                             button onclick=(activate_create_item_form_script(CREATE_ITEM_FORM_CONTAINER_ID, &element.id)) { "Create item" }
+                            button { "Categories" } // todo
                         }
                     }
                 }
