@@ -31,7 +31,13 @@ pub fn hide_element_handler(element_id: &str) -> String {
 pub fn update_form_from_json_string(path: &str, json_parameters: &str) -> String {
     format!(
         r#"{{
-        const form = element.getElementsByTagName("form")[0];
+        const forms = element.getElementsByTagName("form");
+        if (forms.length === 0) {{
+            console.err("Error: No form found within target element", element);
+            return;
+        }}
+
+        const form = forms[forms.length - 1]
         form.action = "{}{}";
 
         const parameters = JSON.parse('{}');

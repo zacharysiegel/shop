@@ -15,6 +15,7 @@ use inventory::product::ProductSerial;
 use maud::{html, Markup};
 use reqwest::Method;
 use serde_json::json;
+use crate::registry::REGISTRY;
 
 pub const RELATIVE_PATH: &'static str = "/admin/product";
 
@@ -22,6 +23,7 @@ const HEADINGS: [&str; 6] = ["id", "display_name ⏶", "internal_name", "upc", "
 const DELETE_FORM_CONTAINER_ID: &str = "delete_form_container";
 const CREATE_ITEM_FORM_CONTAINER_ID: &str = "create_item_form_container";
 const CATEGORY_DETAIL_CONTAINER_ID: &str = "category_detail_container";
+const CATEGORY_TEMPLATE_ID: &str = "category_template";
 
 pub fn configurer(config: &mut ServiceConfig) {
     config
@@ -46,6 +48,9 @@ async fn handle_paginated(
 async fn render(pagination_options: Option<KeysetPaginationOptionsForString>) -> Markup {
     page::page(
         &vec!((RELATIVE_PATH, "Product")),
+        html! {
+            script src="/page/product.js" {}
+        },
         split::split(left(pagination_options).await, right().await),
     )
 }
@@ -282,16 +287,11 @@ async fn activate_categories_script(element_id: &str, product: &ProductSerial) -
     let inject: String = format!(
         r#"{{
         const categories = JSON.parse('{}');
-        const section = element.getElementsByTagName("section")[0];
-        section.replaceChildren();
-        if (categories.length === 0) section.innerText = "None";
-        for (category of categories) {{
-            const div = document.createElement('div');
-            div.innerText = category.display_name;
-            section.appendChild(div);
-        }}
+        activate_categories(element, "{}", "{}", categories); // Defined in product.js
         }}"#,
         serde_json::to_string(&product_categories).unwrap(),
+        REGISTRY.remote_url,
+        product.id,
     );
     let modify_form: String = reactivity::update_form_from_serialize(&format!("/product/{}/category", product.id), product);
 

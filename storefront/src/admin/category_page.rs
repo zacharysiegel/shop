@@ -16,6 +16,7 @@ pub fn configurer(config: &mut ServiceConfig) {
 async fn render() -> Markup {
     page::page(
         &vec!((RELATIVE_PATH, "Category")),
+        Markup::default(),
         split::split(left().await, right()),
     )
 }

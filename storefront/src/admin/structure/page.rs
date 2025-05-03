@@ -2,7 +2,7 @@ use maud::{html, Markup, DOCTYPE};
 
 pub type PageInfo<'a> = (&'a str, &'a str);
 
-pub fn page(current_page_branch: &Vec<PageInfo>, content: Markup) -> Markup {
+pub fn page(current_page_branch: &Vec<PageInfo>, head_content: Markup, body_content: Markup) -> Markup {
     html! {
 		(DOCTYPE)
 		html {
@@ -14,6 +14,7 @@ pub fn page(current_page_branch: &Vec<PageInfo>, content: Markup) -> Markup {
 				link rel="stylesheet" type="text/css" href="/base.css";
 				link rel="stylesheet" type="text/css" href="/tree.css";
 				script src="/submit_form.js" {};
+				(head_content)
 			}
 			body style=(concat!(
 				"min-height: calc(100vh - 2rem);",
@@ -29,7 +30,7 @@ pub fn page(current_page_branch: &Vec<PageInfo>, content: Markup) -> Markup {
 					}
 				}
 				main style=("flex-grow: 1;") {
-					(content)
+					(body_content)
 				}
 			}
 		}

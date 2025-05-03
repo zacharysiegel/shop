@@ -52,6 +52,7 @@ async fn render(
             (product_page::RELATIVE_PATH, "Product"),
             (&RELATIVE_PATH.replace("{product_id}", &product_id), "Item"),
         ),
+        Markup::default(),
         split::split(
             left(&product_id).await,
             right().await,

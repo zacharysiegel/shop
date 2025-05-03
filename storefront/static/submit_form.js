@@ -38,3 +38,5 @@ function submit_form(submit_event) {
 }
 
 document.addEventListener("submit", submit_form);
+
+// todo: enable notification of success/failure

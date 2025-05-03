@@ -7,6 +7,7 @@ use maud::{html, Markup};
 pub async fn render() -> Markup {
     page::page(
         &Vec::default(),
+		Markup::default(),
         html! {
 			div {
 				ol {
