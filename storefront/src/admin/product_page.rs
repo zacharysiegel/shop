@@ -106,7 +106,6 @@ fn table(elements: &Vec<ProductSerial>) -> Markup {
                         td {
                             a
                                 href=(item_page::RELATIVE_PATH.replace("{product_id}", element.id.to_string().as_str()))
-                                target="_blank" rel="noopener"
                                 { button { "View items" } }
                             button onclick=(activate_delete_form_script(DELETE_FORM_CONTAINER_ID, &element.id)) { "Delete" }
                             button onclick=(activate_create_item_form_script(CREATE_ITEM_FORM_CONTAINER_ID, &element.id)) { "Create item" }

@@ -118,7 +118,6 @@ async fn table(elements: &Vec<ItemSerial>) -> Markup {
                                     .replace("{product_id}", &element.product_id.to_string())
                                     .replace("{item_id}", &element.id.to_string())
                                 )
-                                target="_blank" rel="noopener"
                                 { button { "View listings" } }
                             button onclick=(activate_item_create_listing_script(element)) { "Create listing" }
                         }
