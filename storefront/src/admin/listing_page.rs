@@ -1,9 +1,11 @@
 use crate::admin::api::wrapped_get;
+use crate::admin::structure::error_text::error_text;
 use crate::admin::structure::{page, split};
 use crate::admin::{item_page, product_page};
 use crate::unwrap_result_else_markup;
 use actix_web::web;
 use actix_web::web::ServiceConfig;
+use inventory::item::{ItemCondition, ItemSerial, ItemStatus};
 use inventory::listing::ListingSerial;
 use inventory::marketplace::MarketplaceSerial;
 use inventory::product::ProductSerial;
@@ -35,7 +37,7 @@ async fn render(
         ),
         split::split(
             left(&product_id, &item_id).await,
-            right(),
+            right(&item_id).await,
         ),
     )
 }
@@ -44,9 +46,6 @@ async fn left(product_id: &str, item_id: &str) -> Markup {
     let product: ProductSerial = unwrap_result_else_markup!(
         wrapped_get::<ProductSerial>(&format!("/product/{}", product_id)).await
     );
-    // let item: ItemSerial = unwrap_result_else_markup!(
-    //     wrapped_get::<ItemSerial>(&format!("/item/{}", item_id)).await
-    // );
     let listing_vec: Vec<ListingSerial> = unwrap_result_else_markup!(
         wrapped_get::<Vec<ListingSerial>>(&format!("/item/{}/listing", item_id)).await
     );
@@ -61,9 +60,14 @@ async fn left(product_id: &str, item_id: &str) -> Markup {
     }
 }
 
-fn right() -> Markup {
-    // todo: item details?
-    html! { }
+async fn right(item_id: &str) -> Markup {
+    let item: ItemSerial = unwrap_result_else_markup!(
+        wrapped_get::<ItemSerial>(&format!("/item/{}", item_id)).await
+    );
+
+    html! {
+        (item_details(&item))
+    }
 }
 
 async fn table(elements: &Vec<ListingSerial>) -> Markup {
@@ -108,4 +112,74 @@ fn marketplace_markup(marketplace_vec: &Vec<MarketplaceSerial>, listing: &Listin
     };
 
     html! { (marketplace.display_name) }
+}
+
+fn item_details(item: &ItemSerial) -> Markup {
+    html! {
+        div {
+            h2 { "Item details" }
+            table {
+                tbody {
+                    tr {
+                        td { "id" }
+                        td { (item.id) }
+                    }
+                    tr {
+                        td { "product_id" }
+                        td { (item.product_id) }
+                    }
+                    tr {
+                        td { "inventory_location_id" }
+                        td { (item.inventory_location_id) }
+                    }
+                    tr {
+                        td { "condition" }
+                        td { (match ItemCondition::try_from_repr(item.condition) {
+                            Ok(variant) => format!("{:?} ({})", variant, item.condition),
+                            Err(error) => Markup::into_string(error_text(error)),
+                        }) }
+                    }
+                    tr {
+                        td { "status" }
+                        td { (match ItemStatus::try_from_repr(item.status) {
+                            Ok(variant) => format!("{:?} ({})", variant, item.status),
+                            Err(error) => Markup::into_string(error_text(error)),
+                        }) }
+                    }
+                    tr {
+                        td { "price_cents" }
+                        td { (item.price_cents) }
+                    }
+                    tr {
+                        td { "priority" }
+                        td { (item.priority) }
+                    }
+                    tr {
+                        td { "note" }
+                        td { (format!("{:?}", item.note)) }
+                    }
+                    tr {
+                        td { "acquisition_datetime" }
+                        td { (item.acquisition_datetime) }
+                    }
+                    tr {
+                        td { "acquisition_price_cents" }
+                        td { (format!("{:?}", item.acquisition_price_cents)) }
+                    }
+                    tr {
+                        td { "acquisition_location" }
+                        td { (format!("{:?}", item.acquisition_location)) }
+                    }
+                    tr {
+                        td { "created" }
+                        td { (item.created) }
+                    }
+                    tr {
+                        td { "updated" }
+                        td { (item.updated) }
+                    }
+                }
+            }
+        }
+    }
 }

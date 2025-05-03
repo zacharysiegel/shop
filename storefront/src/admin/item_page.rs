@@ -16,13 +16,7 @@ use serde_json::{json, Map, Value};
 use strum::VariantArray;
 
 pub const RELATIVE_PATH: &str = "/admin/product/{product_id}/item";
-
-/// U+00A2 is the "cent" sign.
-const HEADINGS: [&str; 6] = ["id", "location", "condition", "status", "price (\u{00A2})", "actions"];
-const ITEM_DETAILS_CONTAINER_ID: &str = "item_details_container";
-const ITEM_DETAIL_ID_PREFIX: &str = "item_detail_";
-const CREATE_LISTING_FORM_CONTAINER_ID: &str = "create_listing_form_container";
-const ITEM_FIELDS: [&str; 13] = [
+pub const ITEM_FIELDS: [&str; 13] = [
     "id",
     "product_id",
     "inventory_location_id",
@@ -37,6 +31,12 @@ const ITEM_FIELDS: [&str; 13] = [
     "created",
     "updated",
 ];
+
+/// U+00A2 is the "cent" sign.
+const HEADINGS: [&str; 6] = ["id", "location", "condition", "status", "price (\u{00A2})", "actions"];
+const ITEM_DETAILS_CONTAINER_ID: &str = "item_details_container";
+const ITEM_DETAIL_ID_PREFIX: &str = "item_detail_";
+const CREATE_LISTING_FORM_CONTAINER_ID: &str = "create_listing_form_container";
 
 pub fn configurer(config: &mut ServiceConfig) {
     config
