@@ -3,7 +3,7 @@ use crate::object::JsonHttpResponse;
 use crate::{try_from_repr, object, ShopEntity, ShopModel, ShopSerial};
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
-use strum::FromRepr;
+use strum::{FromRepr, VariantArray};
 use uuid::Uuid;
 
 #[derive(Debug)]
@@ -85,7 +85,7 @@ impl ShopModel for ListingModel {
     }
 }
 
-#[derive(Debug, Clone, FromRepr)]
+#[derive(Debug, Clone, FromRepr, VariantArray)]
 #[repr(u8)]
 pub enum ListingStatus {
     Draft = 0,

@@ -7,10 +7,13 @@ use actix_web::web;
 use actix_web::web::ServiceConfig;
 use inventory::inventory_location::InventoryLocationSerial;
 use inventory::item::{ItemCondition, ItemSerial, ItemStatus};
+use inventory::listing::ListingStatus;
 use inventory::product::ProductSerial;
 use maud::{html, Markup};
 use reqwest::Method;
 use serde_json::{json, Map, Value};
+use strum::VariantArray;
+use inventory::marketplace::MarketplaceSerial;
 
 pub const RELATIVE_PATH: &str = "/admin/product/{product_id}/item";
 /// U+00A2 is the "cent" sign.
@@ -34,7 +37,10 @@ async fn render(
             (product_page::RELATIVE_PATH, "Product"),
             (&RELATIVE_PATH.replace("{product_id}", &product_id), "Item"),
         ),
-        split::split(left(&product_id).await, right()),
+        split::split(
+            left(&product_id).await,
+            right().await
+        ),
     )
 }
 
@@ -56,10 +62,10 @@ async fn left(product_id: &String) -> Markup {
     )
 }
 
-fn right() -> Markup {
+async fn right() -> Markup {
     html! {
         (item_details())
-        (create_listing_form())
+        (create_listing_form().await)
     }
 }
 
@@ -179,20 +185,43 @@ fn item_details() -> Markup {
     }
 }
 
-fn create_listing_form() -> Markup {
+async fn create_listing_form() -> Markup {
+    let marketplace_vec: Vec<MarketplaceSerial> = unwrap_result_else_markup!(
+        wrapped_get::<Vec<MarketplaceSerial>>("/marketplace").await
+    );
+
     html! {
         div #(CREATE_LISTING_FORM_CONTAINER_ID) style=(concat!("display: none;")) {
             hr {}
             (form::form("Create listing", "/listing", Method::POST, html! {
                 label {
-                    "item_id"
+                    "Item ID"
                     input type="text" readonly[true] name="item_id";
                 }
                 label {
-                    "marketplace_id"
-                    input type="text" name="marketplace_id";
+                    "Marketplace"
+                    select name="marketplace_id" {
+                        @for marketplace in marketplace_vec {
+                            option value=(marketplace.id) { (marketplace.display_name) }
+                        }
+                    }
                 }
-                // todo
+                label {
+                    "URI (optional)"
+                    input type="text" name="uri";
+                }
+                label {
+                    "Status"
+                    select name="status" {
+                        @for variant in ListingStatus::VARIANTS {
+                            option value=(variant.clone() as u8) {
+                                (format!("{:?}", variant))
+                            }
+                        }
+                    }
+                }
+                input type="hidden" name="created" value=(form::get_current_datetime_string());
+                input type="hidden" name="updated" value=(form::get_current_datetime_string());
                 input type="submit";
             }))
             button onclick=(reactivity::hide_element_handler(CREATE_LISTING_FORM_CONTAINER_ID)) { "Close" }

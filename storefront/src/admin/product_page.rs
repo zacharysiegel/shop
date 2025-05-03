@@ -154,7 +154,7 @@ fn delete_form() -> Markup {
 }
 
 async fn create_item_form() -> Markup {
-    let inventory_location_vec = unwrap_result_else_markup!(
+    let inventory_location_vec: Vec<InventoryLocationSerial> = unwrap_result_else_markup!(
         wrapped_get::<Vec<InventoryLocationSerial>>("/inventory_location").await
     );
 
@@ -171,7 +171,7 @@ async fn create_item_form() -> Markup {
                     select name="inventory_location_id" {
                         option value="" { "_required " }
                         @for inventory_location in inventory_location_vec {
-                            option value=(inventory_location.id.to_string()) { (inventory_location.display_name) }
+                            option value=(inventory_location.id) { (inventory_location.display_name) }
                         }
                     }
                 }
@@ -195,7 +195,7 @@ async fn create_item_form() -> Markup {
                     input type="number" name="priority" value="0";
                 }
                 label {
-                    "Note"
+                    "Note (optional)"
                     textarea name="note" rows="3" wrap="soft" {};
                 }
                 label {
@@ -203,11 +203,11 @@ async fn create_item_form() -> Markup {
                     input type="datetime-local" name="acquisition_datetime" value=(form::get_current_datetime_string());
                 }
                 label {
-                    "Acquisition price (\u{00A2})"
+                    "Acquisition price (\u{00A2}) (optional)"
                     input type="number" name="acquisition_price_cents";
                 }
                 label {
-                    "Acquisition location"
+                    "Acquisition location (optional)"
                     input type="text" name="acquisition_location";
                 }
                 input type="hidden" name="status" value="1";
