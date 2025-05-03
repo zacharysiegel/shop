@@ -22,6 +22,21 @@ const HEADINGS: [&str; 6] = ["id", "location", "condition", "status", "price (\u
 const ITEM_DETAILS_CONTAINER_ID: &str = "item_details_container";
 const ITEM_DETAIL_ID_PREFIX: &str = "item_detail_";
 const CREATE_LISTING_FORM_CONTAINER_ID: &str = "create_listing_form_container";
+const ITEM_FIELDS: [&str; 13] = [
+    "id",
+    "product_id",
+    "inventory_location_id",
+    "condition",
+    "status",
+    "price_cents",
+    "priority",
+    "note",
+    "acquisition_datetime",
+    "acquisition_price_cents",
+    "acquisition_location",
+    "created",
+    "updated",
+];
 
 pub fn configurer(config: &mut ServiceConfig) {
     config
@@ -120,70 +135,11 @@ fn item_details() -> Markup {
             h2 { "Item details" }
             table {
                 tbody {
-                    tr {
-                        @let field = "id";
-                        td { (field) }
-                        td #(String::from(ITEM_DETAIL_ID_PREFIX) + (field)) {  }
-                    }
-                    tr {
-                        @let field = "product_id";
-                        td { (field) }
-                        td #(String::from(ITEM_DETAIL_ID_PREFIX) + field) {  }
-                    }
-                    tr {
-                        @let field = "inventory_location_id";
-                        td { (field) }
-                        td #(String::from(ITEM_DETAIL_ID_PREFIX) + field) {  }
-                    }
-                    tr {
-                        @let field = "condition";
-                        td { (field) }
-                        td #(String::from(ITEM_DETAIL_ID_PREFIX) + field) {  }
-                    }
-                    tr {
-                        @let field = "status";
-                        td { (field) }
-                        td #(String::from(ITEM_DETAIL_ID_PREFIX) + field) {  }
-                    }
-                    tr {
-                        @let field = "price_cents";
-                        td { (field) }
-                        td #(String::from(ITEM_DETAIL_ID_PREFIX) + field) {  }
-                    }
-                    tr {
-                        @let field = "priority";
-                        td { (field) }
-                        td #(String::from(ITEM_DETAIL_ID_PREFIX) + field) {  }
-                    }
-                    tr {
-                        @let field = "note";
-                        td { (field) }
-                        td #(String::from(ITEM_DETAIL_ID_PREFIX) + field) {  }
-                    }
-                    tr {
-                        @let field = "acquisition_datetime";
-                        td { (field) }
-                        td #(String::from(ITEM_DETAIL_ID_PREFIX) + field) {  }
-                    }
-                    tr {
-                        @let field = "acquisition_price_cents";
-                        td { (field) }
-                        td #(String::from(ITEM_DETAIL_ID_PREFIX) + field) {  }
-                    }
-                    tr {
-                        @let field = "acquisition_location";
-                        td { (field) }
-                        td #(String::from(ITEM_DETAIL_ID_PREFIX) + field) {  }
-                    }
-                    tr {
-                        @let field = "created";
-                        td { (field) }
-                        td #(String::from(ITEM_DETAIL_ID_PREFIX) + field) {  }
-                    }
-                    tr {
-                        @let field = "updated";
-                        td { (field) }
-                        td #(String::from(ITEM_DETAIL_ID_PREFIX) + field) {  }
+                    @for field in &ITEM_FIELDS {
+                        tr {
+                            td { (field) }
+                            td #(String::from(ITEM_DETAIL_ID_PREFIX) + field) { }
+                        }
                     }
                 }
             }
