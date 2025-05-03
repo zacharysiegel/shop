@@ -239,6 +239,11 @@ fn listing_update() -> Markup {
                         }
                     }
                     input type="hidden" name="updated" value=(form::get_current_datetime_string());
+
+                    input type="hidden" name="item_id";
+                    input type="hidden" name="marketplace_id";
+                    input type="hidden" name="created";
+                    input type="submit";
                 }
             }))
             button onclick=(reactivity::hide_element_handler(LISTING_UPDATE_CONTAINER_ID)) { "Close" }

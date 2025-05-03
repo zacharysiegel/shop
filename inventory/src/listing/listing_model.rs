@@ -115,7 +115,3 @@ impl ShopSerial for ListingSerial {
 
 impl JsonHttpResponse for ListingSerial {}
 impl JsonHttpResponse for Vec<ListingSerial> {}
-
-pub struct ListingSerialUpdate {
-    // todo:
-}

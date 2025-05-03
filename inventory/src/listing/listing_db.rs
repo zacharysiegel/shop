@@ -40,4 +40,22 @@ pub async fn get_listing(
         .await
 }
 
+pub async fn update_listing(
+    pgpool: &PgPool,
+    listing: &ListingEntity,
+) -> Result<PgQueryResult, Error> {
+    query!("
+        update shop.public.listing
+        set (uri, status, updated) = ($2, $3, $4)
+        where id = $1
+    ",
+        listing.id,
+        listing.uri,
+        listing.status,
+        listing.updated,
+    )
+        .execute(pgpool)
+        .await
+}
+
 // todo: Paginated get_all_marketplace_listings(_page) query
