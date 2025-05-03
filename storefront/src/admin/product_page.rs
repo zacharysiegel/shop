@@ -279,7 +279,6 @@ async fn activate_categories_script(element_id: &str, product: &ProductSerial) -
     };
 
     let activate: String = reactivity::activate_element_handler(element_id);
-    // todo: use HTML <template> for inner div
     let inject: String = format!(
         r#"{{
         const categories = JSON.parse('{}');
