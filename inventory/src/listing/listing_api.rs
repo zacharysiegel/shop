@@ -37,3 +37,5 @@ async fn get_listing(pgpool: web::Data<PgPool>, id: web::Path<String>) -> impl R
     let listing = unwrap_result_else_500!(listing.try_to_model());
     listing.to_serial().to_http_response()
 }
+
+// todo: update_listing

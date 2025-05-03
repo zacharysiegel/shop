@@ -1,6 +1,6 @@
 use crate::error::ShopError;
 use crate::object::JsonHttpResponse;
-use crate::{try_from_repr, object, ShopEntity, ShopModel, ShopSerial};
+use crate::{object, try_from_repr, ShopEntity, ShopModel, ShopSerial};
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use strum::{FromRepr, VariantArray};
@@ -115,3 +115,7 @@ impl ShopSerial for ListingSerial {
 
 impl JsonHttpResponse for ListingSerial {}
 impl JsonHttpResponse for Vec<ListingSerial> {}
+
+pub struct ListingSerialUpdate {
+    // todo:
+}

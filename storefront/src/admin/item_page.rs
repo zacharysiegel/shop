@@ -13,7 +13,6 @@ use inventory::product::ProductSerial;
 use maud::{html, Markup};
 use reqwest::Method;
 use serde_json::{json, Map, Value};
-use strum::VariantArray;
 
 pub const RELATIVE_PATH: &str = "/admin/product/{product_id}/item";
 pub const ITEM_FIELDS: [&str; 13] = [
@@ -176,11 +175,7 @@ async fn create_listing_form() -> Markup {
                 label {
                     "Status"
                     select name="status" {
-                        @for variant in ListingStatus::VARIANTS {
-                            option value=(variant.clone() as u8) {
-                                (format!("{:?}", variant))
-                            }
-                        }
+                        (form::enum_options::<ListingStatus>())
                     }
                 }
                 input type="hidden" name="created" value=(form::get_current_datetime_string());

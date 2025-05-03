@@ -14,7 +14,6 @@ use inventory::pagination::{pagination_guard, KeysetPaginationOptionsForString, 
 use inventory::product::ProductSerial;
 use maud::{html, Markup};
 use reqwest::Method;
-use strum::VariantArray;
 use uuid::Uuid;
 
 pub const RELATIVE_PATH: &'static str = "/admin/product";
@@ -181,11 +180,7 @@ async fn create_item_form() -> Markup {
                     "Condition"
                     select style="display: block;" name="condition" {
                         option value="" { "_required"}
-                        @for variant in ItemCondition::VARIANTS {
-                            option value=(variant.clone() as u8) {
-                                (format!("{:?}", variant))
-                            }
-                        }
+                        (form::enum_options::<ItemCondition>())
                     }
                 }
                 label {

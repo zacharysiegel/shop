@@ -1,12 +1,12 @@
 use crate::admin::api::wrapped_get;
 use crate::admin::structure::error_text::error_text;
-use crate::admin::structure::{page, split};
+use crate::admin::structure::{form, page, split};
 use crate::admin::{item_page, product_page, reactivity};
 use crate::unwrap_result_else_markup;
 use actix_web::web;
 use actix_web::web::ServiceConfig;
 use inventory::item::{ItemCondition, ItemSerial, ItemStatus};
-use inventory::listing::ListingSerial;
+use inventory::listing::{ListingSerial, ListingStatus};
 use inventory::marketplace::MarketplaceSerial;
 use inventory::product::ProductSerial;
 use maud::{html, Markup};
@@ -25,6 +25,7 @@ pub const LISTING_FIELDS: [&str; 7] = [
 const HEADINGS: [&str; 5] = ["id", "marketplace", "uri", "status", "actions"];
 const LISTING_DETAILS_CONTAINER_ID: &str = "listing_details_container";
 const LISTING_DETAIL_ID_PREFIX: &str = "listing_detail_";
+const LISTING_UPDATE_CONTAINER_ID: &str = "listing_update_container";
 
 pub fn configurer(config: &mut ServiceConfig) {
     config
@@ -79,6 +80,7 @@ async fn right(item_id: &str) -> Markup {
     html! {
         (item_details(&item))
         (listing_details())
+        (listing_update())
     }
 }
 
@@ -105,7 +107,7 @@ async fn table(elements: &Vec<ListingSerial>) -> Markup {
                         td { (format!("{:?}", element.status)) }
                         td {
                             button onclick=(activate_listing_details_script(&element)) { "Details" }
-                            button disabled[true] { "Update" } // todo
+                            button onclick=(reactivity::activate_element_handler(LISTING_UPDATE_CONTAINER_ID)) { "Update" }
                         }
                     }
                 }
@@ -212,6 +214,34 @@ fn listing_details() -> Markup {
                 }
             }
             button onclick=(reactivity::hide_element_handler(LISTING_DETAILS_CONTAINER_ID)) { "Close" }
+        }
+    }
+}
+
+fn listing_update() -> Markup {
+    html! {
+        div #(LISTING_UPDATE_CONTAINER_ID) style="display: none;" {
+            hr {}
+            (form::form("Listing modifications", "", reqwest::Method::PUT, html! {
+                label {
+                    label {
+                        "ID"
+                        input type="text" name="id" readonly[true];
+                    }
+                    label {
+                        "URI"
+                        input type="text" name="uri";
+                    }
+                    label {
+                        "Status"
+                        select name="status" {
+                            (form::enum_options::<ListingStatus>())
+                        }
+                    }
+                    input type="hidden" name="updated" value=(form::get_current_datetime_string());
+                }
+            }))
+            button onclick=(reactivity::hide_element_handler(LISTING_UPDATE_CONTAINER_ID)) { "Close" }
         }
     }
 }
