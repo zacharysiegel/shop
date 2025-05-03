@@ -1,7 +1,7 @@
 use crate::admin::api::wrapped_get;
 use crate::admin::structure::error_text::error_text;
 use crate::admin::structure::{page, split};
-use crate::admin::{item_page, product_page};
+use crate::admin::{item_page, product_page, reactivity};
 use crate::unwrap_result_else_markup;
 use actix_web::web;
 use actix_web::web::ServiceConfig;
@@ -12,8 +12,19 @@ use inventory::product::ProductSerial;
 use maud::{html, Markup};
 
 pub const RELATIVE_PATH: &str = "/admin/product/{product_id}/item/{item_id}/listing";
+pub const LISTING_FIELDS: [&str; 7] = [
+    "id",
+    "item_id",
+    "marketplace_id",
+    "uri",
+    "status",
+    "created",
+    "updated",
+];
 
 const HEADINGS: [&str; 5] = ["id", "marketplace", "uri", "status", "actions"];
+const LISTING_DETAILS_CONTAINER_ID: &str = "listing_details_container";
+const LISTING_DETAIL_ID_PREFIX: &str = "listing_detail_";
 
 pub fn configurer(config: &mut ServiceConfig) {
     config
@@ -67,6 +78,7 @@ async fn right(item_id: &str) -> Markup {
 
     html! {
         (item_details(&item))
+        (listing_details())
     }
 }
 
@@ -92,7 +104,7 @@ async fn table(elements: &Vec<ListingSerial>) -> Markup {
                         td { (format!("{:?}", element.uri)) }
                         td { (format!("{:?}", element.status)) }
                         td {
-                            button disabled[true] { "Details" } // todo
+                            button onclick=(activate_listing_details_script(&element)) { "Details" }
                             button disabled[true] { "Update" } // todo
                         }
                     }
@@ -182,4 +194,30 @@ fn item_details(item: &ItemSerial) -> Markup {
             }
         }
     }
+}
+
+fn listing_details() -> Markup {
+    html! {
+        div #(LISTING_DETAILS_CONTAINER_ID) style="display: none;" {
+            hr {}
+            h2 { "Listing details" }
+            table {
+                tbody {
+                    @for field in &LISTING_FIELDS {
+                        tr {
+                            td { (field) }
+                            td #(String::from(LISTING_DETAIL_ID_PREFIX) + field) { }
+                        }
+                    }
+                }
+            }
+            button onclick=(reactivity::hide_element_handler(LISTING_DETAILS_CONTAINER_ID)) { "Close" }
+        }
+    }
+}
+
+fn activate_listing_details_script(listing: &ListingSerial) -> String {
+    let mut script: String = reactivity::activate_element_handler(LISTING_DETAILS_CONTAINER_ID);
+    script.push_str(&reactivity::set_content_by_prefix_from_serialize(LISTING_DETAIL_ID_PREFIX, listing));
+    script
 }
