@@ -1,5 +1,6 @@
+use crate::admin::structure::error_text::error_markup;
 use crate::registry::REGISTRY;
-use maud::{html, Markup};
+use maud::Markup;
 use serde::de::DeserializeOwned;
 
 pub async fn wrapped_get<SerialT: DeserializeOwned>(path_and_query: &str) -> Result<SerialT, Markup> {
@@ -10,13 +11,13 @@ pub async fn wrapped_get<SerialT: DeserializeOwned>(path_and_query: &str) -> Res
     let response = match result {
         Ok(response) => response,
         Err(error) => {
-            return Err(html!((format!("Error: {:#}", error))));
+            return Err(error_markup(error));
         }
     };
     let serial = match response.json::<SerialT>().await {
         Ok(element) => element,
         Err(error) => {
-            return Err(html!((format!("Error: {:#}", error))));
+            return Err(error_markup(error));
         }
     };
     Ok(serial)

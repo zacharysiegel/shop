@@ -1,5 +1,5 @@
 use crate::admin::api::wrapped_get;
-use crate::admin::structure::error_text::error_text;
+use crate::admin::structure::error_text::error_markup;
 use crate::admin::structure::{form, page, split};
 use crate::admin::{item_page, product_page, reactivity};
 use crate::unwrap_result_else_markup;
@@ -150,14 +150,14 @@ fn item_details(item: &ItemSerial) -> Markup {
                         td { "condition" }
                         td { (match ItemCondition::try_from_repr(item.condition) {
                             Ok(variant) => format!("{:?} ({})", variant, item.condition),
-                            Err(error) => Markup::into_string(error_text(error)),
+                            Err(error) => Markup::into_string(error_markup(error)),
                         }) }
                     }
                     tr {
                         td { "status" }
                         td { (match ItemStatus::try_from_repr(item.status) {
                             Ok(variant) => format!("{:?} ({})", variant, item.status),
-                            Err(error) => Markup::into_string(error_text(error)),
+                            Err(error) => Markup::into_string(error_markup(error)),
                         }) }
                     }
                     tr {

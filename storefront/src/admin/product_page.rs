@@ -1,5 +1,5 @@
 use crate::admin::api::wrapped_get;
-use crate::admin::structure::error_text::error_text;
+use crate::admin::structure::error_text::{error_markup, error_text};
 use crate::admin::structure::form;
 use crate::admin::structure::{page, split};
 use crate::admin::{item_page, reactivity};
@@ -7,6 +7,7 @@ use crate::{admin, unwrap_result_else_markup};
 use actix_web::web::ServiceConfig;
 use actix_web::{guard, web};
 use admin::structure::pagination_control::pagination_control;
+use inventory::category::CategorySerial;
 use inventory::inventory_location::InventoryLocationSerial;
 use inventory::item::ItemCondition;
 use inventory::pagination::{pagination_guard, KeysetPaginationOptionsForString, KeysetPaginationResultForString};
@@ -14,13 +15,13 @@ use inventory::product::ProductSerial;
 use maud::{html, Markup};
 use reqwest::Method;
 use serde_json::json;
-use uuid::Uuid;
 
 pub const RELATIVE_PATH: &'static str = "/admin/product";
 
 const HEADINGS: [&str; 6] = ["id", "display_name ⏶", "internal_name", "upc", "release_date", "actions"];
 const DELETE_FORM_CONTAINER_ID: &str = "delete_form_container";
 const CREATE_ITEM_FORM_CONTAINER_ID: &str = "create_item_form_container";
+const CATEGORY_DETAIL_CONTAINER_ID: &str = "category_detail_container";
 
 pub fn configurer(config: &mut ServiceConfig) {
     config
@@ -53,7 +54,7 @@ async fn left(pagination_options: Option<KeysetPaginationOptionsForString>) -> M
     let pagination_options = pagination_options.unwrap_or_default();
     let query_params = match serde_urlencoded::to_string(&pagination_options) {
         Ok(pagination_options) => pagination_options,
-        Err(error) => return error_text(error),
+        Err(error) => return error_markup(error),
     };
 
     let (product_vec, pagination_result) = unwrap_result_else_markup!(
@@ -68,7 +69,7 @@ async fn left(pagination_options: Option<KeysetPaginationOptionsForString>) -> M
         @if product_vec.is_empty() {
             p { "None" }
         } @else {
-            (table(&product_vec))
+            (table(&product_vec).await)
         }
         (pagination_control(RELATIVE_PATH, &pagination_options, &pagination_result))
     }
@@ -79,10 +80,11 @@ async fn right() -> Markup {
         (create_form())
         (delete_form())
         (create_item_form().await)
+        (category_details().await)
     }
 }
 
-fn table(elements: &Vec<ProductSerial>) -> Markup {
+async fn table(elements: &Vec<ProductSerial>) -> Markup {
     // Ascending sort: U+23F6 (⏶)
     // Descending sort: U+23F7 (⏷)
     html! {
@@ -107,8 +109,8 @@ fn table(elements: &Vec<ProductSerial>) -> Markup {
                                 href=(item_page::RELATIVE_PATH.replace("{product_id}", element.id.to_string().as_str()))
                                 { button { "View items" } }
                             button onclick=(activate_delete_form_script(DELETE_FORM_CONTAINER_ID, &element)) { "Delete" }
-                            button onclick=(activate_create_item_form_script(CREATE_ITEM_FORM_CONTAINER_ID, &element.id)) { "Create item" }
-                            button { "Categories" } // todo
+                            button onclick=(activate_create_item_form_script(CREATE_ITEM_FORM_CONTAINER_ID, &element)) { "Create item" }
+                            button onclick=(activate_categories_script(CATEGORY_DETAIL_CONTAINER_ID, &element).await) { "Categories" }
                         }
                     }
                 }
@@ -218,6 +220,17 @@ async fn create_item_form() -> Markup {
     }
 }
 
+async fn category_details() -> Markup {
+    html! {
+        div #(CATEGORY_DETAIL_CONTAINER_ID) style=(concat!("display: none;")) {
+            hr {}
+            h2 { "Categories" }
+            ul style="list-style: none;" {}
+            // todo: form to create association
+        }
+    }
+}
+
 // These scripts could be defined as global functions in a .js file instead
 fn activate_delete_form_script(element_id: &str, product: &ProductSerial) -> String {
     let activate_form: String = reactivity::activate_element_handler(element_id);
@@ -225,12 +238,38 @@ fn activate_delete_form_script(element_id: &str, product: &ProductSerial) -> Str
     activate_form + &update_form
 }
 
-fn activate_create_item_form_script(element_id: &str, product_id: &Uuid) -> String {
+fn activate_create_item_form_script(element_id: &str, product: &ProductSerial) -> String {
     let activate_form: String = reactivity::activate_element_handler(element_id);
     let modify_form: String = {
         let mut json_map = serde_json::Map::with_capacity(1);
-        json_map.insert(String::from("product_id"), json!(product_id));
+        json_map.insert(String::from("product_id"), json!(product.id));
         reactivity::update_form_from_serialize("/item", &json_map)
     };
     activate_form + &modify_form
+}
+
+async fn activate_categories_script(element_id: &str, product: &ProductSerial) -> String {
+    let category_vec: Vec<CategorySerial> = match wrapped_get::<Vec<CategorySerial>>(
+        &format!("/product/{}/category", product.id)
+    ).await {
+        Ok(value) => value,
+        Err(markup) => return Markup::into_string(markup)
+    };
+    let json: String = serde_json::to_string(&category_vec).unwrap();
+
+    let activate: String = reactivity::activate_element_handler(element_id);
+    let inject: String = format!(r#"
+        const categories = JSON.parse('{}');
+        const ul = element.getElementsByTagName("ul")[0];
+        ul.replaceChildren();
+        for (category of categories) {{
+            const li = document.createElement('li');
+            li.innerText = category.display_name;
+            ul.appendChild(li);
+        }}
+    "#,
+        json,
+    );
+
+    activate + &inject
 }

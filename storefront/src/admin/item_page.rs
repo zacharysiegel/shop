@@ -1,5 +1,5 @@
 use crate::admin::api::wrapped_get;
-use crate::admin::structure::error_text::error_text;
+use crate::admin::structure::error_text::error_markup;
 use crate::admin::structure::{form, page, split};
 use crate::admin::{listing_page, product_page, reactivity};
 use crate::unwrap_result_else_markup;
@@ -103,11 +103,11 @@ async fn table(elements: &Vec<ItemSerial>) -> Markup {
                         td { (inventory_location_markup(&inventory_location_vec, &element)) }
                         td { (match ItemCondition::try_from_repr(element.condition) {
                             Ok(variant) => format!("{:?}", variant),
-                            Err(error) => Markup::into_string(error_text(error)),
+                            Err(error) => Markup::into_string(error_markup(error)),
                         }) }
                         td { (match ItemStatus::try_from_repr(element.status) {
                             Ok(variant) => format!("{:?}", variant),
-                            Err(error) => Markup::into_string(error_text(error)),
+                            Err(error) => Markup::into_string(error_markup(error)),
                         }) }
                         td { (element.price_cents) }
                         td {
