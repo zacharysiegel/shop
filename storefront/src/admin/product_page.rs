@@ -23,7 +23,6 @@ const HEADINGS: [&str; 6] = ["id", "display_name ⏶", "internal_name", "upc", "
 const DELETE_FORM_CONTAINER_ID: &str = "delete_form_container";
 const CREATE_ITEM_FORM_CONTAINER_ID: &str = "create_item_form_container";
 const CATEGORY_DETAIL_CONTAINER_ID: &str = "category_detail_container";
-const CATEGORY_TEMPLATE_ID: &str = "category_template";
 
 pub fn configurer(config: &mut ServiceConfig) {
     config
