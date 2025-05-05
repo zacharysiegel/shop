@@ -29,7 +29,7 @@ async fn left() -> Markup {
     );
 
     html! {
-        h2 { "All categories" }
+        h2 { "Categories" }
         @if elements.is_empty() {
             p { "None" }
         } @else {

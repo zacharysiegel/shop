@@ -1,5 +1,6 @@
 use crate::marketplace::MarketplaceEntity;
-use sqlx::{query_as, Error, PgPool};
+use sqlx::{query, query_as, Error, PgPool};
+use sqlx::postgres::PgQueryResult;
 use uuid::Uuid;
 
 pub async fn get_marketplace(
@@ -30,4 +31,21 @@ pub async fn get_all_marketplaces(pgpool: &PgPool) -> Result<Vec<MarketplaceEnti
 	)
         .fetch_all(pgpool)
         .await
+}
+
+pub async fn create_marketplace(
+	pgpool: &PgPool,
+	marketplace: &MarketplaceEntity,
+) -> Result<PgQueryResult, Error> {
+	query!("
+		INSERT INTO shop.public.marketplace (id, display_name, internal_name, uri)
+		VALUES ($1, $2, $3, $4)
+	",
+		marketplace.id,
+		marketplace.display_name,
+		marketplace.internal_name,
+		marketplace.uri,
+	)
+		.execute(pgpool)
+		.await
 }
