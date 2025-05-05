@@ -118,13 +118,13 @@ async fn table(elements: &Vec<ItemSerial>) -> Markup {
                         }) }
                         td { (element.price_cents) }
                         td {
-                            button onclick=(activate_item_details_script(element)) { "Details" }
                             a
                                 href=(listing_page::PAGE.relative_path
                                     .replace("{product_id}", &element.product_id.to_string())
                                     .replace("{item_id}", &element.id.to_string())
                                 )
                                 { button { "View listings" } }
+                            button onclick=(activate_item_details_script(element)) { "Details" }
                             button onclick=(activate_create_listing_script(element)) { "Create listing" }
                         }
                     }
