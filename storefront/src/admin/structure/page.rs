@@ -1,8 +1,24 @@
 use maud::{html, Markup, DOCTYPE};
 
-pub type PageInfo<'a> = (&'a str, &'a str);
+pub struct PageInfo<'a> {
+	name: &'a str,
+	relative_path: &'a str,
+}
 
-pub fn page(current_page_branch: &Vec<PageInfo>, head_content: Markup, body_content: Markup) -> Markup {
+impl PageInfo<'_> {
+	pub fn new<'a>(name: &'a str, relative_path: &'a str) -> PageInfo<'a>{
+		PageInfo {
+			name,
+			relative_path,
+		}
+	}
+}
+
+pub fn page(
+	current_page_branch: &Vec<PageInfo>,
+	head_content: Markup,
+	body_content: Markup
+) -> Markup {
     html! {
 		(DOCTYPE)
 		html {
@@ -41,9 +57,9 @@ fn breadcrumb(current_page_branch: &Vec<PageInfo>) -> Markup {
     html! {
 		p {
 			a href="/admin" { "Home" }
-			@for (path, name) in current_page_branch {
+			@for page_info in current_page_branch {
 				" / "
-				a href=(path) { (name) }
+				a href=(page_info.relative_path) { (page_info.name) }
 			}
 		}
 	}

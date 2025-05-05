@@ -1,4 +1,5 @@
 use crate::admin::api::wrapped_get;
+use crate::admin::structure::page::PageInfo;
 use crate::admin::structure::{form, page, split};
 use crate::unwrap_result_else_markup;
 use actix_web::web;
@@ -15,7 +16,7 @@ pub fn configurer(config: &mut ServiceConfig) {
 
 async fn render() -> Markup {
     page::page(
-        &vec!((RELATIVE_PATH, "Inventory location")),
+        &vec!(PageInfo::new("Inventory location", RELATIVE_PATH)),
         Markup::default(),
         split::split(left().await, right()),
     )

@@ -3,6 +3,7 @@ use crate::object::JsonHttpResponse;
 use crate::{object, ShopEntity, ShopModel, ShopSerial};
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
+
 #[derive(Debug, Clone)]
 pub struct MarketplaceEntity {
     pub id: Uuid,

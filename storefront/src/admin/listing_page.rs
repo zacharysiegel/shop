@@ -1,5 +1,6 @@
 use crate::admin::api::wrapped_get;
 use crate::admin::structure::error_text::error_markup;
+use crate::admin::structure::page::PageInfo;
 use crate::admin::structure::{form, page, split};
 use crate::admin::{item_page, product_page, reactivity};
 use crate::unwrap_result_else_markup;
@@ -43,9 +44,9 @@ async fn render(
 
     page::page(
         &vec!(
-            (product_page::RELATIVE_PATH, "Product"),
-            (&item_page::RELATIVE_PATH.replace("{product_id}", &product_id), "Item"),
-            (&this_path, "Listing"),
+            PageInfo::new("Product", product_page::RELATIVE_PATH),
+            PageInfo::new("Item", &item_page::RELATIVE_PATH.replace("{product_id}", &product_id)),
+            PageInfo::new("Listing", &this_path),
         ),
         Markup::default(),
         split::split(

@@ -1,8 +1,10 @@
 use crate::admin::api::wrapped_get;
 use crate::admin::structure::error_text::error_markup;
 use crate::admin::structure::form;
+use crate::admin::structure::page::PageInfo;
 use crate::admin::structure::{page, split};
 use crate::admin::{item_page, reactivity};
+use crate::registry::REGISTRY;
 use crate::{admin, unwrap_result_else_markup};
 use actix_web::web::ServiceConfig;
 use actix_web::{guard, web};
@@ -15,7 +17,6 @@ use inventory::product::ProductSerial;
 use maud::{html, Markup};
 use reqwest::Method;
 use serde_json::json;
-use crate::registry::REGISTRY;
 
 pub const RELATIVE_PATH: &'static str = "/admin/product";
 
@@ -46,7 +47,7 @@ async fn handle_paginated(
 
 async fn render(pagination_options: Option<KeysetPaginationOptionsForString>) -> Markup {
     page::page(
-        &vec!((RELATIVE_PATH, "Product")),
+        &vec!(PageInfo::new("Product", RELATIVE_PATH)),
         html! {
             script src="/page/product.js" {}
         },
