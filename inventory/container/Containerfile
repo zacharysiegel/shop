@@ -1,0 +1,14 @@
+# This Containerfile is expected to be referenced from the Rust workspace root, so it can access the target directory.
+
+from alpine:3.21
+
+arg candidate='debug'
+
+copy ./inventory/container/entrypoint.sh /entrypoint.sh
+# todo: This won't actually work until we get cross compilation working (to linux target for container VM)
+copy ./target/${candidate}/inventory /${candidate}/inventory
+copy ./.env /.env
+
+env CONTAINER_EXECUTABLE_PATH /${candidate}/inventory
+
+entrypoint ["sh", "/entrypoint.sh"]

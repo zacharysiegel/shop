@@ -18,6 +18,7 @@ pub async fn open_server() -> std::io::Result<()> {
         .await
 }
 
+// todo: serve static files with nginx instead of actix
 fn generate_static_file_map() -> HashMap<&'static str, Resource> {
     include!(concat!(env!("OUT_DIR"), "/public.rs"))
 }

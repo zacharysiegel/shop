@@ -1,0 +1,11 @@
+.DS_Store
+.idea
+
+.git
+.gitignore
+
+target/**/build
+target/**/deps
+target/**/examples
+target/**/incremental
+
