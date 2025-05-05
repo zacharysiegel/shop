@@ -44,7 +44,7 @@ pub async fn get_all_products_paged_display_name(
         }
         Direction::Descending => {
             query_as!(ProductEntity, "\
-                with page as (
+                with PAGE as (
                     select id, display_name, internal_name, upc, release_date, created, updated
                     from shop.public.product
                     where display_name <= $1
@@ -52,7 +52,7 @@ pub async fn get_all_products_paged_display_name(
                     limit $2
                 )
                 select id, display_name, internal_name, upc, release_date, created, updated
-                from page
+                from PAGE
                 order by display_name asc
         	",
                 start_value,

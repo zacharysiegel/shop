@@ -1,7 +1,8 @@
 use crate::admin::api::wrapped_get;
+use crate::admin::structure::breadcrumb::BreadcrumbItem;
 use crate::admin::structure::error_text::error_markup;
 use crate::admin::structure::form;
-use crate::admin::structure::page::PageInfo;
+use crate::admin::structure::page::Page;
 use crate::admin::structure::{page, split};
 use crate::admin::{item_page, reactivity};
 use crate::registry::REGISTRY;
@@ -18,7 +19,11 @@ use maud::{html, Markup};
 use reqwest::Method;
 use serde_json::json;
 
-pub const RELATIVE_PATH: &'static str = "/admin/product";
+pub const PAGE: Page = Page {
+    name: "Product",
+    relative_path: "/admin/product",
+    configurer,
+};
 
 const HEADINGS: [&str; 6] = ["id", "display_name ⏶", "internal_name", "upc", "release_date", "actions"];
 const DELETE_FORM_CONTAINER_ID: &str = "delete_form_container";
@@ -47,9 +52,9 @@ async fn handle_paginated(
 
 async fn render(pagination_options: Option<KeysetPaginationOptionsForString>) -> Markup {
     page::page(
-        &vec!(PageInfo::new("Product", RELATIVE_PATH)),
+        &vec!(BreadcrumbItem::from(PAGE)),
         html! {
-            script src="/page/product.js" {}
+            script src="/PAGE/product.js" {}
         },
         split::split(left(pagination_options).await, right().await),
     )
@@ -70,13 +75,13 @@ async fn left(pagination_options: Option<KeysetPaginationOptionsForString>) -> M
 
     html! {
         h2 { "Products" }
-        (pagination_control(RELATIVE_PATH, &pagination_options, &pagination_result))
+        (pagination_control(PAGE.relative_path, &pagination_options, &pagination_result))
         @if product_vec.is_empty() {
             p { "None" }
         } @else {
             (table(&product_vec).await)
         }
-        (pagination_control(RELATIVE_PATH, &pagination_options, &pagination_result))
+        (pagination_control(PAGE.relative_path, &pagination_options, &pagination_result))
     }
 }
 
@@ -111,7 +116,7 @@ async fn table(elements: &Vec<ProductSerial>) -> Markup {
                         td { (format!("{:?}", element.release_date)) }
                         td {
                             a
-                                href=(item_page::RELATIVE_PATH.replace("{product_id}", element.id.to_string().as_str()))
+                                href=(item_page::PAGE.relative_path.replace("{product_id}", element.id.to_string().as_str()))
                                 { button { "View items" } }
                             button onclick=(activate_delete_form_script(DELETE_FORM_CONTAINER_ID, &element)) { "Delete" }
                             button onclick=(activate_create_item_form_script(CREATE_ITEM_FORM_CONTAINER_ID, &element)) { "Create item" }

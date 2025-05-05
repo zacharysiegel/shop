@@ -1,6 +1,7 @@
 use crate::admin::api::wrapped_get;
+use crate::admin::structure::breadcrumb::BreadcrumbItem;
 use crate::admin::structure::error_text::error_markup;
-use crate::admin::structure::page::PageInfo;
+use crate::admin::structure::page::Page;
 use crate::admin::structure::{form, page, split};
 use crate::admin::{item_page, product_page, reactivity};
 use crate::unwrap_result_else_markup;
@@ -12,7 +13,11 @@ use inventory::marketplace::MarketplaceSerial;
 use inventory::product::ProductSerial;
 use maud::{html, Markup};
 
-pub const RELATIVE_PATH: &str = "/admin/product/{product_id}/item/{item_id}/listing";
+pub const PAGE: Page = Page {
+    name: "Listing",
+    relative_path: "/admin/product/{product_id}/item/{item_id}/listing",
+    configurer,
+};
 pub const LISTING_FIELDS: [&str; 7] = [
     "id",
     "item_id",
@@ -28,7 +33,7 @@ const LISTING_DETAILS_CONTAINER_ID: &str = "listing_details_container";
 const LISTING_DETAIL_ID_PREFIX: &str = "listing_detail_";
 const LISTING_UPDATE_CONTAINER_ID: &str = "listing_update_container";
 
-pub fn configurer(config: &mut ServiceConfig) {
+fn configurer(config: &mut ServiceConfig) {
     config
         .route("/product/{product_id}/item/{item_id}/listing", web::get().to(render))
     ;
@@ -38,15 +43,15 @@ async fn render(
     path: web::Path<(String, String)>,
 ) -> Markup {
     let (product_id, item_id): (String, String) = path.into_inner();
-    let this_path: String = RELATIVE_PATH.to_string()
+    let this_path: String = PAGE.relative_path.to_string()
         .replace("{product_id}", &product_id)
         .replace("{item_id}", &item_id);
 
     page::page(
         &vec!(
-            PageInfo::new("Product", product_page::RELATIVE_PATH),
-            PageInfo::new("Item", &item_page::RELATIVE_PATH.replace("{product_id}", &product_id)),
-            PageInfo::new("Listing", &this_path),
+            BreadcrumbItem::from(product_page::PAGE),
+            BreadcrumbItem::new("Item", &item_page::PAGE.relative_path.replace("{product_id}", &product_id)),
+            BreadcrumbItem::new(PAGE.name, &this_path),
         ),
         Markup::default(),
         split::split(

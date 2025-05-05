@@ -1,5 +1,5 @@
 use crate::admin::api::wrapped_get;
-use crate::admin::structure::page::PageInfo;
+use crate::admin::structure::page::Page;
 use crate::admin::structure::{form, page, split};
 use crate::unwrap_result_else_markup;
 use actix_web::web;
@@ -8,15 +8,19 @@ use inventory::inventory_location::InventoryLocationSerial;
 use maud::{html, Markup};
 use reqwest::Method;
 
-pub const RELATIVE_PATH: &str = "/admin/inventory_location";
+pub const PAGE: Page = Page {
+    name: "Inventory location",
+    relative_path: "/admin/inventory_location",
+    configurer,
+};
 
-pub fn configurer(config: &mut ServiceConfig) {
+fn configurer(config: &mut ServiceConfig) {
     config.route("/inventory_location", web::get().to(render));
 }
 
 async fn render() -> Markup {
     page::page(
-        &vec!(PageInfo::new("Inventory location", RELATIVE_PATH)),
+        &vec!(PAGE.into()),
         Markup::default(),
         split::split(left().await, right()),
     )

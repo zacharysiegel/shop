@@ -1,25 +1,30 @@
-use crate::admin::structure::page::PageInfo;
+use crate::admin::api::wrapped_get;
+use crate::admin::structure::breadcrumb::BreadcrumbItem;
+use crate::admin::structure::page::Page;
 use crate::admin::structure::{form, page, split};
+use crate::unwrap_result_else_markup;
 use actix_web::web;
 use actix_web::web::ServiceConfig;
+use inventory::marketplace::MarketplaceSerial;
 use maud::{html, Markup};
 use reqwest::Method;
-use inventory::marketplace::MarketplaceSerial;
-use crate::admin::api::wrapped_get;
-use crate::unwrap_result_else_markup;
 
-pub const RELATIVE_PATH: &str = "/admin/marketplace";
+pub const PAGE: Page = Page {
+    name: "Marketplace",
+    relative_path: "/admin/marketplace",
+    configurer,
+};
 
 const HEADINGS: [&str; 4] = ["id", "display_name", "internal_name", "uri"];
 
-pub fn configurer(config: &mut ServiceConfig) {
+fn configurer(config: &mut ServiceConfig) {
     config.route("/marketplace", web::get().to(render))
     ;
 }
 
 async fn render() -> Markup {
     page::page(
-        &vec!(PageInfo::new("Marketplace", RELATIVE_PATH)),
+        &vec!(BreadcrumbItem::from(PAGE)),
         Markup::default(),
         split::split(left().await, right()),
     )

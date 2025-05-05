@@ -1,6 +1,7 @@
 use crate::admin::api::wrapped_get;
+use crate::admin::structure::breadcrumb::BreadcrumbItem;
 use crate::admin::structure::error_text::error_markup;
-use crate::admin::structure::page::PageInfo;
+use crate::admin::structure::page::Page;
 use crate::admin::structure::{form, page, split};
 use crate::admin::{listing_page, product_page, reactivity};
 use crate::unwrap_result_else_markup;
@@ -15,7 +16,11 @@ use maud::{html, Markup};
 use reqwest::Method;
 use serde_json::{json, Map, Value};
 
-pub const RELATIVE_PATH: &str = "/admin/product/{product_id}/item";
+pub const PAGE: Page = Page {
+    name: "Product",
+    relative_path: "/admin/product/{product_id}/item",
+    configurer,
+};
 pub const ITEM_FIELDS: [&str; 13] = [
     "id",
     "product_id",
@@ -38,7 +43,7 @@ const ITEM_DETAILS_CONTAINER_ID: &str = "item_details_container";
 const ITEM_DETAIL_ID_PREFIX: &str = "item_detail_";
 const CREATE_LISTING_FORM_CONTAINER_ID: &str = "create_listing_form_container";
 
-pub fn configurer(config: &mut ServiceConfig) {
+fn configurer(config: &mut ServiceConfig) {
     config
         .route("/product/{product_id}/item", web::get().to(render))
     ;
@@ -50,8 +55,8 @@ async fn render(
     let product_id = product_id.into_inner();
     page::page(
         &vec!(
-            PageInfo::new("Product", product_page::RELATIVE_PATH),
-            PageInfo::new("Item", &RELATIVE_PATH.replace("{product_id}", &product_id)),
+            BreadcrumbItem::from(product_page::PAGE),
+            BreadcrumbItem::new("Item", &PAGE.relative_path.replace("{product_id}", &product_id)),
         ),
         Markup::default(),
         split::split(
@@ -115,7 +120,7 @@ async fn table(elements: &Vec<ItemSerial>) -> Markup {
                         td {
                             button onclick=(activate_item_details_script(element)) { "Details" }
                             a
-                                href=(listing_page::RELATIVE_PATH
+                                href=(listing_page::PAGE.relative_path
                                     .replace("{product_id}", &element.product_id.to_string())
                                     .replace("{item_id}", &element.id.to_string())
                                 )

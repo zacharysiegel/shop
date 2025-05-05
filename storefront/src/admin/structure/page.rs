@@ -1,23 +1,19 @@
+use crate::admin::structure::breadcrumb;
+use crate::admin::structure::breadcrumb::BreadcrumbItem;
+use actix_web::web::ServiceConfig;
+use breadcrumb::breadcrumb;
 use maud::{html, Markup, DOCTYPE};
 
-pub struct PageInfo<'a> {
-	name: &'a str,
-	relative_path: &'a str,
-}
-
-impl PageInfo<'_> {
-	pub fn new<'a>(name: &'a str, relative_path: &'a str) -> PageInfo<'a>{
-		PageInfo {
-			name,
-			relative_path,
-		}
-	}
+pub struct Page<'a> {
+    pub name: &'a str,
+    pub relative_path: &'a str,
+    pub configurer: fn(&mut ServiceConfig) -> (),
 }
 
 pub fn page(
-	current_page_branch: &Vec<PageInfo>,
-	head_content: Markup,
-	body_content: Markup
+    current_page_branch: &Vec<BreadcrumbItem>,
+    head_content: Markup,
+    body_content: Markup,
 ) -> Markup {
     html! {
 		(DOCTYPE)
@@ -48,18 +44,6 @@ pub fn page(
 				main style=("flex-grow: 1;") {
 					(body_content)
 				}
-			}
-		}
-	}
-}
-
-fn breadcrumb(current_page_branch: &Vec<PageInfo>) -> Markup {
-    html! {
-		p {
-			a href="/admin" { "Home" }
-			@for page_info in current_page_branch {
-				" / "
-				a href=(page_info.relative_path) { (page_info.name) }
 			}
 		}
 	}

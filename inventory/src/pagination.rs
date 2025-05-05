@@ -28,26 +28,26 @@ impl Default for Direction {
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct KeysetPaginationOptionsForString {
-    /// Maximum number of elements in a returned page.
+    /// Maximum number of elements in a returned PAGE.
     pub max_page_size: u32,
     /// Ascend or descend in the relation from your current position.
     pub direction: Direction,
-    /// If ascending, this is the preceding element to the desired page.
-    /// If descending, this is the maximal element in the desired page.
-    /// If none, returns the first page.
+    /// If ascending, this is the preceding element to the desired PAGE.
+    /// If descending, this is the maximal element in the desired PAGE.
+    /// If none, returns the first PAGE.
     pub start_value: Option<String>,
 }
 
 impl KeysetPaginationOptionsForString {
     pub fn validated(self) -> Result<Self, ShopError> {
         if self.max_page_size.overflowing_add(1).1 {
-            return Err(ShopError { message: format!("Maximum page size exceeds maximum value; [{}]", u32::MAX - 1) });
+            return Err(ShopError { message: format!("Maximum PAGE size exceeds maximum value; [{}]", u32::MAX - 1) });
         } else if self.max_page_size == 0 {
-            return Err(ShopError { message: "Maximum page size cannot be zero;".to_string() });
+            return Err(ShopError { message: "Maximum PAGE size cannot be zero;".to_string() });
         }
 
         if self.start_value.is_none() && self.direction == Direction::Descending {
-            return Err(ShopError { message: "Unspecified start value cannot request a descending page;".to_string() });
+            return Err(ShopError { message: "Unspecified start value cannot request a descending PAGE;".to_string() });
         }
 
         Ok(self)
@@ -73,10 +73,10 @@ pub struct KeysetPaginationResultForString {
     pub relation_max_value: Option<String>,
     /// The minimum value for the entire table.
     pub relation_min_value: Option<String>,
-    /// True iff min_value is less than the minimum value in the current page.
+    /// True iff min_value is less than the minimum value in the current PAGE.
     /// This comparison should be performed by the DBMS.
     pub has_lesser_value: bool,
-    /// True iff max_value is greater than the maximum value in the current page.
+    /// True iff max_value is greater than the maximum value in the current PAGE.
     /// This comparison should be performed by the DBMS.
     pub has_greater_value: bool,
 }
