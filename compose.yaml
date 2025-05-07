@@ -34,6 +34,10 @@ services:
     depends_on:
       - postgres
 
+  authelia:
+    image: docker.io/authelia/authelia:4.39
+    ports:
+      - '127.0.0.1:12001:9091/tcp'
 # todo: inventory container
 # todo: storefront container
 # These containers should be qualified with [prod/qa] profiles.
