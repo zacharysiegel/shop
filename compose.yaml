@@ -20,24 +20,13 @@ services:
       - ./proxy/nginx.conf:/etc/nginx/nginx.conf:ro
       - ./proxy/cert:/cert:ro
 
-  rauthy:
-    image: 'ghcr.io/sebadob/rauthy:latest'
-    environment:
-      COOKIE_MODE: danger-insecure
-      ENC_KEYS: '0c27c58b/vyKhtg2nxMyFF087orKfIbps+hI/vcKQuEBUCJ3ghLM='
-      ENC_KEY_ACTIVE: '0c27c58b'
-    ports:
-      - '127.0.0.1:12000:8080/tcp'
-    volumes:
-      - ./identity/rauthy.cfg:/app/rauthy.cfg
-      - rauthy-data:/app/data
-    depends_on:
-      - postgres
-
   authelia:
-    image: docker.io/authelia/authelia:4.39
+    image: gchr.io/authelia/authelia:4.39
     ports:
       - '127.0.0.1:12001:9091/tcp'
+    env_file:
+      - identity/.env
+
 # todo: inventory container
 # todo: storefront container
 # These containers should be qualified with [prod/qa] profiles.
@@ -46,4 +35,3 @@ services:
 
 volumes:
   postgres-data:
-  rauthy-data:
