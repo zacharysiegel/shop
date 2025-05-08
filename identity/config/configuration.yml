@@ -16,7 +16,7 @@ totp:
 
 identity_validation:
   reset_password:
-    jwt_secret: 'a_very_important_secret'
+    # jwt_secret defined via AUTHELIA_IDENTITY_VALIDATION_RESET_PASSWORD_FILE
 
 # duo_api:
 #  hostname: api-123456789.example.com

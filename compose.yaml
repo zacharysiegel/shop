@@ -26,6 +26,10 @@ services:
       - '127.0.0.1:12001:9091/tcp'
     env_file:
       - identity/.env
+    volumes:
+      - ./identity/config:/config
+      - ./identity/secret:/secret
+    restart: unless-stopped
 
 # todo: inventory container
 # todo: storefront container
