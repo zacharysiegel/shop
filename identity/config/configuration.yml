@@ -7,6 +7,11 @@ theme: dark
 
 server:
   address: 'tcp://:11002'
+  endpoints:
+    authz:
+      auth-request:
+        # https://www.authelia.com/integration/proxies/nginx/
+        implementation: AuthRequest
 
 log:
   level: 'debug'
