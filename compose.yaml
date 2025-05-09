@@ -23,15 +23,29 @@ services:
     restart: unless-stopped
 
   authelia:
-    image: gchr.io/authelia/authelia:4.39
+    image: authelia/authelia:4.39
     ports:
-      - '127.0.0.1:12001:9091/tcp'
+      - '127.0.0.1:11002:11002/tcp'
     env_file:
-      - identity/.env
+      - ./identity/.env
     volumes:
       - ./identity/config:/config
       - ./identity/secret:/secret
-    restart: unless-stopped
+      - ./identity/data:/data
+    restart: no # todo: unless-stopped after testing
+
+  authelia-validate:
+    image: authelia/authelia:4.39
+    command: authelia config validate --config /config/configuration.yml
+    env_file:
+      - ./identity/.env
+    volumes:
+      - ./identity/config:/config
+      - ./identity/secret:/secret
+      - ./identity/data:/data
+    restart: no
+    profiles:
+      - validate
 
 # todo: inventory container
 # todo: storefront container

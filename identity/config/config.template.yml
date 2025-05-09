@@ -45,8 +45,8 @@
 ## Useful to allow overriding of specific static assets.
 # asset_path: '/config/assets/'
 
-## Disables writing the health check vars to /app/.healthcheck..env which makes healthcheck.sh return exit code 0.
-## This is disabled by default if either /app/.healthcheck..env or /app/healthcheck.sh do not exist.
+## Disables writing the health check vars to /app/.healthcheck.env which makes healthcheck.sh return exit code 0.
+## This is disabled by default if either /app/.healthcheck.env or /app/healthcheck.sh do not exist.
 # disable_healthcheck: false
 
 ## Authelia by default doesn't accept TLS communication on the server port. This section overrides this behaviour.
@@ -495,9 +495,9 @@ identity_validation:
       ## The private key used with the certificate_chain if the server requests TLS Client Authentication
       ## i.e. Mutual TLS.
       # private_key: |
-      # -----BEGIN RSA PRIVATE KEY-----
+      # -----BEGIN PRIVATE KEY-----
       # ...
-      # -----END RSA PRIVATE KEY-----
+      # -----END PRIVATE KEY-----
 
       ## Connection Pooling configuration.
       # pooling:
@@ -619,6 +619,7 @@ identity_validation:
       # key_length: 32
       # salt_length: 16
       # scrypt:
+      # variant: 'scrypt'
       # iterations: 16
       # block_size: 8
       # parallelism: 1
@@ -940,9 +941,9 @@ session:
     ## The private key used with the certificate_chain if the server requests TLS Client Authentication
     ## i.e. Mutual TLS.
     # private_key: |
-    # -----BEGIN RSA PRIVATE KEY-----
+    # -----BEGIN PRIVATE KEY-----
     # ...
-    # -----END RSA PRIVATE KEY-----
+    # -----END PRIVATE KEY-----
 
     ## The Redis HA configuration options.
     ## This provides specific options to Redis Sentinel, sentinel_name must be defined (Master Name).
@@ -1069,9 +1070,9 @@ session:
     ## The private key used with the certificate_chain if the server requests TLS Client Authentication
     ## i.e. Mutual TLS.
     # private_key: |
-    # -----BEGIN RSA PRIVATE KEY-----
+    # -----BEGIN PRIVATE KEY-----
     # ...
-    # -----END RSA PRIVATE KEY-----
+    # -----END PRIVATE KEY-----
 
     ##
     ## PostgreSQL (Storage Provider)
@@ -1103,9 +1104,9 @@ session:
     # ...
     # -----END CERTIFICATE-----
     # private_key: |
-    # -----BEGIN RSA PRIVATE KEY-----
+    # -----BEGIN PRIVATE KEY-----
     # ...
-    # -----END RSA PRIVATE KEY-----
+    # -----END PRIVATE KEY-----
 
     ## The database name to use.
     # database: 'authelia'
@@ -1156,9 +1157,9 @@ session:
     ## The private key used with the certificate_chain if the server requests TLS Client Authentication
     ## i.e. Mutual TLS.
     # private_key: |
-    # -----BEGIN RSA PRIVATE KEY-----
+    # -----BEGIN PRIVATE KEY-----
     # ...
-    # -----END RSA PRIVATE KEY-----
+    # -----END PRIVATE KEY-----
 
     ##
     ## Notification Provider
@@ -1254,9 +1255,9 @@ session:
     ## The private key used with the certificate_chain if the server requests TLS Client Authentication
     ## i.e. Mutual TLS.
     # private_key: |
-    # -----BEGIN RSA PRIVATE KEY-----
+    # -----BEGIN PRIVATE KEY-----
     # ...
-    # -----END RSA PRIVATE KEY-----
+    # -----END PRIVATE KEY-----
 
     ##
     ## Identity Providers
@@ -1289,9 +1290,9 @@ session:
 
     ## Required Private Key in PEM DER form.
     # key: |
-    # -----BEGIN RSA PRIVATE KEY-----
+    # -----BEGIN PRIVATE KEY-----
     # ...
-    # -----END RSA PRIVATE KEY-----
+    # -----END PRIVATE KEY-----
 
 
     ## Optional matching certificate chain in PEM DER form that matches the key. All certificates within the chain
