@@ -16,6 +16,9 @@ server:
 
 log:
   level: trace
+  format: text
+  file_path: /data/_authelia.%d.log
+  keep_stdout: true
 
 totp:
 #  issuer: zach.ro

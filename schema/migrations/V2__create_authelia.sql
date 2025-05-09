@@ -8,4 +8,9 @@ create role authelia
     login
     noreplication
     nobypassrls
-    password 'IOv/Anp95KZPERCAYNecgDPdlmsxSRkj0vBjgssskF8';
+    password 'IOv/Anp95KZPERCAYNecgDPdlmsxSRkj0vBjgssskF8'
+;
+
+alter database authelia
+    owner to authelia
+;
