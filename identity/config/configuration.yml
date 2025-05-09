@@ -15,7 +15,7 @@ server:
         implementation: AuthRequest
 
 log:
-  level: trace
+  level: debug
   format: text
   file_path: /data/_authelia.%d.log
   keep_stdout: true
@@ -46,6 +46,8 @@ access_control:
       policy: one_factor
     - domain: '*.authelia'
       policy: one_factor
+    - domain: '127.0.0.1'
+      policy: one_factor
 #    - domain: 'public.example.com'
 #      policy: 'bypass'
 #    - domain: 'traefik.example.com'
@@ -59,9 +61,9 @@ session:
   cookies:
     # https://www.authelia.com/integration/proxies/nginx/
     - name: 'authelia_session'
-      domain: 'zach.ro' # Should match whatever your root protected domain is
+      domain: '127.0.0.1' # Should match whatever your root protected domain is
       # todo: these hosts may need to change to "nginx"
-      authelia_url: 'https://zach.ro/auth'
+      authelia_url: 'https://127.0.0.1:11002'
       expiration: '1 hour'
       inactivity: '5 minutes'
 
@@ -83,10 +85,16 @@ storage:
 notifier:
   filesystem:
     filename: /data/notification.txt
-#  smtp:
+#  smtp: # todo: set up email
 #    username: 'test'
 #    # This secret can also be set using the .env variables AUTHELIA_NOTIFIER_SMTP_PASSWORD_FILE
 #    password: 'password'
 #    address: 'smtp://mail.example.com:25'
 #    sender: 'admin@example.com'
+
+ntp:
+  address: 'udp://time.cloudflare.com:123'
+  max_desync: '3s'
+  disable_startup_check: true # todo: remove
+
 ...

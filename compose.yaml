@@ -12,6 +12,8 @@ services:
     volumes:
       - postgres-data:/var/lib/postgresql/data
     restart: unless-stopped
+    networks:
+      - shop
 
   nginx:
     image: nginx:1.28-alpine-slim
@@ -22,6 +24,8 @@ services:
       - ./proxy/authelia:/etc/nginx/authelia:ro
       - ./proxy/cert:/cert:ro
     restart: unless-stopped
+    networks:
+      shop:
 
   authelia:
     image: authelia/authelia:4.39
@@ -34,6 +38,8 @@ services:
       - ./identity/secret:/secret
       - ./identity/data:/data
     restart: no # todo: unless-stopped after testing
+    networks:
+      - shop
 
   authelia-validate:
     image: authelia/authelia:4.39
@@ -56,3 +62,7 @@ services:
 
 volumes:
   postgres-data:
+
+networks:
+  shop:
+    driver: bridge
