@@ -11,6 +11,7 @@ services:
       - '127.0.0.1:5432:5432/tcp'
     volumes:
       - postgres-data:/var/lib/postgresql/data
+    restart: unless-stopped
 
   nginx:
     image: nginx:1.28-alpine-slim
@@ -19,6 +20,7 @@ services:
     volumes:
       - ./proxy/nginx.conf:/etc/nginx/nginx.conf:ro
       - ./proxy/cert:/cert:ro
+    restart: unless-stopped
 
   authelia:
     image: gchr.io/authelia/authelia:4.39
