@@ -12,24 +12,32 @@ use sqlx::postgres::PgQueryResult;
 use sqlx::PgPool;
 use uuid::Uuid;
 
+pub const SCOPE_PATH: &str = "/product";
+
 pub fn configurer(config: &mut web::ServiceConfig) {
     config.service(
-        web::scope("/product")
-            .route("", web::get()
-                .guard(fn_guard(pagination_guard))
-                .to(get_all_products_paged_display_name))
-            .route("", web::get().to(get_all_products))
+        web::scope(SCOPE_PATH)
+            .configure(configurer_public)
             .route("", web::post()
                 .guard(guard::Header("content-type", "application/json"))
                 .to(create_product_json))
-            .route("/{product_id}", web::get().to(get_product))
             .route("/{product_id}", web::delete().to(delete_product))
-            .route("/{product_id}/category", web::get().to(get_product_categories))
             .route("/{product_id}/category", web::post().to(create_product_category_association_body))
             .route("/{product_id}/category/{category_id}", web::post().to(create_product_category_association_path))
             .route("/{product_id}/category/{category_id}", web::delete().to(delete_product_category_association))
             .route("/{product_id}/item", web::get().to(get_product_items)),
     );
+}
+
+pub fn configurer_public(config: &mut web::ServiceConfig) {
+    config
+        .route("", web::get()
+            .guard(fn_guard(pagination_guard))
+            .to(get_all_products_paged_display_name))
+        .route("", web::get().to(get_all_products))
+        .route("/{product_id}", web::get().to(get_product))
+        .route("/{product_id}/category", web::get().to(get_product_categories))
+    ;
 }
 
 async fn get_all_products(

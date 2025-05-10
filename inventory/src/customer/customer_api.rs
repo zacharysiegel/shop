@@ -8,6 +8,7 @@ use actix_web::web::ServiceConfig;
 use actix_web::{web, HttpResponse, Responder};
 use sqlx::PgPool;
 use uuid::Uuid;
+
 pub fn configurer(config: &mut ServiceConfig) {
     config.service(
         web::scope("/customer")

@@ -19,7 +19,7 @@ pub mod purchase;
 pub mod db;
 pub mod env;
 pub mod server;
-pub mod public;
+pub mod public_api;
 pub mod error;
 pub mod object;
 pub mod pagination;

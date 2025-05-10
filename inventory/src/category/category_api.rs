@@ -6,13 +6,21 @@ use actix_web::{get, post, web, HttpResponseBuilder, Responder};
 use sqlx::{PgPool, Pool, Postgres};
 use uuid::Uuid;
 
+pub const SCOPE_PATH: &str = "/category";
+
 pub fn configurer(config: &mut web::ServiceConfig) {
     config.service(
-        web::scope("/category")
-            .service(get_all_categories)
-            .service(get_category)
-            .service(create_category),
+        web::scope(SCOPE_PATH)
+            .configure(configurer_public)
+            .service(create_category)
     );
+}
+
+pub fn configurer_public(config: &mut web::ServiceConfig) {
+    config
+        .service(get_all_categories)
+        .service(get_category)
+    ;
 }
 
 #[get("")]
