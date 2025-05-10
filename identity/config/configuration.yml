@@ -11,10 +11,17 @@ theme: dark
 server:
   address: 'tcp://:11002/auth'
   endpoints:
+    # https://www.authelia.com/configuration/miscellaneous/server-endpoints-authz/
     authz:
       auth-request:
         # https://www.authelia.com/integration/proxies/nginx/
         implementation: AuthRequest
+        authn_strategies:
+          - name: CookieSession
+          - name: HeaderAuthorization
+            schemes:
+              - basic
+            scheme_basic_cache_lifespan: 0
 
 log:
   level: info
@@ -23,7 +30,7 @@ log:
   keep_stdout: true
 
 totp:
-#  issuer: zach.ro
+  #  issuer: zach.ro
   issuer: authelia
 
 identity_validation:
