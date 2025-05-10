@@ -3,7 +3,7 @@ use std::error;
 
 pub fn error_markup(error: impl error::Error) -> Markup {
     html!{
-        (format!("Error: {:#}", error))
+        p { (error_text(error)) }
     }
 }
 
