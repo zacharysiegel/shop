@@ -51,18 +51,8 @@ access_control:
   default_policy: deny
   rules:
     # Rules applied to everyone
-    - domain: '*.zach.ro'
-      policy: one_factor
-    - domain: '*.authelia'
-      policy: one_factor
     - domain: '127.0.0.1'
       policy: one_factor
-#    - domain: 'public.example.com'
-#      policy: 'bypass'
-#    - domain: 'traefik.example.com'
-#      policy: 'one_factor'
-#    - domain: 'secure.example.com'
-#      policy: 'two_factor'
 
 session:
   # secret defined via AUTHELIA_SESSION_SECRET_FILE
