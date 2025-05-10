@@ -18,14 +18,14 @@ pub async fn get_all_products(pgpool: &PgPool) -> Result<Vec<ProductEntity>, Err
 
 pub async fn get_all_products_paged_display_name(
     pgpool: &PgPool,
-    keyset_pagination_options: KeysetPaginationOptionsForString,
+    keyset_pagination_options: &KeysetPaginationOptionsForString,
 ) -> Result<(Vec<ProductEntity>, KeysetPaginationResultForString), Error> {
     let limit: u32 = if keyset_pagination_options.start_value.is_none() {
         keyset_pagination_options.max_page_size
     } else {
         keyset_pagination_options.max_page_size.saturating_add(1)
     };
-    let start_value: String = keyset_pagination_options.start_value.unwrap_or_default().to_string();
+    let start_value: String = keyset_pagination_options.start_value.clone().unwrap_or_default();
 
     /* This function always returns records in ascending order on the ordered column, but we must alternate
         between ascending and descending in order to move forward and backward between pages. */

@@ -49,7 +49,7 @@ async fn get_all_products_paged_display_name(
 ) -> impl Responder {
     let query_result = product_db::get_all_products_paged_display_name(
         &pgpool.into_inner(),
-        query.into_inner(), // todo: pass a reference?
+        &query.into_inner(),
     ).await;
 
     let (entities, pagination_result) = unwrap_result_else_500!(query_result);
