@@ -1,4 +1,4 @@
-use crate::admin::api::wrapped_get;
+use crate::admin::api::{wrapped_get, wrapped_get_cookie};
 use crate::admin::structure::breadcrumb::BreadcrumbItem;
 use crate::admin::structure::error_text::error_markup;
 use crate::admin::structure::form;
@@ -7,8 +7,9 @@ use crate::admin::structure::{page, split};
 use crate::admin::{item_page, reactivity};
 use crate::registry::REGISTRY;
 use crate::{admin, unwrap_result_else_markup};
+use actix_web::http::header::HeaderValue;
 use actix_web::web::ServiceConfig;
-use actix_web::{guard, web};
+use actix_web::{guard, web, HttpRequest};
 use admin::structure::pagination_control::pagination_control;
 use inventory::category::CategorySerial;
 use inventory::inventory_location::InventoryLocationSerial;
@@ -40,27 +41,31 @@ pub fn configurer(config: &mut ServiceConfig) {
     ;
 }
 
-async fn handle_unpaginated() -> Markup {
-    render(None).await
+async fn handle_unpaginated(
+    request: HttpRequest,
+) -> Markup {
+    let cookie: Option<&HeaderValue> = request.headers().get("cookie");
+    render(None, cookie).await
 }
 
 async fn handle_paginated(
     query: web::Query<KeysetPaginationOptionsForString>,
+    request: HttpRequest,
 ) -> Markup {
-    render(Some(query.into_inner())).await
+    render(Some(query.into_inner()), request.headers().get("cookie")).await
 }
 
-async fn render(pagination_options: Option<KeysetPaginationOptionsForString>) -> Markup {
+async fn render(pagination_options: Option<KeysetPaginationOptionsForString>, cookie: Option<&HeaderValue>) -> Markup {
     page::page(
         &vec!(BreadcrumbItem::from(PAGE)),
         html! {
-            script src="/PAGE/product.js" {}
+            script src="/page/product.js" {}
         },
-        split::split(left(pagination_options).await, right().await),
+        split::split(left(pagination_options, cookie).await, right().await),
     )
 }
 
-async fn left(pagination_options: Option<KeysetPaginationOptionsForString>) -> Markup {
+async fn left(pagination_options: Option<KeysetPaginationOptionsForString>, cookie: Option<&HeaderValue>) -> Markup {
     let pagination_options = pagination_options.unwrap_or_default();
     let query_params = match serde_urlencoded::to_string(&pagination_options) {
         Ok(pagination_options) => pagination_options,
@@ -68,8 +73,9 @@ async fn left(pagination_options: Option<KeysetPaginationOptionsForString>) -> M
     };
 
     let (product_vec, pagination_result) = unwrap_result_else_markup!(
-        wrapped_get::<(Vec<ProductSerial>, KeysetPaginationResultForString)>(
-            format!("/product?{}", query_params).as_str()
+        wrapped_get_cookie::<(Vec<ProductSerial>, KeysetPaginationResultForString)>(
+            format!("/product?{}", query_params).as_str(),
+            cookie,
         ).await
     );
 

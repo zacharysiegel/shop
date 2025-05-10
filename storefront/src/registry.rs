@@ -1,7 +1,7 @@
+use inventory::environment::RuntimeEnvironment;
 use reqwest::Client;
 use std::env;
 use std::sync::LazyLock;
-use inventory::environment::RuntimeEnvironment;
 
 pub struct Registry {
     pub http_client: Client,
@@ -11,7 +11,7 @@ pub struct Registry {
 pub static REGISTRY: LazyLock<Registry> = LazyLock::new(|| {
     Registry {
         http_client: create_http_client(),
-        remote_url: env::var("REMOTE_URL").unwrap_or("https://localhost:1443/api".to_string()),
+        remote_url: env::var("REMOTE_URL").unwrap_or("https://127.0.0.1:1443/api".to_string()),
     }
 });
 
