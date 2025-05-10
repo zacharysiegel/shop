@@ -50,7 +50,6 @@ authentication_backend:
 access_control:
   default_policy: deny
   rules:
-    # Rules applied to everyone
     - domain: '127.0.0.1'
       policy: one_factor
 
