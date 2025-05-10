@@ -1,34 +1,69 @@
----
-# yaml-language-server: $schema=https://www.authelia.com/schemas/latest/json-schema/user-database.json
-
-###############################################################
-#                         Users Database                      #
-###############################################################
-
-# This file can be used if you do not have an LDAP set up.
-
-# List of users
 users:
-  authelia:
-    disabled: false
-    displayname: 'Authelia User'
-    # Password is authelia
-    password: '$6$rounds=50000$BpLnfgDsc2WD8F2q$Zis.ixdg9s/UOJYrs56b5QEZFiZECu0qZVNsIYxBaNJ7ucIL.nlxVCT5tqh8KHG8X4tlwCFm5r6NTOZZ5qRFN/'  # yamllint disable-line rule:line-length
-    email: 'authelia@authelia.com'
-    groups:
-      - 'admins'
-      - 'dev'
-  zachary:
-    displayname: Zachary Siegel
-    email: zach@zach.ro
-    groups:
-      - admins
-      - dev
-    password: '$6$rounds=50000$BpLnfgDsc2WD8F2q$Zis.ixdg9s/UOJYrs56b5QEZFiZECu0qZVNsIYxBaNJ7ucIL.nlxVCT5tqh8KHG8X4tlwCFm5r6NTOZZ5qRFN/'
-  bentley:
-    displayname: Bentley Hatchet
-    groups:
-      - admins
-    password: '$6$rounds=50000$BpLnfgDsc2WD8F2q$Zis.ixdg9s/UOJYrs56b5QEZFiZECu0qZVNsIYxBaNJ7ucIL.nlxVCT5tqh8KHG8X4tlwCFm5r6NTOZZ5qRFN/'
-
-...
+    authelia:
+        password: $6$rounds=50000$BpLnfgDsc2WD8F2q$Zis.ixdg9s/UOJYrs56b5QEZFiZECu0qZVNsIYxBaNJ7ucIL.nlxVCT5tqh8KHG8X4tlwCFm5r6NTOZZ5qRFN/
+        displayname: Authelia User
+        email: authelia@authelia.com
+        groups:
+            - admins
+            - dev
+        given_name: ""
+        middle_name: ""
+        family_name: ""
+        nickname: ""
+        gender: ""
+        birthdate: ""
+        website: ""
+        profile: ""
+        picture: ""
+        zoneinfo: ""
+        locale: ""
+        phone_number: ""
+        phone_extension: ""
+        disabled: false
+        address: null
+        extra: {}
+    bentley:
+        password: $6$rounds=50000$BpLnfgDsc2WD8F2q$Zis.ixdg9s/UOJYrs56b5QEZFiZECu0qZVNsIYxBaNJ7ucIL.nlxVCT5tqh8KHG8X4tlwCFm5r6NTOZZ5qRFN/
+        displayname: Bentley Hatchet
+        email: ""
+        groups:
+            - admins
+        given_name: ""
+        middle_name: ""
+        family_name: ""
+        nickname: ""
+        gender: ""
+        birthdate: ""
+        website: ""
+        profile: ""
+        picture: ""
+        zoneinfo: ""
+        locale: ""
+        phone_number: ""
+        phone_extension: ""
+        disabled: false
+        address: null
+        extra: {}
+    zachary:
+        password: $argon2id$v=19$m=65536,t=3,p=4$l+o4CpLZi+nerjjxht+lxg$l7uTtiUlEaTP+iX84AMtSzstAIn3NAp6FYwvx5puBpc
+        displayname: Zachary Siegel
+        email: zach@zach.ro
+        groups:
+            - admins
+            - dev
+        given_name: ""
+        middle_name: ""
+        family_name: ""
+        nickname: ""
+        gender: ""
+        birthdate: ""
+        website: ""
+        profile: ""
+        picture: ""
+        zoneinfo: ""
+        locale: ""
+        phone_number: ""
+        phone_extension: ""
+        disabled: false
+        address: null
+        extra: {}
