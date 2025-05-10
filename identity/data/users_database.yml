@@ -20,15 +20,15 @@ users:
       - 'dev'
   zachary:
     displayname: Zachary Siegel
-    password: initial
     email: zach@zach.ro
     groups:
       - admins
       - dev
+    password: '$6$rounds=50000$BpLnfgDsc2WD8F2q$Zis.ixdg9s/UOJYrs56b5QEZFiZECu0qZVNsIYxBaNJ7ucIL.nlxVCT5tqh8KHG8X4tlwCFm5r6NTOZZ5qRFN/'
   bentley:
     displayname: Bentley Hatchet
-    password: initial
     groups:
       - admins
+    password: '$6$rounds=50000$BpLnfgDsc2WD8F2q$Zis.ixdg9s/UOJYrs56b5QEZFiZECu0qZVNsIYxBaNJ7ucIL.nlxVCT5tqh8KHG8X4tlwCFm5r6NTOZZ5qRFN/'
 
 ...
