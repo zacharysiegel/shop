@@ -1,4 +1,6 @@
 # yamllint disable rule:comments-indentation
+# yaml-language-server: $schema=https://www.authelia.com/schemas/v4.39/json-schema/configuration.json
+
 ---
 ###############################################################################
 ##                           Authelia Configuration                          ##
