@@ -8,6 +8,7 @@ pub async fn open_server(pgpool: Pool<Postgres>) -> std::io::Result<()> {
             .wrap(middleware::NormalizePath::trim())
             .app_data(web::Data::new(pgpool.clone()))
             .default_service(web::route().to(HttpResponse::NotFound))
+            .configure(crate::public::configurer)
             .configure(crate::category::category_api::configurer)
             .configure(crate::product::product_api::configurer)
             .configure(crate::inventory_location::inventory_location_api::configurer)
