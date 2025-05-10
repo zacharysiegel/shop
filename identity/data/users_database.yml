@@ -18,4 +18,17 @@ users:
     groups:
       - 'admins'
       - 'dev'
+  zachary:
+    displayname: Zachary Siegel
+    password: initial
+    email: zach@zach.ro
+    groups:
+      - admins
+      - dev
+  bentley:
+    displayname: Bentley Hatchet
+    password: initial
+    groups:
+      - admins
+
 ...
