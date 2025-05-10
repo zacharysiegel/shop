@@ -17,7 +17,7 @@ server:
         implementation: AuthRequest
 
 log:
-  level: debug
+  level: info
   format: text
   file_path: /data/~authelia.log
   keep_stdout: true
@@ -98,6 +98,5 @@ notifier:
 ntp:
   address: 'udp://time.cloudflare.com:123'
   max_desync: '3s'
-  disable_startup_check: true # todo: remove
 
 ...
