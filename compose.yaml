@@ -37,7 +37,7 @@ services:
       - ./identity/config:/config
       - ./identity/secret:/secret
       - ./identity/data:/data
-    restart: no # todo: unless-stopped after testing
+    restart: unless-stopped
     networks:
       - shop
 
