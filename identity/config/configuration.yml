@@ -17,11 +17,13 @@ server:
         # https://www.authelia.com/integration/proxies/nginx/
         implementation: AuthRequest
         authn_strategies:
-          - name: CookieSession
+          # HeaderAuthorization must come before CookieSession, else a request without an Authorization header will be
+          #   considered a "failure" rather than "neutral", and no Location header will be returned with the 302 redirect.
           - name: HeaderAuthorization
             schemes:
               - basic
             scheme_basic_cache_lifespan: 0
+          - name: CookieSession
 
 log:
   level: info
