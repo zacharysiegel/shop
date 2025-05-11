@@ -8,7 +8,7 @@ use crate::unwrap_result_else_markup;
 use actix_web::web;
 use actix_web::web::ServiceConfig;
 use inventory::item::{ItemCondition, ItemSerial, ItemStatus};
-use inventory::listing::ListingSerial;
+use inventory::listing::{ListingSerial, ListingStatus};
 use inventory::marketplace::MarketplaceSerial;
 use inventory::product::ProductSerial;
 use maud::{html, Markup};
@@ -106,15 +106,18 @@ async fn table(elements: &Vec<ListingSerial>) -> Markup {
                 }
             }
             tbody {
-                @for element in elements {
+                @for listing in elements {
                     tr {
-                        td { (element.id) }
-                        td { (marketplace_markup(&marketplace_vec, element)) }
-                        td { (format!("{:?}", element.uri)) }
-                        td { (format!("{:?}", element.status)) }
+                        td { (listing.id) }
+                        td { (marketplace_markup(&marketplace_vec, listing)) }
+                        td { (format!("{:?}", listing.uri)) }
+                        td { (match ListingStatus::try_from_repr(listing.status) {
+                            Ok(variant) => format!("{}", variant),
+                            Err(error) => Markup::into_string(error_markup(error)),
+                        }) }
                         td {
-                            button onclick=(activate_listing_details_script(&element)) { "Details" }
-                            button onclick=(activate_listing_update_form_script(&element)) { "Update" }
+                            button onclick=(activate_listing_details_script(&listing)) { "Details" }
+                            button onclick=(activate_listing_update_form_script(&listing)) { "Update" }
                         }
                     }
                 }
@@ -156,14 +159,14 @@ fn item_details(item: &ItemSerial) -> Markup {
                     tr {
                         td { "condition" }
                         td { (match ItemCondition::try_from_repr(item.condition) {
-                            Ok(variant) => format!("{:?} ({})", variant, item.condition),
+                            Ok(variant) => format!("{}", variant),
                             Err(error) => Markup::into_string(error_markup(error)),
                         }) }
                     }
                     tr {
                         td { "status" }
                         td { (match ItemStatus::try_from_repr(item.status) {
-                            Ok(variant) => format!("{:?} ({})", variant, item.status),
+                            Ok(variant) => format!("{}", variant),
                             Err(error) => Markup::into_string(error_markup(error)),
                         }) }
                     }

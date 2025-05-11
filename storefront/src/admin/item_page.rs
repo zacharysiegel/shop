@@ -108,11 +108,11 @@ async fn table(elements: &Vec<ItemSerial>) -> Markup {
                         td { (element.id) }
                         td { (inventory_location_markup(&inventory_location_vec, &element)) }
                         td { (match ItemCondition::try_from_repr(element.condition) {
-                            Ok(variant) => format!("{:?}", variant),
+                            Ok(variant) => format!("{}", variant),
                             Err(error) => Markup::into_string(error_markup(error)),
                         }) }
                         td { (match ItemStatus::try_from_repr(element.status) {
-                            Ok(variant) => format!("{:?}", variant),
+                            Ok(variant) => format!("{}", variant),
                             Err(error) => Markup::into_string(error_markup(error)),
                         }) }
                         td { (element.price_cents) }

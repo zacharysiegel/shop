@@ -3,7 +3,9 @@ use crate::object::JsonHttpResponse;
 use crate::{create_json_spec, object, try_from_repr, ShopEntity, ShopModel, ShopSerial};
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
-use strum::{FromRepr, VariantArray};
+use std::fmt;
+use std::fmt::Display;
+use strum::{FromRepr, IntoStaticStr, VariantArray};
 use uuid::Uuid;
 
 #[derive(Debug)]
@@ -27,7 +29,7 @@ pub struct Item {
 
 /// Variants inspired by Ebay: https://www.ebay.com/help/selling/listings/creating-managing-listings/item-conditions-category.
 /// See the "Movies & TV, Music, Video Games" section.
-#[derive(Debug, Clone, FromRepr, VariantArray)]
+#[derive(Debug, Clone, FromRepr, VariantArray, IntoStaticStr)]
 #[repr(u8)]
 pub enum ItemCondition {
     Inapplicable = 0,
@@ -53,10 +55,16 @@ impl ItemCondition {
     }
 }
 
+impl Display for ItemCondition {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{} ({})", Into::<&'static str>::into(self), self.clone() as u8)
+    }
+}
+
 create_json_spec!(ItemCondition<u8>);
 try_from_repr!(ItemCondition<u8>);
 
-#[derive(Debug, Clone, FromRepr, VariantArray)]
+#[derive(Debug, Clone, FromRepr, VariantArray, IntoStaticStr)]
 #[repr(u8)]
 pub enum ItemStatus {
     /// Item is only partially constructed and expects modifications before publishing
@@ -77,6 +85,12 @@ pub enum ItemStatus {
     Shipped,
     /// Item has been received by the customer (either via shipping or pickup)
     Received,
+}
+
+impl Display for ItemStatus {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{} ({})", Into::<&'static str>::into(self), self.clone() as u8)
+    }
 }
 
 try_from_repr!(ItemStatus<u8>);
