@@ -91,7 +91,6 @@ async fn delete_product(
     HttpResponse::Ok().body(query_result.rows_affected().to_string())
 }
 
-// todo: restrict to authenticated administrator
 async fn create_product_json(
     pgpool: web::Data<PgPool>,
     body: web::Json<ProductSerial>,

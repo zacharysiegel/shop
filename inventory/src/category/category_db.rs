@@ -32,7 +32,6 @@ pub async fn get_category(
         .await
 }
 
-// todo: restrict to authenticated administrator
 pub async fn create_category(
     pool: &Pool<Postgres>,
     category: CategoryEntity,
