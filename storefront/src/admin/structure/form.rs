@@ -5,7 +5,6 @@ use reqwest::Method;
 use std::fmt::Debug;
 use strum::VariantArray;
 
-/// Generates an HTML form element. Will send a POST request to the path prefixed by the REGISTRY.remote_url.
 pub fn form(heading: &str, path: &str, method: Method, content: Markup) -> Markup {
     html! {
         div {
