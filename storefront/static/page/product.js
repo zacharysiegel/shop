@@ -10,6 +10,7 @@
  * @param {string} product_id
  * @param {Array<Category>} categories
  */
+// noinspection JSUnusedGlobalSymbols
 function activate_categories(element, base_url, product_id, categories) {
     const section = element.getElementsByTagName("section")[0];
     section.replaceChildren();
