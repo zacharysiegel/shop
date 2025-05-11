@@ -12,7 +12,7 @@ pub fn form(heading: &str, path: &str, method: Method, content: Markup) -> Marku
             h2 { (heading) }
 
             form
-            action=(format!("{}{}", REGISTRY.remote_url, path))
+            action=(format!("{}{}", REGISTRY.inventory_external_path, path))
             autocomplete="off"
             /* The standard method attribute only allows "post", "get", and "dialogue" values.
                 This value is extracted in submit_form.js. */

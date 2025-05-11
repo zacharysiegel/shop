@@ -47,7 +47,7 @@ pub fn update_form_from_json_string(path: &str, json_parameters: &str) -> String
             input.value = value;
         }}
         }}"#,
-        REGISTRY.remote_url,
+        REGISTRY.inventory_external_path,
         path,
         json_parameters,
     )

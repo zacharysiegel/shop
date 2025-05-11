@@ -54,7 +54,7 @@ impl ShopModel for ListingModel {
             item_id: serial.item_id.clone(),
             marketplace_id: serial.marketplace_id.clone(),
             uri: serial.uri.clone(),
-            status: ListingStatus::try_from_repr(serial.status.clone())?,
+            status: ListingStatus::default(),
             created: serial.created.clone(),
             updated: serial.updated.clone(),
         })
@@ -97,6 +97,12 @@ pub enum ListingStatus {
 
 try_from_repr!(ListingStatus<u8>);
 
+impl Default for ListingStatus {
+    fn default() -> Self {
+        ListingStatus::Draft
+    }
+}
+
 #[derive(Debug, Serialize, Deserialize)]
 pub struct ListingSerial {
     #[serde(default)]
@@ -104,6 +110,7 @@ pub struct ListingSerial {
     pub item_id: Uuid,
     pub marketplace_id: Uuid,
     pub uri: Option<String>,
+    #[serde(default)]
     pub status: u8,
     pub created: DateTime<Utc>,
     pub updated: DateTime<Utc>,

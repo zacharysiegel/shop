@@ -8,7 +8,7 @@ use crate::unwrap_result_else_markup;
 use actix_web::web;
 use actix_web::web::ServiceConfig;
 use inventory::item::{ItemCondition, ItemSerial, ItemStatus};
-use inventory::listing::{ListingSerial, ListingStatus};
+use inventory::listing::ListingSerial;
 use inventory::marketplace::MarketplaceSerial;
 use inventory::product::ProductSerial;
 use maud::{html, Markup};
@@ -238,12 +238,6 @@ fn listing_update() -> Markup {
                     label {
                         "URI"
                         input type="text" name="uri";
-                    }
-                    label {
-                        "Status"
-                        select name="status" {
-                            (form::enum_options::<ListingStatus>())
-                        }
                     }
                     input type="hidden" name="updated" value=(form::get_current_datetime_string());
 

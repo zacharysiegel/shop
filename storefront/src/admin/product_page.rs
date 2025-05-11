@@ -295,7 +295,7 @@ async fn activate_categories_script(element_id: &str, product: &ProductSerial) -
         activate_categories(element, "{}", "{}", categories); // Defined in product.js
         }}"#,
         serde_json::to_string(&product_categories).unwrap(),
-        REGISTRY.remote_url,
+        REGISTRY.inventory_external_path,
         product.id,
     );
     let modify_form: String = reactivity::update_form_from_serialize(&format!("/product/{}/category", product.id), product);

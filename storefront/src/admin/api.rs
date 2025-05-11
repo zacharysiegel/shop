@@ -5,7 +5,7 @@ use serde::de::DeserializeOwned;
 
 pub async fn wrapped_get<SerialT: DeserializeOwned>(path_and_query: &str) -> Result<SerialT, Markup> {
     let result = REGISTRY.http_client
-        .get(format!("{}{}", REGISTRY.remote_url, path_and_query))
+        .get(format!("{}{}", REGISTRY.inventory_internal_path, path_and_query))
         .send()
         .await;
     let response = match result {

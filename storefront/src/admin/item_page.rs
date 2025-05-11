@@ -9,7 +9,6 @@ use actix_web::web;
 use actix_web::web::ServiceConfig;
 use inventory::inventory_location::InventoryLocationSerial;
 use inventory::item::{ItemCondition, ItemSerial, ItemStatus};
-use inventory::listing::ListingStatus;
 use inventory::marketplace::MarketplaceSerial;
 use inventory::product::ProductSerial;
 use maud::{html, Markup};
@@ -178,12 +177,6 @@ async fn create_listing_form() -> Markup {
                 label {
                     "URI (optional)"
                     input type="text" name="uri";
-                }
-                label {
-                    "Status"
-                    select name="status" {
-                        (form::enum_options::<ListingStatus>())
-                    }
                 }
                 input type="hidden" name="created" value=(form::get_current_datetime_string());
                 input type="hidden" name="updated" value=(form::get_current_datetime_string());
