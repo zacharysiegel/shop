@@ -10,13 +10,11 @@ macro_rules! try_from_repr {
 				match $id::from_repr(descriminant.clone()) {
 					::std::option::Option::Some(variant) => ::std::result::Result::Ok(variant),
 					::std::option::Option::None => {
-						::std::result::Result::Err($crate::error::ShopError {
-							message: ::std::string::String::from(format!(
-								"Error parsing enumeration [{}]",
-								descriminant,
-							)),
-						})
-					}
+						::std::result::Result::Err($crate::error::ShopError::new(&format!(
+							"Error parsing enumeration [{}]",
+							descriminant,
+						)))
+					},
 				}
 			}
 		}

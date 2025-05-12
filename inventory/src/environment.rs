@@ -28,9 +28,7 @@ impl TryFrom<String> for RuntimeEnvironment {
             "local" => Ok(Self::Local),
             "stage" => Ok(Self::Stage),
             "production" => Ok(Self::Production),
-            _ => Err(ShopError {
-                message: format!("Error parsing runtime environment [{}]", value),
-            })
+            _ => Err(ShopError::new(&format!("Error parsing runtime environment [{}]", value)))
         }
     }
 }

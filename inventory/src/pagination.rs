@@ -1,8 +1,8 @@
-use std::cmp::PartialEq;
+use crate::error::ShopError;
 use crate::ShopEntity;
 use actix_web::guard;
 use serde::{Deserialize, Serialize};
-use crate::error::ShopError;
+use std::cmp::PartialEq;
 
 pub fn pagination_guard(ctx: &guard::GuardContext) -> bool {
     ctx.head()
@@ -41,13 +41,13 @@ pub struct KeysetPaginationOptionsForString {
 impl KeysetPaginationOptionsForString {
     pub fn validated(self) -> Result<Self, ShopError> {
         if self.max_page_size.overflowing_add(1).1 {
-            return Err(ShopError { message: format!("Maximum PAGE size exceeds maximum value; [{}]", u32::MAX - 1) });
+            return Err(ShopError::new(&format!("Maximum PAGE size exceeds maximum value; [{}]", u32::MAX - 1)));
         } else if self.max_page_size == 0 {
-            return Err(ShopError { message: "Maximum PAGE size cannot be zero;".to_string() });
+            return Err(ShopError::new("Maximum PAGE size cannot be zero;"));
         }
 
         if self.start_value.is_none() && self.direction == Direction::Descending {
-            return Err(ShopError { message: "Unspecified start value cannot request a descending PAGE;".to_string() });
+            return Err(ShopError::new("Unspecified start value cannot request a descending PAGE;"));
         }
 
         Ok(self)
