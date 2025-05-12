@@ -39,3 +39,8 @@ Start the web server.
 ### Proxy
 
 The NGINX server manages TLS security concerns. It proxies HTTPS requests via HTTP to the internal services so each internal service is not burdened with SSL certification.
+
+### Authelia
+
+Authentication is proxied through the Authelia server. It uses a session cookie to persist a user's authorization across HTTP connections.
+Since the cookie can only apply to a single domain, during local development, if you touch Authelia, only `127.0.0.1` will work (`localhost` will not).
