@@ -1,4 +1,4 @@
-use crate::listing::ListingEntity;
+use crate::listing::{ListingEntity, ListingStatus};
 use sqlx::postgres::PgQueryResult;
 use sqlx::{query, query_as, Error, PgPool};
 use uuid::Uuid;
@@ -53,6 +53,22 @@ pub async fn update_listing(
         listing.uri,
         listing.status,
         listing.updated,
+    )
+        .execute(pgpool)
+        .await
+}
+
+pub async fn publish_listing(
+    pgpool: &PgPool,
+    listing_id: &Uuid,
+) -> Result<PgQueryResult, Error> {
+    query!("
+        update shop.public.listing
+        set status = $2
+        where id = $1
+    ",
+        listing_id,
+        i32::from(ListingStatus::Published as u8),
     )
         .execute(pgpool)
         .await

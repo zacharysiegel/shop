@@ -4,6 +4,7 @@ use crate::admin::structure::error_text::error_markup;
 use crate::admin::structure::page::Page;
 use crate::admin::structure::{form, page, split};
 use crate::admin::{item_page, product_page, reactivity};
+use crate::registry::REGISTRY;
 use crate::unwrap_result_else_markup;
 use actix_web::web;
 use actix_web::web::ServiceConfig;
@@ -118,6 +119,11 @@ async fn table(elements: &Vec<ListingSerial>) -> Markup {
                         td {
                             button onclick=(activate_listing_details_script(&listing)) { "Details" }
                             button onclick=(activate_listing_update_form_script(&listing)) { "Update" }
+                            @if listing.status == ListingStatus::Draft as u8 {
+                                x-publish-listing
+                                action=(format!("{}/listing/{}/publish", REGISTRY.inventory_external_path, listing.id))
+                                {}
+                            }
                         }
                     }
                 }

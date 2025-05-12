@@ -16,6 +16,7 @@ pub fn configurer(config: &mut ServiceConfig) {
             .route("", web::post().to(create_listing))
             .route("/{listing_id}", web::get().to(get_listing))
             .route("/{listing_id}", web::put().to(update_listing))
+            .route("/{listing_id}/publish", web::put().to(publish_listing))
     );
 }
 
@@ -55,4 +56,18 @@ async fn update_listing(
     let query_result: PgQueryResult =
         unwrap_result_else_500!(listing_db::update_listing(&pgpool, &listing.to_entity()).await);
     HttpResponse::Ok().body(query_result.rows_affected().to_string())
+}
+
+async fn publish_listing(
+    pgpool: web::Data<PgPool>,
+    listing_id: web::Path<String>,
+) -> impl Responder {
+    let listing_id: Uuid = unwrap_result_else_400!(Uuid::try_parse(&listing_id.into_inner()));
+
+    // todo: publish to associated marketplace
+    // todo: detect success
+
+    unwrap_result_else_500!(listing_db::publish_listing(&pgpool, &listing_id).await);
+
+    HttpResponse::Ok().finish()
 }

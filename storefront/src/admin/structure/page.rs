@@ -25,6 +25,7 @@ pub fn page(
 				link rel="stylesheet" type="text/css" href="/reset.css";
 				link rel="stylesheet" type="text/css" href="/base.css";
 				link rel="stylesheet" type="text/css" href="/tree.css";
+				script src="/index.js" type="module" {};
 				script src="/submit_form.js" {};
 				(head_content)
 			}
