@@ -1,13 +1,10 @@
-use crate::listing::{listing_db, ListingModel, ListingSerial};
+use crate::listing::{listing_db, ListingEntity, ListingModel, ListingSerial};
 use crate::object::JsonHttpResponse;
-use crate::{
-    unwrap_option_else_404, unwrap_result_else_400, unwrap_result_else_500, ShopEntity, ShopModel,
-    ShopSerial,
-};
+use crate::{marketplace, unwrap_option_else_404, unwrap_result_else_400, unwrap_result_else_500, ShopEntity, ShopModel, ShopSerial};
 use actix_web::web::ServiceConfig;
 use actix_web::{web, HttpResponse, Responder};
-use sqlx::PgPool;
 use sqlx::postgres::PgQueryResult;
+use sqlx::PgPool;
 use uuid::Uuid;
 
 pub fn configurer(config: &mut ServiceConfig) {
@@ -64,9 +61,11 @@ async fn publish_listing(
 ) -> impl Responder {
     let listing_id: Uuid = unwrap_result_else_400!(Uuid::try_parse(&listing_id.into_inner()));
 
-    // todo: publish to associated marketplace
-    // todo: detect success
+    let listing_entity: Option<ListingEntity> = unwrap_result_else_500!(listing_db::get_listing(&pgpool, &listing_id).await);
+    let listing_entity: ListingEntity = unwrap_option_else_404!(listing_entity);
+    let listing: ListingModel = unwrap_result_else_500!(listing_entity.try_to_model());
 
+    unwrap_result_else_500!(marketplace::ebay::publish(&pgpool, &listing));
     unwrap_result_else_500!(listing_db::publish_listing(&pgpool, &listing_id).await);
 
     HttpResponse::Ok().finish()

@@ -15,6 +15,7 @@ async fn main() -> Result<(), std::io::Error> {
     log::info!("Runtime environment: {:?}", environment::RuntimeEnvironment::default());
 
     let pgpool: Pool<Postgres> = inventory::db::sqlx_connect().await?;
+
     marketplace::ebay::init(&pgpool).await;
 
     server::open_server(pgpool).await

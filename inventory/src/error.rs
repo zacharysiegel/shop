@@ -14,3 +14,11 @@ impl Display for ShopError {
 }
 
 impl Error for ShopError {}
+
+impl Default for ShopError {
+    fn default() -> Self {
+        ShopError {
+            message: "Error: unspecified".to_string(),
+        }
+    }
+}

@@ -86,7 +86,7 @@ impl ShopModel for ListingModel {
     }
 }
 
-#[derive(Debug, Clone, FromRepr, VariantArray, IntoStaticStr)]
+#[derive(Debug, Clone, PartialEq, FromRepr, VariantArray, IntoStaticStr)]
 #[repr(u8)]
 pub enum ListingStatus {
     Draft = 0,

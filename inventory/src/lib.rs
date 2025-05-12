@@ -17,7 +17,6 @@ pub mod product;
 pub mod purchase;
 
 pub mod db;
-pub mod env;
 pub mod server;
 pub mod public_api;
 pub mod error;
