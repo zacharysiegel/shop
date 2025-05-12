@@ -28,3 +28,9 @@ impl Default for ShopError {
         Self::new("unspecified")
     }
 }
+
+impl From<sqlx::Error> for ShopError {
+    fn from(error: sqlx::Error) -> Self {
+        Self::new(&format!("{:#}", error))
+    }
+}
