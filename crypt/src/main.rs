@@ -1,7 +1,12 @@
+use std::error::Error;
+use base64::{DecodeError, Engine};
+use chacha20poly1305::Key;
 use clap::{Arg, ArgAction, ArgMatches, Command};
-use crypt::secrets::list_secrets;
+use clap::error::ErrorKind;
+use crypt::secrets;
+use crypt::secrets::{encrypt, list_secrets, Secret, BASE64};
 
-fn main() {
+fn main() -> Result<(), Box<dyn Error>> {
     let command: Command = Command::new("shop-crypt")
         .version("1.0")
         .about("Manage encrypted secrets for the shop application")
@@ -32,9 +37,21 @@ fn main() {
         let text = list_secrets()
             .join("\n");
         println!("{}", text);
-        return;
+        return Ok(());
     }
-    //
-    // let x = encrypt(b"");
-    // let y = decrypt(&x.0, &x.1, x.2.unwrap().as_slice());
+
+    if let Some(sub_matches) = matches.subcommand_matches("encrypt") {
+        let plaintext: &String = sub_matches.get_one("plaintext")
+            .expect("plaintext is required");
+
+        let secret: Secret = encrypt(plaintext.as_bytes())?;
+        println!("{}", secret);
+        return Ok(());
+    }
+
+    if let Some(sub_matches) = matches.subcommand_matches("decrypt") {
+
+    }
+
+    unreachable!()
 }
