@@ -10,9 +10,9 @@ pub const BASE64: base64::engine::general_purpose::GeneralPurpose = base64::engi
 pub const SECRETS: LazyLock<BTreeMap<&'static str, Secret>> = LazyLock::new(|| {
     let mut map: BTreeMap<&'static str, Secret> = BTreeMap::new();
     map.insert("ebay_cert_id_zach", Secret {
-        key_base64: String::default(),
-        nonce_base64: String::default(),
-        ciphertext_base64: String::default(),
+        key_base64: String::from("redacted"),
+        nonce_base64: String::from("Q97zM4h1mSBpR04u"),
+        ciphertext_base64: String::from("iichSrBjy7Rm03whyX5K89jFfPrOrIin4+DKUmIcAcPnQgGO+pdwFGKGl8mf7HhNNrihQA=="),
     });
     map
 });
@@ -50,7 +50,23 @@ pub fn encrypt(plaintext: &[u8]) -> Result<Secret, Box<dyn Error>> {
     })
 }
 
-pub fn decrypt(
+pub fn decrypt(secret_name: &str) -> Result<Vec<u8>, Box<dyn Error>> {
+    let secrets = SECRETS;
+    let secret: &Secret = secrets.get(secret_name)
+        .ok_or(format!(r#"Secret "{}" does not exist"#, secret_name))?;
+
+    let key = BASE64.decode(&secret.key_base64)?;
+    let nonce = BASE64.decode(&secret.nonce_base64)?;
+    let ciphertext = BASE64.decode(&secret.ciphertext_base64)?;
+
+    Ok(decrypt_raw(
+        chacha20poly1305::Key::from_slice(key.as_slice()),
+        chacha20poly1305::Nonce::from_slice(nonce.as_slice()),
+        &ciphertext,
+    )?)
+}
+
+fn decrypt_raw(
     key: &chacha20poly1305::Key,
     nonce: &chacha20poly1305::Nonce,
     ciphertext: &[u8],
