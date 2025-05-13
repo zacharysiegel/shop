@@ -42,7 +42,7 @@ impl Display for SecretBase64 {
         let mut display: String = String::from("SecretBase64 {\n");
         display.push_str(&format!("    nonce: String::from(\"{}\"),\n", self.nonce));
         display.push_str(&format!("    ciphertext: String::from(\"{}\"),\n", self.ciphertext));
-        display.push_str("}");
+        display.push_str("},");
         write!(f, "{}", display)
     }
 }
