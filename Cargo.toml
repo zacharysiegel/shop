@@ -1,6 +1,6 @@
 [workspace]
 resolver = "2"
-members = ["inventory", "storefront", "schema"]
+members = ["inventory", "storefront", "schema", "crypt"]
 
 [profile.dev.package.sqlx-macros]
 opt-level = 3
