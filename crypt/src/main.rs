@@ -1,6 +1,7 @@
 use base64::Engine;
 use clap::{Arg, ArgAction, ArgMatches, Command};
-use crypt::secrets::{decrypt, encrypt, list_secrets, Secret, BASE64};
+use crypt::cryptography::{decrypt, encrypt};
+use crypt::secrets::{list_secret_names, SecretBase64, BASE64};
 use std::error::Error;
 
 fn main() -> Result<(), Box<dyn Error>> {
@@ -31,7 +32,7 @@ fn main() -> Result<(), Box<dyn Error>> {
 
 
     if matches.get_flag("list") {
-        let text = list_secrets()
+        let text = list_secret_names()
             .join("\n");
         println!("{}", text);
         return Ok(());
@@ -40,7 +41,7 @@ fn main() -> Result<(), Box<dyn Error>> {
     if let Some(sub_matches) = matches.subcommand_matches("encrypt") {
         let plaintext: &String = sub_matches.get_one("plaintext")
             .expect("plaintext is required");
-        let secret: Secret = encrypt(plaintext.as_bytes())?;
+        let secret: SecretBase64 = encrypt(plaintext.as_bytes())?;
 
         println!("{}", secret);
         return Ok(());
