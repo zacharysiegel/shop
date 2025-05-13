@@ -6,32 +6,31 @@ use chacha20poly1305::aead::{Aead, Payload};
 use chacha20poly1305::{aead, AeadCore, ChaCha20Poly1305, KeyInit};
 use std::error::Error;
 
-pub fn encrypt(plaintext: &[u8]) -> Result<SecretBase64, Box<dyn Error>> {
-    let key: chacha20poly1305::Key = ChaCha20Poly1305::generate_key(aead::OsRng);
+pub fn encrypt(key: &Vec<u8>, plaintext: &[u8]) -> Result<SecretBase64, Box<dyn Error>> {
+    let key: &chacha20poly1305::Key = chacha20poly1305::Key::from_slice(key);
     let nonce: chacha20poly1305::Nonce = ChaCha20Poly1305::generate_nonce(aead::OsRng);
-    let cipher: ChaCha20Poly1305 = ChaCha20Poly1305::new(&key);
+    let cipher: ChaCha20Poly1305 = ChaCha20Poly1305::new(key);
     let payload = Payload {
         msg: plaintext,
-        aad: &[],
+        aad: &[], // Additional Associated Data is unused.
     };
     let ciphertext: Vec<u8> = cipher.encrypt(&nonce, payload)?;
 
     let secret: SecretBytes = SecretBytes {
-        key: key.to_vec(),
         nonce: nonce.to_vec(),
         ciphertext,
     };
     Ok(secret.base64_encode())
 }
 
-pub fn decrypt(secret_name: &str) -> Result<Vec<u8>, Box<dyn Error>> {
+pub fn decrypt(key: &Vec<u8>, secret_name: &str) -> Result<Vec<u8>, Box<dyn Error>> {
     let secrets = SECRETS;
     let secret: SecretBytes = secrets.get(secret_name)
         .ok_or(format!(r#"Secret "{}" does not exist"#, secret_name))?
         .base64_decode()?;
 
     Ok(decrypt_raw(
-        chacha20poly1305::Key::from_slice(secret.key.as_slice()),
+        chacha20poly1305::Key::from_slice(key),
         chacha20poly1305::Nonce::from_slice(secret.nonce.as_slice()),
         &secret.ciphertext,
     )?)
@@ -49,4 +48,8 @@ fn decrypt_raw(
     };
 
     cipher.decrypt(nonce, payload)
+}
+
+pub fn generate_key() -> Vec<u8> {
+    ChaCha20Poly1305::generate_key(aead::OsRng).to_vec()
 }

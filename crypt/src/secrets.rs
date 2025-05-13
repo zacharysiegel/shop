@@ -16,17 +16,15 @@ pub const SECRETS: LazyLock<BTreeMap<&'static str, SecretBase64>> = LazyLock::ne
     map.insert(
         "ebay_cert_id_zach",
         SecretBase64 {
-            key: String::from("redacted"),
-            nonce: String::from("0hFHYPhEObIXg9du"),
-            ciphertext: String::from("X24FrgFqbr2FBZLo8DcUCLFXWWeGKHWY+3wmmTSHf03p6TPNRhIJtmh9HAAhCXhv4vR7jA=="),
-        }
+            nonce: String::from("mXMDz6u6Ddp/h/qf"),
+            ciphertext: String::from("OEFWMp+4gpbv9Ma/YBXM9R2du+SPzj4c7mSNUBqj5Yt7VFwv4a2ABmpoSrp+q+CemAbN4Q=="),
+        },
     );
     map
 });
 
 #[derive(Debug)]
 pub struct Secret<T> {
-    pub key: T,
     pub nonce: T,
     pub ciphertext: T,
 }
@@ -37,7 +35,6 @@ pub type SecretBytes = Secret<Vec<u8>>;
 impl SecretBase64 {
     pub fn base64_decode(&self) -> Result<SecretBytes, base64::DecodeError> {
         Ok(SecretBytes {
-            key: BASE64.decode(&self.key)?,
             nonce: BASE64.decode(&self.nonce)?,
             ciphertext: BASE64.decode(&self.ciphertext)?,
         })
@@ -47,7 +44,6 @@ impl SecretBase64 {
 impl SecretBytes {
     pub fn base64_encode(&self) -> SecretBase64 {
         SecretBase64 {
-            key: BASE64.encode(&self.key),
             nonce: BASE64.encode(&self.nonce),
             ciphertext: BASE64.encode(&self.ciphertext),
         }
@@ -57,7 +53,6 @@ impl SecretBytes {
 impl Display for SecretBase64 {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         let mut display: String = String::from("SecretBase64 {\n");
-        display.push_str(&format!("    key: String::from(\"{}\"),\n", self.key));
         display.push_str(&format!("    nonce: String::from(\"{}\"),\n", self.nonce));
         display.push_str(&format!("    ciphertext: String::from(\"{}\"),\n", self.ciphertext));
         display.push_str("}");
