@@ -2,7 +2,8 @@
 //! This algorithm provides an Associated Data feature which we are not currently utilizing.
 //! todo: Associated Data may be useful for recording identifiers for which key was used to encrypt the value.
 
-use crate::secrets::{SecretBase64, SecretBytes, SECRETS};
+use crate::data::SECRETS;
+use crate::secrets::{SecretBase64, SecretBytes};
 use chacha20poly1305::aead::{Aead, Payload};
 use chacha20poly1305::{aead, AeadCore, ChaCha20Poly1305, KeyInit};
 use std::error::Error;

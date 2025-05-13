@@ -1,8 +1,7 @@
+use crate::data::SECRETS;
 use base64::engine::DecodePaddingMode;
 use base64::Engine;
-use std::collections::BTreeMap;
 use std::fmt::{Display, Formatter};
-use std::sync::LazyLock;
 
 pub const BASE64: base64::engine::general_purpose::GeneralPurpose = base64::engine::GeneralPurpose::new(
     &base64::alphabet::STANDARD,
@@ -10,18 +9,6 @@ pub const BASE64: base64::engine::general_purpose::GeneralPurpose = base64::engi
         .with_decode_padding_mode(DecodePaddingMode::Indifferent)
         .with_encode_padding(true),
 );
-
-pub const SECRETS: LazyLock<BTreeMap<&'static str, SecretBase64>> = LazyLock::new(|| {
-    let mut map: BTreeMap<&'static str, SecretBase64> = BTreeMap::new();
-    map.insert(
-        "ebay_cert_id_zach",
-        SecretBase64 {
-            nonce: String::from("mXMDz6u6Ddp/h/qf"),
-            ciphertext: String::from("OEFWMp+4gpbv9Ma/YBXM9R2du+SPzj4c7mSNUBqj5Yt7VFwv4a2ABmpoSrp+q+CemAbN4Q=="),
-        },
-    );
-    map
-});
 
 #[derive(Debug)]
 pub struct Secret<T> {
