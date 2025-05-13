@@ -1,3 +1,3 @@
-pub mod secrets;
+pub mod secret;
 pub mod cryptography;
 pub mod data;

@@ -3,7 +3,7 @@ use clap::error::ErrorKind;
 use clap::{Arg, ArgAction, ArgGroup, ArgMatches, Command};
 use crypt::cryptography;
 use crypt::cryptography::{decrypt, encrypt, generate_key};
-use crypt::secrets::{list_secret_names, SecretBase64, BASE64};
+use crypt::secret::{list_secret_names, SecretBase64, BASE64};
 use std::error::Error;
 
 fn main() -> Result<(), Box<dyn Error>> {

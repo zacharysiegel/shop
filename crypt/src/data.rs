@@ -1,4 +1,4 @@
-use crate::secrets::SecretBase64;
+use crate::secret::SecretBase64;
 use std::collections::BTreeMap;
 use std::sync::LazyLock;
 
