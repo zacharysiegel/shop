@@ -4,14 +4,23 @@ use std::collections::BTreeMap;
 use std::fmt::{Display, Formatter};
 use std::sync::LazyLock;
 
-pub const BASE64: base64::engine::general_purpose::GeneralPurpose = base64::engine::general_purpose::STANDARD;
-pub const SECRETS: LazyLock<BTreeMap<&'static str, Secret>> = LazyLock::new(|| {
-    let mut map: BTreeMap<&'static str, Secret> = BTreeMap::new();
-    map.insert("ebay_cert_id_zach", Secret {
-        key_base64: String::from("redacted"),
-        nonce_base64: String::from("Q97zM4h1mSBpR04u"),
-        ciphertext_base64: String::from("iichSrBjy7Rm03whyX5K89jFfPrOrIin4+DKUmIcAcPnQgGO+pdwFGKGl8mf7HhNNrihQA=="),
-    });
+pub const BASE64: base64::engine::general_purpose::GeneralPurpose = base64::engine::GeneralPurpose::new(
+    &base64::alphabet::STANDARD,
+    base64::engine::GeneralPurposeConfig::new()
+        .with_decode_padding_mode(DecodePaddingMode::Indifferent)
+        .with_encode_padding(true),
+);
+
+pub const SECRETS: LazyLock<BTreeMap<&'static str, SecretBase64>> = LazyLock::new(|| {
+    let mut map: BTreeMap<&'static str, SecretBase64> = BTreeMap::new();
+    map.insert(
+        "ebay_cert_id_zach",
+        SecretBase64 {
+            key: String::from("redacted"),
+            nonce: String::from("0hFHYPhEObIXg9du"),
+            ciphertext: String::from("X24FrgFqbr2FBZLo8DcUCLFXWWeGKHWY+3wmmTSHf03p6TPNRhIJtmh9HAAhCXhv4vR7jA=="),
+        }
+    );
     map
 });
 
