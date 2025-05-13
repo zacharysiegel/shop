@@ -1,23 +1,21 @@
 use base64::Engine;
+use clap::error::ErrorKind;
 use clap::{Arg, ArgAction, ArgMatches, Command};
 use crypt::cryptography::{decrypt, encrypt};
 use crypt::secrets::{list_secret_names, SecretBase64, BASE64};
 use std::error::Error;
 
 fn main() -> Result<(), Box<dyn Error>> {
-    let command: Command = Command::new("shop-crypt")
+    let mut command: Command = Command::new("shop-crypt")
         .version("1.0")
         .about("Manage encrypted secrets for the shop application")
         .author("Zachary Siegel")
-        .next_line_help(true)
         .flatten_help(true)
         .subcommand(Command::new("encrypt")
-            .next_line_help(true)
             .arg(Arg::new("plaintext")
                 .help("The plaintext to encrypt")
                 .required(true)))
         .subcommand(Command::new("decrypt")
-            .next_line_help(true)
             .arg(Arg::new("name")
                 .help("The name of the encrypted secret")
                 .required(true)))
@@ -28,8 +26,7 @@ fn main() -> Result<(), Box<dyn Error>> {
             .exclusive(true)
             .help("List all available secrets"))
         ;
-    let matches: ArgMatches = command.get_matches();
-
+    let matches: ArgMatches = command.clone().get_matches();
 
     if matches.get_flag("list") {
         let text = list_secret_names()
@@ -59,5 +56,5 @@ fn main() -> Result<(), Box<dyn Error>> {
         return Ok(());
     }
 
-    Err("Failed to detect invalid subcommand".into())
+    command.error(ErrorKind::DisplayHelp, "Invalid invocation").exit()
 }
