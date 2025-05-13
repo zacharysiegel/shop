@@ -1,6 +1,7 @@
 use base64::Engine;
 use clap::error::ErrorKind;
-use clap::{Arg, ArgAction, ArgMatches, Command};
+use clap::{Arg, ArgAction, ArgGroup, ArgMatches, Command};
+use crypt::cryptography;
 use crypt::cryptography::{decrypt, encrypt, generate_key};
 use crypt::secrets::{list_secret_names, SecretBase64, BASE64};
 use std::error::Error;
@@ -16,8 +17,16 @@ fn main() -> Result<(), Box<dyn Error>> {
             .arg(Arg::new("key")
                 .help("The base64-encoded secret key")
                 .short('k')
-                .long("key")
-                .required(true))
+                .long("key"))
+            .arg(Arg::new("generate_key")
+                .help("Generate a new key during encryption rather than accepting an existing key")
+                .short('g')
+                .long("generate-key")
+                .action(ArgAction::SetTrue))
+            .group(ArgGroup::new("keys")
+                .args(["key", "generate_key"])
+                .required(true)
+                .multiple(false))
             .arg(Arg::new("plaintext")
                 .help("The plaintext to encrypt")
                 .required(true)))
@@ -52,10 +61,24 @@ fn main() -> Result<(), Box<dyn Error>> {
     if let Some(sub_matches) = matches.subcommand_matches("encrypt") {
         let plaintext: &String = sub_matches.get_one("plaintext")
             .expect("plaintext is required");
-        let key: Vec<u8> = match_key(sub_matches)?;
+
+        let provided_key: Option<&String> = sub_matches.get_one("key");
+        let generate_key: bool = sub_matches.get_flag("generate_key");
+
+        if provided_key.is_some() && generate_key {
+            command.error(ErrorKind::DisplayHelp, "key and generate_key are mutually exclusive").exit();
+        }
+
+        let key: Vec<u8> = match provided_key {
+            Some(key) => BASE64.decode(key)?,
+            None => cryptography::generate_key(),
+        };
 
         let secret: SecretBase64 = encrypt(&key, plaintext.as_bytes())?;
 
+        if generate_key {
+            println!("Generated key (Base64):\n\t{}", BASE64.encode(&key));
+        }
         println!("{}", secret);
         return Ok(());
     }
@@ -63,7 +86,10 @@ fn main() -> Result<(), Box<dyn Error>> {
     if let Some(sub_matches) = matches.subcommand_matches("decrypt") {
         let secret_name: &String = sub_matches.get_one("name")
             .expect("secret name is required");
-        let key: Vec<u8> = match_key(sub_matches)?;
+        let key: Vec<u8> = match sub_matches.get_one::<String>("key") {
+            Some(key) => BASE64.decode(key.as_bytes())?,
+            None => panic!("key is required"),
+        };
 
         let plaintext: Vec<u8> = decrypt(&key, secret_name)?;
 
@@ -80,11 +106,5 @@ fn main() -> Result<(), Box<dyn Error>> {
         return Ok(());
     }
 
-    command.error(ErrorKind::DisplayHelp, "Invalid invocation").exit()
-}
-
-fn match_key(matches: &ArgMatches) -> Result<Vec<u8>, Box<dyn Error>> {
-    let key: &String = matches.get_one("key")
-        .expect("key is required");
-    Ok(BASE64.decode(key.as_bytes())?)
+    command.error(ErrorKind::DisplayHelp, "Invalid invocation").exit();
 }
