@@ -7,8 +7,8 @@ pub const SECRETS: LazyLock<BTreeMap<&'static str, SecretBase64>> = LazyLock::ne
     map.insert(
         "ebay_cert_id_zach",
         SecretBase64 {
-            nonce: String::from("mXMDz6u6Ddp/h/qf"),
-            ciphertext: String::from("OEFWMp+4gpbv9Ma/YBXM9R2du+SPzj4c7mSNUBqj5Yt7VFwv4a2ABmpoSrp+q+CemAbN4Q=="),
+            nonce: String::from("vzB3tLkRz0xnv4Ud"),
+            ciphertext: String::from("BZjNxWZfKjDhbsuB87qPtW1pDGgUd7yI6iHXGDK04TYgTKfLDlbgaGyFKOVlnaBF7YRt7Q=="),
         },
     );
     map

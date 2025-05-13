@@ -44,3 +44,7 @@ The NGINX server manages TLS security concerns. It proxies HTTPS requests via HT
 
 Authentication is proxied through the Authelia server. It uses a session cookie to persist a user's authorization across HTTP connections.
 Since the cookie can only apply to a single domain, during local development, if you touch Authelia, only `127.0.0.1` will work (`localhost` will not).
+
+### Environment variables
+
+Environment variables are specified in `env/.env`. If you need to add an environment variable, add it to both `.env` and `.env.template`. If the value is secret, still add the variable declaration to the template file, but leave it unassigned. (e.g. `TWITTER_API_TOKEN=`)
