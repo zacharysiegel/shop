@@ -77,7 +77,7 @@ fn main() -> Result<(), Box<dyn Error>> {
         let secret: SecretBase64 = encrypt(&key, plaintext.as_bytes())?;
 
         if generate_key {
-            println!("Generated key (Base64):\n\t{}", BASE64.encode(&key));
+            println!("Generated key (base64):\n\t{}", BASE64.encode(&key));
         }
         println!("{}", secret);
         return Ok(());
@@ -102,7 +102,7 @@ fn main() -> Result<(), Box<dyn Error>> {
 
     if let Some(_) = matches.subcommand_matches("key") {
         let key: Vec<u8> = generate_key();
-        println!("Base64 encoding:\n\t{}", BASE64.encode(key));
+        println!("Generated key (base64):\n\t{}", BASE64.encode(key));
         return Ok(());
     }
 
