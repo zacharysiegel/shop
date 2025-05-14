@@ -1,2 +1,2 @@
-*.log
-notification.txt
+/*.log
+/notification.txt
