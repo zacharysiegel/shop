@@ -25,7 +25,7 @@ services:
       - ./proxy/cert:/cert:ro
     restart: unless-stopped
     networks:
-      shop:
+      - shop
 
   authelia:
     image: authelia/authelia:4.39
