@@ -57,7 +57,6 @@ pub async fn publish(pgpool: &PgPool, listing: &ListingModel) -> Result<(), Shop
 
     log::info!("Publishing listing to {}; [listing_id: {}]; [marketplace_id: {}]", MARKETPLACE_INTERNAL_NAME, listing.id, MARKETPLACE_ID.get().unwrap());
 
-
     // todo: oauth
     let _ = REGISTRY.http_client
         .put(format!("{}/inventory_item/{}", INVENTORY_API_BASE_PATH, item.id))
