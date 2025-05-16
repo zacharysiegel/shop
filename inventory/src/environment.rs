@@ -1,7 +1,13 @@
 use crate::error::ShopError;
 use std::env;
+use std::ops::Deref;
+use std::sync::LazyLock;
 
-#[derive(Debug, PartialEq)]
+static RUNTIME_ENVIRONMENT_DEFAULT: LazyLock<RuntimeEnvironment> = LazyLock::new(||
+    RuntimeEnvironment::from_env().unwrap_or(RuntimeEnvironment::Local)
+);
+
+#[derive(Debug, PartialEq, Clone)]
 pub enum RuntimeEnvironment {
     Local = 0,
     Stage,
@@ -16,7 +22,7 @@ impl RuntimeEnvironment {
 
 impl Default for RuntimeEnvironment {
     fn default() -> RuntimeEnvironment {
-        RuntimeEnvironment::from_env().unwrap_or(RuntimeEnvironment::Local)
+        RUNTIME_ENVIRONMENT_DEFAULT.deref().clone()
     }
 }
 
