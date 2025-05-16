@@ -1,6 +1,8 @@
 # Shop
 
-## Setup instructions for macOS
+## Setup instructions
+
+_This setup has only been tested on macOS and may not "just work" in a different environment._
 
 ### Podman setup
 
@@ -50,3 +52,9 @@ Since the cookie can only apply to a single domain, during local development, if
 ### Environment variables
 
 Environment variables are specified in `.env`. If you need to add an environment variable, add it to both `.env` and `.env.template`. If the value is secret, still add the variable declaration to the template file, but leave it unassigned. (e.g. `TWITTER_API_TOKEN=`)
+
+### Secrets
+
+The `crypt` application/library manages nearly all secrets within the application. The ciphertext for application secrets (e.g. the eBay client secret) are stored within `crypt`. The secrets can be manually decrypted using the CLI provided by `crypt`. They are decrypted within the other applications via the `MASTER_SECRET` environment variable.
+
+You must be given the master secret and save it into your local `.env` file (not committed to Git) before you can run the server properly.
