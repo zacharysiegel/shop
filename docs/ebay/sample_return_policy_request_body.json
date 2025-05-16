@@ -1,0 +1,20 @@
+{ // https://developer.ebay.com/api-docs/sell/account/resources/return_policy/methods/createReturnPolicy
+  "categoryTypes": [
+    {
+      "default": true,
+      "name": "ALL_EXCLUDING_MOTORS_VEHICLES" // ALL_EXCLUDING_MOTORS_VEHICLES | MOTORS_VEHICLES
+    }
+  ],
+  "description": "nominal",
+//  "internationalOverride": {}, // @type InternationalReturnOverrideType?; https://developer.ebay.com/api-docs/sell/account/types/api:InternationalReturnOverrideType
+  "marketplaceId": "EBAY_US", // @type MarketplaceIdEnum
+  "name": "nominal",
+//  "refundMethod": "MONEY_BACK", // @type RefundMethodEnum?; MONEY_BACK | MERCHANDISE_CREDIT
+  "returnsAccepted": false // Required for "Top-Rated Seller"; If false, none of the other return/refund properties may be set;
+//  "returnMethod": "REPLACEMENT", // @type ReturnMethodEnum?; REPLACEMENT; https://developer.ebay.com/api-docs/sell/account/types/api:ReturnMethodEnum
+//  "returnPeriod": { // @type TimeDuration?; Required iff returnsAccepted == true;
+//    "unit": "DAYS",
+//    "value": 14
+//  },
+//  "returnShippingCostPayer": "SELLER" // @type ReturnShippingCostPayerEnum?; BUYER | SELLER;
+}
