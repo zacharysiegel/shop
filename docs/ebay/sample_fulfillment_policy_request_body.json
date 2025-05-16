@@ -1,0 +1,56 @@
+{ // https://developer.ebay.com/api-docs/sell/account/resources/fulfillment_policy/methods/createFulfillmentPolicy
+  "categoryTypes": [
+    {
+      "default": true,
+      "name": "ALL_EXCLUDING_MOTORS_VEHICLES"
+    }
+  ],
+  "description": "nominal items",
+  "freightShipping": false,
+  "handlingTime": {
+    "unit": "DAY",
+    "value": 7 // Subject to change
+  },
+  "localPickup": false,
+  "marketplaceId": "EBAY_US",
+  "name": "nominal",
+  "pickupDropOff": false,
+  "shippingOptions": [
+    {
+      "costType": "FLAT_RATE", // FLAT_RATE | CALCULATED
+      "optionType": "DOMESTIC", // DOMESTIC | INTERNATIONAL
+      // "packageHandlingCost": { // @type Amount?
+      //     "currency": "Duis laborum id dolor dolore",
+      //     "value": "exercitation dolor sed"
+      // },
+      // "rateTableId": "velit dolore e", // string? https://developer.ebay.com/api-docs/sell/account/resources/rate_table/methods/getRateTables
+      // "shippingDiscountProfileId": "commodo proident mollit", // string? Trading API: ShippingDiscountProfiles
+      // "shippingPromotionOffered": true, // boolean? Trading API: ShippingDiscountProfiles
+      "shippingServices": [
+        {
+          // "additionalShippingCost": { // @type Amount?
+          //     "currency": "ullamco nulla",
+          //     "value": "nostrud incididunt"
+          // },
+          "freeShipping": false, // If true, must be first in this array
+          "shippingCarrierCode": "FedEx", // USPS | FedEx | UPS | ...; Subject to change; https://developer.ebay.com/devzone/xml/docs/reference/ebay/GeteBayDetails.html
+          "shippingCost": {
+            "currency": "USD", // https://developer.ebay.com/api-docs/sell/account/types/ba:CurrencyCodeEnum
+            "value": "5" // Subject to change
+          },
+          "shippingServiceCode": "FedEx2Day", // Subject to change
+          // "shipToLocations": {}, // @type RegionSet?
+          "sortOrder": 1
+        }
+      ]
+    }
+  ],
+  "shipToLocations": {
+    "regionIncluded": [
+      {
+        "regionName": "US",
+        "regionType": "COUNTRY"
+      }
+    ]
+  }
+}

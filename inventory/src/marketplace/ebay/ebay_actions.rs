@@ -25,6 +25,8 @@ static EBAY_CLIENT_SECRET: LazyLock<String> = LazyLock::new(|| String::from_utf8
 const MARKETPLACE_INTERNAL_NAME: &str = "ebay";
 const INVENTORY_API_BASE_PATH: &str = "https://api.ebay.com/sell/inventory/v1";
 const EBAY_CLIENT_ID: &str = "ZacharyS-shop-SBX-9a6e149a0-59597965";
+const EBAY_MARKETPLACE_US: &str = "EBAY_US"; // https://developer.ebay.com/api-docs/sell/account/types/ba:MarketplaceIdEnum
+const EBAY_CATEGORY_STANDARD: &str = "ALL_EXCLUDING_MOTORS_VEHICLES"; // https://developer.ebay.com/api-docs/sell/account/types/api:CategoryTypeEnum
 
 /// Should be called only once.
 pub async fn init(pgpool: &PgPool) {
