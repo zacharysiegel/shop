@@ -5,12 +5,21 @@ use std::fmt::{Display, Formatter};
 #[derive(Debug)]
 pub struct ShopError {
     pub message: String,
+    pub sub_error: Option<Box<dyn Error>>,
 }
 
 impl ShopError {
     pub fn new(message: &str) -> ShopError {
         ShopError {
-            message: format!("Error: {}", message)
+            message: format!("Error: {}", message),
+            sub_error: None,
+        }
+    }
+
+    pub fn from_error(message: &str, error: Box<dyn Error>) -> ShopError {
+        ShopError {
+            message: format!("Error: {}", message),
+            sub_error: Some(error),
         }
     }
 }
@@ -31,6 +40,6 @@ impl Default for ShopError {
 
 impl From<sqlx::Error> for ShopError {
     fn from(error: sqlx::Error) -> Self {
-        Self::new(&format!("{:#}", error))
+        Self::from_error(&format!("{:#}", error), Box::new(error))
     }
 }

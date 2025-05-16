@@ -3,8 +3,9 @@ use crate::item::{item_db, Item, ItemEntity};
 use crate::listing::{ListingModel, ListingStatus};
 use crate::marketplace::marketplace_db;
 use crate::product::{product_db, ProductEntity};
-use crate::registry::REGISTRY;
+use crate::registry::{BASE64, REGISTRY};
 use crate::ShopEntity;
+use base64::Engine;
 use sqlx::PgPool;
 use std::sync::OnceLock;
 use uuid::Uuid;
@@ -24,18 +25,22 @@ pub async fn init(pgpool: &PgPool) {
     _ = MARKETPLACE_ID.set(entity.id);
 }
 
+/// Returns the base64-encoded basic authentication value.
+fn basic_auth() -> String {
+    let raw: String = format!("{}:{}", REGISTRY.ebay_client_id, REGISTRY.ebay_client_secret);
+    BASE64.encode(raw.as_bytes())
+}
+
 /// https://developer.ebay.com/api-docs/sell/inventory/resources/inventory_item/methods/createOrReplaceInventoryItem
 pub async fn publish(pgpool: &PgPool, listing: &ListingModel) -> Result<(), ShopError> {
     if listing.status != ListingStatus::Draft {
-        return Err(ShopError {
-            message: String::from("Invalid listing; Attempted to publish non-draft listing;")
-        });
+        return Err(ShopError::new("Invalid listing; Attempted to publish non-draft listing;"));
     } else if listing.marketplace_id.ne(MARKETPLACE_ID.get().unwrap()) {
-        return Err(ShopError {
-            message: format!("Invalid listing; Listing marketplace ID does not match \"{}\"; [{}]",
-                             MARKETPLACE_INTERNAL_NAME,
-                             MARKETPLACE_ID.get().unwrap()),
-        })
+        return Err(ShopError::new(&format!(
+            "Invalid listing; Listing marketplace ID does not match \"{}\"; [{}]",
+            MARKETPLACE_INTERNAL_NAME,
+            MARKETPLACE_ID.get().unwrap(),
+        )))
     }
 
     let item: Option<ItemEntity> = match item_db::get_item(pgpool, &listing.item_id).await {
