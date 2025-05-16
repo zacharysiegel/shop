@@ -61,3 +61,7 @@ Authorization: Bearer <user_access_token>
 
 > Once opted in, use the Account API v1 to set up policies for fulfillment (previously known as shipping), return, and payment. All three policies are required to publish offers and create active listings through the Inventory API.
 > [Source](https://developer.ebay.com/api-docs/sell/static/inventory/publishing-offers.html)
+
+#### In-store pickup
+
+If we want to offer "in-store pickup" through eBay, we must register [here](https://developer.ebay.com/api-docs/sell/static/inventory/in-store-pickup.html).
