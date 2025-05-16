@@ -1,5 +1,5 @@
 use super::*;
-use crate::item_audit::{item_audit_db, ItemAuditModel, ItemAuditSerial};
+use crate::item_audit::{item_audit_db, ItemAudit, ItemAuditSerial};
 use crate::item_image::ItemImageSerial;
 use crate::label::LabelSerial;
 use crate::object::JsonHttpResponse;
@@ -140,7 +140,7 @@ async fn get_all_item_item_audits(
 
     let item_audit_entity_vec =
         unwrap_result_else_500!(item_audit_db::get_all_item_item_audits(&pgpool, &item_id).await);
-    let mut item_audit_model_vec: Vec<ItemAuditModel> = Vec::new();
+    let mut item_audit_model_vec: Vec<ItemAudit> = Vec::new();
     for item_audit_entity in item_audit_entity_vec {
         item_audit_model_vec.push(unwrap_result_else_500!(item_audit_entity.try_to_model()));
     }

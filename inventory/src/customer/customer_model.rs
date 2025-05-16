@@ -30,12 +30,12 @@ pub struct CustomerEntity {
 }
 
 impl ShopEntity for CustomerEntity {
-    type Model = CustomerModel;
+    type Model = Customer;
 }
 
 /// On storing addresses: https://web.archive.org/web/20191008203135/http://www.endswithsaurus.com/2009/07/lesson-in-address-storage.html
 #[derive(Debug)]
-pub struct CustomerModel {
+pub struct Customer {
     pub id: Uuid,
     pub email_address: String,
     pub phone_number: Option<String>,
@@ -57,7 +57,7 @@ pub struct CustomerModel {
     pub updated: DateTime<Utc>,
 }
 
-impl ShopModel for CustomerModel {
+impl ShopModel for Customer {
     type Entity = CustomerEntity;
     type Serial = CustomerSerial;
 
@@ -203,7 +203,7 @@ pub struct CustomerSerial {
 }
 
 impl ShopSerial for CustomerSerial {
-    type Model = CustomerModel;
+    type Model = Customer;
 }
 
 impl JsonHttpResponse for CustomerSerial {}

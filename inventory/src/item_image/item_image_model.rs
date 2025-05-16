@@ -3,8 +3,9 @@ use crate::object::JsonHttpResponse;
 use crate::{object, ShopEntity, ShopModel, ShopSerial};
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
+
 #[derive(Debug, Clone)]
-pub struct ItemImage {
+pub struct ItemImageEntity {
     pub id: Uuid,
     pub item_id: Uuid,
     pub uri: String,
@@ -12,11 +13,14 @@ pub struct ItemImage {
     pub priority: i32,
 }
 
-impl ShopEntity for ItemImage {
+impl ShopEntity for ItemImageEntity {
     type Model = ItemImage;
 }
+
+pub type ItemImage = ItemImageEntity;
+
 impl ShopModel for ItemImage {
-    type Entity = ItemImage;
+    type Entity = ItemImageEntity;
     type Serial = ItemImageSerial;
 
     fn to_serial(&self) -> Self::Serial {
@@ -30,7 +34,7 @@ impl ShopModel for ItemImage {
     }
 
     fn try_from_serial(serial: &Self::Serial) -> Result<Self, ShopError> {
-        Ok(ItemImage {
+        Ok(ItemImageEntity {
             id: object::random_uuid(),
             item_id: serial.item_id.clone(),
             uri: serial.uri.clone(),

@@ -13,9 +13,12 @@ pub struct MarketplaceEntity {
 }
 
 impl ShopEntity for MarketplaceEntity {
-    type Model = MarketplaceEntity;
+    type Model = Marketplace;
 }
-impl ShopModel for MarketplaceEntity {
+
+pub type Marketplace = MarketplaceEntity;
+
+impl ShopModel for Marketplace {
     type Entity = MarketplaceEntity;
     type Serial = MarketplaceSerial;
 
@@ -56,7 +59,7 @@ pub struct MarketplaceSerial {
 }
 
 impl ShopSerial for MarketplaceSerial {
-    type Model = MarketplaceEntity;
+    type Model = Marketplace;
 }
 
 impl JsonHttpResponse for MarketplaceSerial {}

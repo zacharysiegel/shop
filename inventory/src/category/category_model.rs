@@ -13,9 +13,12 @@ pub struct CategoryEntity {
 }
 
 impl ShopEntity for CategoryEntity {
-    type Model = Self;
+    type Model = Category;
 }
-impl ShopModel for CategoryEntity {
+
+pub type Category = CategoryEntity;
+
+impl ShopModel for Category {
     type Entity = Self;
     type Serial = CategorySerial;
 
@@ -56,7 +59,7 @@ pub struct CategorySerial {
 }
 
 impl ShopSerial for CategorySerial {
-    type Model = CategoryEntity;
+    type Model = Category;
 }
 impl JsonHttpResponse for CategorySerial {}
 impl JsonHttpResponse for Vec<CategorySerial> {}

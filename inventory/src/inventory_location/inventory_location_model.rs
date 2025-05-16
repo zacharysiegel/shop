@@ -12,9 +12,12 @@ pub struct InventoryLocationEntity {
 }
 
 impl ShopEntity for InventoryLocationEntity {
-    type Model = InventoryLocationEntity;
+    type Model = InventoryLocation;
 }
-impl ShopModel for InventoryLocationEntity {
+
+pub type InventoryLocation = InventoryLocationEntity;
+
+impl ShopModel for InventoryLocation {
     type Entity = Self;
     type Serial = InventoryLocationSerial;
 
@@ -52,7 +55,7 @@ pub struct InventoryLocationSerial {
 }
 
 impl ShopSerial for InventoryLocationSerial {
-    type Model = InventoryLocationEntity;
+    type Model = InventoryLocation;
 }
 impl JsonHttpResponse for InventoryLocationSerial {}
 impl JsonHttpResponse for Vec<InventoryLocationSerial> {}

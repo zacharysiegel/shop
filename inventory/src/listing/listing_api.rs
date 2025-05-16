@@ -1,4 +1,4 @@
-use crate::listing::{listing_db, ListingEntity, ListingModel, ListingSerial};
+use crate::listing::{listing_db, ListingEntity, Listing, ListingSerial};
 use crate::object::JsonHttpResponse;
 use crate::{marketplace, unwrap_option_else_404, unwrap_result_else_400, unwrap_result_else_500, ShopEntity, ShopModel, ShopSerial};
 use actix_web::web::ServiceConfig;
@@ -47,7 +47,7 @@ async fn update_listing(
     listing: web::Json<ListingSerial>,
 ) -> impl Responder {
     let listing_id: Uuid = unwrap_result_else_400!(Uuid::try_parse(&listing_id.into_inner()));
-    let mut listing: ListingModel = unwrap_result_else_400!(listing.into_inner().try_to_model());
+    let mut listing: Listing = unwrap_result_else_400!(listing.into_inner().try_to_model());
     listing.id = listing_id; // Listing ID is overridden with a random UUID in `try_to_model`.
 
     let query_result: PgQueryResult =
@@ -63,7 +63,7 @@ async fn publish_listing(
 
     let listing_entity: Option<ListingEntity> = unwrap_result_else_500!(listing_db::get_listing(&pgpool, &listing_id).await);
     let listing_entity: ListingEntity = unwrap_option_else_404!(listing_entity);
-    let listing: ListingModel = unwrap_result_else_500!(listing_entity.try_to_model());
+    let listing: Listing = unwrap_result_else_500!(listing_entity.try_to_model());
 
     unwrap_result_else_500!(marketplace::ebay::ebay_action::publish(&pgpool, &listing).await);
     unwrap_result_else_500!(listing_db::publish_listing(&pgpool, &listing_id).await);

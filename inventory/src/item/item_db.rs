@@ -1,5 +1,5 @@
 use super::*;
-use crate::label::Label;
+use crate::label::LabelEntity;
 use crate::listing::ListingEntity;
 use sqlx::postgres::PgQueryResult;
 use sqlx::{query, query_as, Error, PgPool};
@@ -40,9 +40,9 @@ pub async fn create_item(pgpool: &PgPool, item: &ItemEntity) -> Result<PgQueryRe
         .await
 }
 
-pub async fn get_all_item_labels(pgpool: &PgPool, item_id: &Uuid) -> Result<Vec<Label>, Error> {
+pub async fn get_all_item_labels(pgpool: &PgPool, item_id: &Uuid) -> Result<Vec<LabelEntity>, Error> {
     query_as!(
-		Label,
+		LabelEntity,
 		"
         select id, display_name, internal_name
 		from shop.public.label

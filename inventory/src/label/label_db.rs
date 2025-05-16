@@ -3,9 +3,9 @@ use sqlx::postgres::PgQueryResult;
 use sqlx::{query, query_as, PgPool};
 use uuid::Uuid;
 
-pub async fn get_label(pgpool: &PgPool, label_id: Uuid) -> Result<Option<Label>, sqlx::Error> {
+pub async fn get_label(pgpool: &PgPool, label_id: Uuid) -> Result<Option<LabelEntity>, sqlx::Error> {
     query_as!(
-		Label,
+		LabelEntity,
 		"\
         select id, display_name, internal_name \
         from shop.public.label \
@@ -17,7 +17,7 @@ pub async fn get_label(pgpool: &PgPool, label_id: Uuid) -> Result<Option<Label>,
         .await
 }
 
-pub async fn create_label(pgpool: &PgPool, label: &Label) -> Result<PgQueryResult, sqlx::Error> {
+pub async fn create_label(pgpool: &PgPool, label: &LabelEntity) -> Result<PgQueryResult, sqlx::Error> {
     query!(
 		"\
         insert into shop.public.label (id, display_name, internal_name) \
@@ -31,9 +31,9 @@ pub async fn create_label(pgpool: &PgPool, label: &Label) -> Result<PgQueryResul
         .await
 }
 
-pub async fn get_all_labels(pgpool: &PgPool) -> Result<Vec<Label>, sqlx::Error> {
+pub async fn get_all_labels(pgpool: &PgPool) -> Result<Vec<LabelEntity>, sqlx::Error> {
     query_as!(
-		Label,
+		LabelEntity,
 		"\
         select id, display_name, internal_name \
         from shop.public.label \

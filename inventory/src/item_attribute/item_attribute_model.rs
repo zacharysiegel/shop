@@ -5,7 +5,7 @@ use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
 #[derive(Debug, Clone)]
-pub struct ItemAttribute {
+pub struct ItemAttributeEntity {
     pub item_id: Uuid,
     pub key: String,
     pub value: String,
@@ -14,11 +14,14 @@ pub struct ItemAttribute {
     // constraint pk_item_attribute primary key (item_id, key)
 }
 
-impl ShopEntity for ItemAttribute {
+impl ShopEntity for ItemAttributeEntity {
     type Model = ItemAttribute;
 }
+
+pub type ItemAttribute = ItemAttributeEntity;
+
 impl ShopModel for ItemAttribute {
-    type Entity = ItemAttribute;
+    type Entity = ItemAttributeEntity;
     type Serial = ItemAttributeSerial;
 
     fn to_serial(&self) -> Self::Serial {
@@ -32,7 +35,7 @@ impl ShopModel for ItemAttribute {
     }
 
     fn try_from_serial(serial: &Self::Serial) -> Result<Self, ShopError> {
-        Ok(ItemAttribute {
+        Ok(ItemAttributeEntity {
             item_id: serial.item_id.clone(),
             key: serial.key.clone(),
             value: serial.value.clone(),

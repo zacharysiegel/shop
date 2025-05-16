@@ -19,10 +19,10 @@ pub struct ProductEntity {
 }
 
 impl ShopEntity for ProductEntity {
-    type Model = Self;
+    type Model = Product;
 }
 
-pub type Product = ProductEntity; // todo: Refactor other dual entity/model types to use this pattern
+pub type Product = ProductEntity;
 
 impl ShopModel for Product {
     type Entity = Self;
@@ -70,7 +70,7 @@ pub struct ProductSerial {
 }
 
 impl ShopSerial for ProductSerial {
-    type Model = ProductEntity;
+    type Model = Product;
 }
 impl JsonHttpResponse for ProductSerial {}
 impl JsonHttpResponse for Vec<ProductSerial> {}

@@ -6,9 +6,9 @@ use uuid::Uuid;
 pub async fn get_item_image(
     pgpool: &PgPool,
     item_image_id: Uuid,
-) -> Result<Option<ItemImage>, sqlx::Error> {
+) -> Result<Option<ItemImageEntity>, sqlx::Error> {
     query_as!(
-		ItemImage,
+		ItemImageEntity,
 		"\
         select id, item_id, uri, alt_text, priority \
         from shop.public.item_image \
@@ -22,7 +22,7 @@ pub async fn get_item_image(
 
 pub async fn create_item_image(
     pgpool: &PgPool,
-    item_image: ItemImage,
+    item_image: ItemImageEntity,
 ) -> Result<PgQueryResult, sqlx::Error> {
     query!(
 		"\
@@ -42,9 +42,9 @@ pub async fn create_item_image(
 pub async fn get_all_item_images(
     pgpool: &PgPool,
     item_id: Uuid,
-) -> Result<Vec<ItemImage>, sqlx::Error> {
+) -> Result<Vec<ItemImageEntity>, sqlx::Error> {
     query_as!(
-		ItemImage,
+		ItemImageEntity,
 		"\
         select id, item_id, uri, alt_text, priority \
         from shop.public.item_image \

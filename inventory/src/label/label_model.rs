@@ -3,18 +3,22 @@ use crate::object::JsonHttpResponse;
 use crate::{object, ShopEntity, ShopModel, ShopSerial};
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
+
 #[derive(Debug, Clone)]
-pub struct Label {
+pub struct LabelEntity {
     pub id: Uuid,
     pub display_name: String,
     pub internal_name: String,
 }
 
-impl ShopEntity for Label {
+impl ShopEntity for LabelEntity {
     type Model = Label;
 }
+
+pub type Label = LabelEntity;
+
 impl ShopModel for Label {
-    type Entity = Label;
+    type Entity = LabelEntity;
     type Serial = LabelSerial;
 
     fn to_serial(&self) -> Self::Serial {
@@ -26,7 +30,7 @@ impl ShopModel for Label {
     }
 
     fn try_from_serial(serial: &Self::Serial) -> Result<Self, ShopError> {
-        Ok(Label {
+        Ok(LabelEntity {
             id: object::random_uuid(),
             display_name: serial.display_name.clone(),
             internal_name: serial.internal_name.clone(),

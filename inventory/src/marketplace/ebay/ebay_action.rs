@@ -2,7 +2,7 @@ use crate::decrypt::master_decrypt;
 use crate::environment::RuntimeEnvironment;
 use crate::error::ShopError;
 use crate::item::Item;
-use crate::listing::{listing_action, ListingModel, ListingStatus};
+use crate::listing::{listing_action, Listing, ListingStatus};
 use crate::marketplace::marketplace_db;
 use crate::product::Product;
 use crate::registry::{BASE64, REGISTRY};
@@ -42,12 +42,12 @@ fn basic_auth() -> String {
     BASE64.encode(raw.as_bytes())
 }
 
-pub async fn post(pgpool: &PgPool, listing: &ListingModel) -> Result<(), ShopError> {
+pub async fn post(pgpool: &PgPool, listing: &Listing) -> Result<(), ShopError> {
     Err(ShopError::new("todo")) // todo
 }
 
 /// https://developer.ebay.com/api-docs/sell/inventory/resources/inventory_item/methods/createOrReplaceInventoryItem
-pub async fn publish(pgpool: &PgPool, listing: &ListingModel) -> Result<(), ShopError> {
+pub async fn publish(pgpool: &PgPool, listing: &Listing) -> Result<(), ShopError> {
     if listing.status != ListingStatus::Draft {
         return Err(ShopError::new("Invalid listing; Attempted to publish non-draft listing;"));
     } else if listing.marketplace_id.ne(MARKETPLACE_ID.get().unwrap()) {

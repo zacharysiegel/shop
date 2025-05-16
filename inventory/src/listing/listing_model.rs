@@ -19,11 +19,11 @@ pub struct ListingEntity {
 }
 
 impl ShopEntity for ListingEntity {
-    type Model = ListingModel;
+    type Model = Listing;
 }
 
 #[derive(Debug)]
-pub struct ListingModel {
+pub struct Listing {
     pub id: Uuid,
     pub item_id: Uuid,
     pub marketplace_id: Uuid,
@@ -33,7 +33,7 @@ pub struct ListingModel {
     pub updated: DateTime<Utc>,
 }
 
-impl ShopModel for ListingModel {
+impl ShopModel for Listing {
     type Entity = ListingEntity;
     type Serial = ListingSerial;
 
@@ -50,7 +50,7 @@ impl ShopModel for ListingModel {
     }
 
     fn try_from_serial(serial: &Self::Serial) -> Result<Self, ShopError> {
-        Ok(ListingModel {
+        Ok(Listing {
             id: object::random_uuid(),
             item_id: serial.item_id.clone(),
             marketplace_id: serial.marketplace_id.clone(),
@@ -74,7 +74,7 @@ impl ShopModel for ListingModel {
     }
 
     fn try_from_entity(entity: &Self::Entity) -> Result<Self, ShopError> {
-        Ok(ListingModel {
+        Ok(Listing {
             id: entity.id.clone(),
             item_id: entity.item_id.clone(),
             marketplace_id: entity.marketplace_id.clone(),
@@ -124,7 +124,7 @@ pub struct ListingSerial {
 }
 
 impl ShopSerial for ListingSerial {
-    type Model = ListingModel;
+    type Model = Listing;
 }
 
 impl JsonHttpResponse for ListingSerial {}

@@ -1,13 +1,13 @@
 use crate::error::ShopError;
 use crate::item::{item_db, Item, ItemEntity};
-use crate::listing::ListingModel;
+use crate::listing::Listing;
 use crate::product::{product_db, Product, ProductEntity};
 use crate::ShopEntity;
 use sqlx::PgPool;
 
 pub async fn get_item_and_product_for_listing(
     pgpool: &PgPool,
-    listing: &ListingModel,
+    listing: &Listing,
 ) -> Result<(Item, Product), ShopError> {
     let item: Option<ItemEntity> = match item_db::get_item(pgpool, &listing.item_id).await {
         Ok(entity) => entity,

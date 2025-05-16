@@ -18,11 +18,11 @@ pub struct ItemAuditEntity {
 }
 
 impl ShopEntity for ItemAuditEntity {
-    type Model = ItemAuditModel;
+    type Model = ItemAudit;
 }
 
 #[derive(Debug)]
-pub struct ItemAuditModel {
+pub struct ItemAudit {
     pub id: Uuid,
     pub item_id: Uuid,
     pub status_before: ItemStatus,
@@ -32,7 +32,7 @@ pub struct ItemAuditModel {
     pub created: DateTime<Utc>,
 }
 
-impl ShopModel for ItemAuditModel {
+impl ShopModel for ItemAudit {
     type Entity = ItemAuditEntity;
     type Serial = ItemAuditSerial;
 
@@ -49,7 +49,7 @@ impl ShopModel for ItemAuditModel {
     }
 
     fn try_from_serial(serial: &Self::Serial) -> Result<Self, ShopError> {
-        Ok(ItemAuditModel {
+        Ok(ItemAudit {
             id: object::random_uuid(),
             item_id: serial.item_id.clone(),
             status_before: ItemStatus::try_from_repr(serial.status_before)?,
@@ -73,7 +73,7 @@ impl ShopModel for ItemAuditModel {
     }
 
     fn try_from_entity(entity: &Self::Entity) -> Result<Self, ShopError> {
-        Ok(ItemAuditModel {
+        Ok(ItemAudit {
             id: entity.id.clone(),
             item_id: entity.item_id.clone(),
             status_before: ItemStatus::try_from_repr(entity.status_before as u8)?,
@@ -98,7 +98,7 @@ pub struct ItemAuditSerial {
 }
 
 impl ShopSerial for ItemAuditSerial {
-    type Model = ItemAuditModel;
+    type Model = ItemAudit;
 }
 
 impl JsonHttpResponse for ItemAuditSerial {}

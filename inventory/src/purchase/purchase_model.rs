@@ -38,11 +38,11 @@ pub struct PurchaseEntity {
 }
 
 impl ShopEntity for PurchaseEntity {
-    type Model = PurchaseModel;
+    type Model = Purchase;
 }
 
 #[derive(Debug)]
-pub struct PurchaseModel {
+pub struct Purchase {
     pub id: Uuid,
     pub marketplace_id: Uuid,
     pub external_id: Option<String>,
@@ -72,7 +72,7 @@ pub struct PurchaseModel {
     pub updated: DateTime<Utc>,
 }
 
-impl ShopModel for PurchaseModel {
+impl ShopModel for Purchase {
     type Entity = PurchaseEntity;
     type Serial = PurchaseSerial;
 
@@ -109,7 +109,7 @@ impl ShopModel for PurchaseModel {
     }
 
     fn try_from_serial(serial: &Self::Serial) -> Result<Self, ShopError> {
-        Ok(PurchaseModel {
+        Ok(Purchase {
             id: object::random_uuid(),
             marketplace_id: serial.marketplace_id.clone(),
             external_id: serial.external_id.clone(),
@@ -177,7 +177,7 @@ impl ShopModel for PurchaseModel {
     }
 
     fn try_from_entity(entity: &Self::Entity) -> Result<Self, ShopError> {
-        Ok(PurchaseModel {
+        Ok(Purchase {
             id: entity.id.clone(),
             marketplace_id: entity.marketplace_id.clone(),
             external_id: entity.external_id.clone(),
@@ -275,7 +275,7 @@ pub struct PurchaseSerial {
 }
 
 impl ShopSerial for PurchaseSerial {
-    type Model = PurchaseModel;
+    type Model = Purchase;
 }
 
 impl JsonHttpResponse for PurchaseSerial {}

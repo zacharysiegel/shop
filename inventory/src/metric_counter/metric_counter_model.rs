@@ -5,18 +5,21 @@ use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
 #[derive(Debug, Clone)]
-pub struct MetricCounter {
+pub struct MetricCounterEntity {
     pub id: Uuid,
     pub internal_name: String,
     pub object_id: Option<String>,
     pub value: i64,
 }
 
-impl ShopEntity for MetricCounter {
+impl ShopEntity for MetricCounterEntity {
     type Model = MetricCounter;
 }
+
+pub type MetricCounter = MetricCounterEntity;
+
 impl ShopModel for MetricCounter {
-    type Entity = MetricCounter;
+    type Entity = MetricCounterEntity;
     type Serial = MetricCounterSerial;
 
     fn to_serial(&self) -> Self::Serial {
@@ -29,7 +32,7 @@ impl ShopModel for MetricCounter {
     }
 
     fn try_from_serial(serial: &Self::Serial) -> Result<Self, ShopError> {
-        Ok(MetricCounter {
+        Ok(MetricCounterEntity {
             id: object::random_uuid(),
             internal_name: serial.internal_name.clone(),
             object_id: serial.object_id.clone(),

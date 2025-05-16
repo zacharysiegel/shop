@@ -6,9 +6,9 @@ use uuid::Uuid;
 pub async fn get_metric_counter(
     pgpool: &PgPool,
     id: &Uuid,
-) -> Result<Option<MetricCounter>, Error> {
+) -> Result<Option<MetricCounterEntity>, Error> {
     query_as!(
-		MetricCounter,
+		MetricCounterEntity,
 		"\
         select id, internal_name, object_id, value \
         from shop.public.metric_counter \
@@ -22,7 +22,7 @@ pub async fn get_metric_counter(
 
 pub async fn create_metric_counter(
     pgpool: &PgPool,
-    metric_counter: &MetricCounter,
+    metric_counter: &MetricCounterEntity,
 ) -> Result<PgQueryResult, Error> {
     query!(
 		"\
