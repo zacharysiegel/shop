@@ -57,3 +57,7 @@ GET https://api.sandbox.ebay.com/sell/account/v1/program/get_opted_in_programs
 Authorization: Bearer <user_access_token>
 ```
 
+#### Business policies
+
+> Once opted in, use the Account API v1 to set up policies for fulfillment (previously known as shipping), return, and payment. All three policies are required to publish offers and create active listings through the Inventory API.
+> [Source](https://developer.ebay.com/api-docs/sell/static/inventory/publishing-offers.html)

@@ -1,20 +1,30 @@
+use std::ops::Deref;
+use crate::environment::RuntimeEnvironment;
 use crate::error::ShopError;
 use crate::item::{item_db, Item, ItemEntity};
 use crate::listing::{ListingModel, ListingStatus};
 use crate::marketplace::marketplace_db;
 use crate::product::{product_db, ProductEntity};
-use crate::registry::{BASE64, REGISTRY};
+use crate::registry::{master_decrypt, BASE64, REGISTRY};
 use crate::ShopEntity;
 use base64::Engine;
 use sqlx::PgPool;
-use std::sync::OnceLock;
+use std::sync::{LazyLock, OnceLock};
 use uuid::Uuid;
 
 static MARKETPLACE_ID: OnceLock<Uuid> = OnceLock::new();
+static EBAY_BASE_URL: LazyLock<&str> = LazyLock::new(|| match RuntimeEnvironment::default() {
+    RuntimeEnvironment::Local | RuntimeEnvironment::Stage => "https://api.sandbox.ebay.com/",
+    RuntimeEnvironment::Production => "https://api.ebay.com/"
+});
+// This value pertains to my testing "zach" account. Presumably this will change to an official eBay account.
+// This value pertains to my testing "zach" account. Presumably this will change to an official eBay account.
+/// Presented as a UTF-8-encoded string because this secret must be re-encoded with the client ID in base64 to form the basic authentication credential
+static EBAY_CLIENT_SECRET: LazyLock<String> = LazyLock::new(|| String::from_utf8(master_decrypt("ebay__zach.sandbox.cert_id").unwrap()).unwrap());
 
 const MARKETPLACE_INTERNAL_NAME: &str = "ebay";
 const INVENTORY_API_BASE_PATH: &str = "https://api.ebay.com/sell/inventory/v1";
-
+const EBAY_CLIENT_ID: &str = "ZacharyS-shop-SBX-9a6e149a0-59597965";
 
 /// Should be called only once.
 pub async fn init(pgpool: &PgPool) {
@@ -27,8 +37,12 @@ pub async fn init(pgpool: &PgPool) {
 
 /// Returns the base64-encoded basic authentication value.
 fn basic_auth() -> String {
-    let raw: String = format!("{}:{}", REGISTRY.ebay_client_id, REGISTRY.ebay_client_secret);
+    let raw: String = format!("{}:{}", EBAY_CLIENT_ID, *EBAY_CLIENT_SECRET);
     BASE64.encode(raw.as_bytes())
+}
+
+pub async fn post(pgpool: &PgPool, listing: &ListingModel) -> Result<(), ShopError> {
+    Err(ShopError::new("todo")) // todo
 }
 
 /// https://developer.ebay.com/api-docs/sell/inventory/resources/inventory_item/methods/createOrReplaceInventoryItem
