@@ -1,14 +1,14 @@
-use std::ops::Deref;
 use crate::environment::RuntimeEnvironment;
 use crate::error::ShopError;
 use crate::item::{item_db, Item, ItemEntity};
-use crate::listing::{ListingModel, ListingStatus};
+use crate::listing::{listing_action, ListingModel, ListingStatus};
 use crate::marketplace::marketplace_db;
-use crate::product::{product_db, ProductEntity};
+use crate::product::{product_db, Product, ProductEntity};
 use crate::registry::{master_decrypt, BASE64, REGISTRY};
 use crate::ShopEntity;
 use base64::Engine;
 use sqlx::PgPool;
+use std::ops::Deref;
 use std::sync::{LazyLock, OnceLock};
 use uuid::Uuid;
 
@@ -59,22 +59,7 @@ pub async fn publish(pgpool: &PgPool, listing: &ListingModel) -> Result<(), Shop
         )))
     }
 
-    let item: Option<ItemEntity> = match item_db::get_item(pgpool, &listing.item_id).await {
-        Ok(entity) => entity,
-        Err(error) => return Err(ShopError::from(error)),
-    };
-    let Some(item): Option<ItemEntity> = item else {
-        return Err(ShopError::new(&format!("Item not found for listing; [{}]", listing.id)));
-    };
-    let item: Item = item.try_to_model()?;
-
-    let product: Option<ProductEntity> = match product_db::get_product(pgpool, &item.product_id).await {
-        Ok(entity) => entity,
-        Err(error) => return Err(ShopError::from(error)),
-    };
-    let Some(product): Option<ProductEntity> = product else {
-        return Err(ShopError::new(&format!("Product not found for item; [{}]", item.id)));
-    };
+    let (item, product): (Item, Product) = listing_action::get_item_and_product_for_listing(pgpool, listing).await?;
 
     log::info!("Publishing listing to {}; [listing_id: {}]; [marketplace_id: {}]", MARKETPLACE_INTERNAL_NAME, listing.id, MARKETPLACE_ID.get().unwrap());
 

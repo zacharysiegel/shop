@@ -1,1 +1,1 @@
-pub mod ebay_actions;
+pub mod ebay_action;

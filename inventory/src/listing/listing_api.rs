@@ -65,7 +65,7 @@ async fn publish_listing(
     let listing_entity: ListingEntity = unwrap_option_else_404!(listing_entity);
     let listing: ListingModel = unwrap_result_else_500!(listing_entity.try_to_model());
 
-    unwrap_result_else_500!(marketplace::ebay::publish(&pgpool, &listing).await);
+    unwrap_result_else_500!(marketplace::ebay::ebay_action::publish(&pgpool, &listing).await);
     unwrap_result_else_500!(listing_db::publish_listing(&pgpool, &listing_id).await);
 
     HttpResponse::Ok().finish()

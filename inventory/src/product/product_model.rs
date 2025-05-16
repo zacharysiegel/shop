@@ -21,7 +21,10 @@ pub struct ProductEntity {
 impl ShopEntity for ProductEntity {
     type Model = Self;
 }
-impl ShopModel for ProductEntity {
+
+pub type Product = ProductEntity; // todo: Refactor other dual entity/model types to use this pattern
+
+impl ShopModel for Product {
     type Entity = Self;
     type Serial = ProductSerial;
 

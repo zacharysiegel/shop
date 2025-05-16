@@ -16,7 +16,7 @@ async fn main() -> Result<(), std::io::Error> {
 
     let pgpool: Pool<Postgres> = inventory::db::sqlx_connect().await?;
 
-    marketplace::ebay::init(&pgpool).await;
+    marketplace::ebay::ebay_action::init(&pgpool).await;
 
     server::open_server(pgpool).await
 }
