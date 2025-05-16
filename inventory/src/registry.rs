@@ -12,3 +12,5 @@ pub static REGISTRY: LazyLock<Registry> = LazyLock::new(|| {
         http_client: Client::builder().build().unwrap(),
     }
 });
+
+// todo: rename module "http". add global client.execute function.
