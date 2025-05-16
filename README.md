@@ -1,6 +1,6 @@
 # Shop
 
-## Setup instructions for MacOS
+## Setup instructions for macOS
 
 ### Podman setup
 
