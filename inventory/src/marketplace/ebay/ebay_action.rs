@@ -1,14 +1,13 @@
+use crate::decrypt::master_decrypt;
 use crate::environment::RuntimeEnvironment;
 use crate::error::ShopError;
-use crate::item::{item_db, Item, ItemEntity};
+use crate::item::Item;
 use crate::listing::{listing_action, ListingModel, ListingStatus};
 use crate::marketplace::marketplace_db;
-use crate::product::{product_db, Product, ProductEntity};
-use crate::registry::{master_decrypt, BASE64, REGISTRY};
-use crate::ShopEntity;
+use crate::product::Product;
+use crate::registry::{BASE64, REGISTRY};
 use base64::Engine;
 use sqlx::PgPool;
-use std::ops::Deref;
 use std::sync::{LazyLock, OnceLock};
 use uuid::Uuid;
 
