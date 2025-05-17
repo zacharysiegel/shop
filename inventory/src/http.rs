@@ -6,8 +6,6 @@ pub const BASE64: base64::engine::GeneralPurpose = crypt::BASE64;
 
 pub static HTTP_CLIENT: LazyLock<Client> = LazyLock::new(|| Client::builder().build().unwrap());
 
-// todo: add global client.execute function.
-
 /// Standard wrapper for the reqwest::Client::execute method.
 /// Converts I/O errors to standard ShopError structs.
 /// Converts error responses (4xx/5xx) to ShopError structs.
