@@ -6,10 +6,15 @@ pub fn configurer(config: &mut ServiceConfig) {
     config.service(
         web::scope("/ebay")
             .route("/auth/application_token", web::get().to(get_application_token))
+            .route("/auth/user_token", web::get().to(get_user_token))
     );
 }
 
 async fn get_application_token() -> impl Responder {
     let token: String = unwrap_result_else_500!(super::ebay_client::get_application_token().await);
     HttpResponse::Ok().body(token)
+}
+
+async fn get_user_token() -> impl Responder {
+    HttpResponse::Gone().finish() // todo
 }
