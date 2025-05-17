@@ -8,13 +8,14 @@ use sqlx::PgPool;
 use uuid::Uuid;
 
 pub fn configurer(config: &mut ServiceConfig) {
-    config.service(
-        web::scope("/marketplace")
+    config
+        .service(web::scope("/marketplace")
             .route("", web::get().to(get_all_marketplaces))
             .route("", web::post().to(create_marketplace))
             .route("/{id}", web::get().to(get_marketplace))
-            .configure(ebay::ebay_api::configurer)
-    );
+        )
+        .configure(ebay::ebay_api::configurer)
+    ;
 }
 
 async fn get_all_marketplaces(pgpool: web::Data<PgPool>) -> impl Responder {
