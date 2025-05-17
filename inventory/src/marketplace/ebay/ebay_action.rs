@@ -6,6 +6,7 @@ use crate::product::Product;
 use sqlx::PgPool;
 use std::sync::OnceLock;
 use uuid::Uuid;
+use crate::marketplace::ebay::ebay_header::XEbayAuthorization;
 
 static MARKETPLACE_ID: OnceLock<Uuid> = OnceLock::new();
 
@@ -21,7 +22,7 @@ pub async fn init(pgpool: &PgPool) {
     _ = MARKETPLACE_ID.set(entity.id);
 }
 
-pub async fn post(pgpool: &PgPool, listing: &Listing) -> Result<(), ShopError> {
+pub async fn post(ebay_auth: XEbayAuthorization, pgpool: &PgPool, listing: &Listing) -> Result<(), ShopError> {
     validate_listing(listing)?;
 
     let (item, product): (Item, Product) = listing_action::get_item_and_product_for_listing(pgpool, listing).await?;

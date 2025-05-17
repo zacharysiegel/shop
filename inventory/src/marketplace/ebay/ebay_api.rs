@@ -1,6 +1,8 @@
+use super::client;
 use crate::environment::RuntimeEnvironment;
 use crate::listing::{listing_db, Listing, ListingEntity};
 use crate::marketplace::ebay::client::{AuthorizationCodeResponse, ClientCredentialsResponse};
+use crate::marketplace::ebay::{ebay_action, ebay_header};
 use crate::{unwrap_option_else_404, unwrap_result_else_400, unwrap_result_else_500, ShopEntity};
 use actix_web::web::ServiceConfig;
 use actix_web::{web, HttpResponse, Responder};
@@ -26,7 +28,7 @@ pub fn configurer(config: &mut ServiceConfig) {
 
 async fn get_application_token() -> impl Responder {
     let token_response: ClientCredentialsResponse = unwrap_result_else_500!(
-        super::client::get_application_token().await
+        client::get_application_token().await
     );
     HttpResponse::Ok().json(token_response)
 }
@@ -36,7 +38,7 @@ async fn get_user_token(
 ) -> impl Responder {
     let authorization_code: &String = unwrap_result_else_400!(query.get("code").ok_or("Missing authorization code"));
     let user_token_response: AuthorizationCodeResponse = unwrap_result_else_500!(
-        super::client::get_user_token(authorization_code).await
+        client::get_user_token(authorization_code).await
     );
     HttpResponse::Ok().json(user_token_response)
 }
@@ -50,6 +52,8 @@ async fn get_oauth_redirect() -> impl Responder {
 async fn put_listing(
     pgpool: web::Data<PgPool>,
     listing_id: web::Path<String>,
+    ebay_auth: web::Header<ebay_header::XEbayAuthorization>,
+    request: actix_web::HttpRequest,
 ) -> impl Responder {
     let listing_id: Uuid = unwrap_result_else_400!(Uuid::try_parse(&listing_id));
     let listing: Option<ListingEntity> = unwrap_result_else_500!(
@@ -58,6 +62,9 @@ async fn put_listing(
     let listing: ListingEntity = unwrap_option_else_404!(listing);
     let listing: Listing = unwrap_result_else_500!(listing.try_to_model());
 
-    let x = super::ebay_action::post(&pgpool, &listing).await;
+    Ok(actix_web::cookie::CookieJar)
+    request.headers()
+        .get("Cookie")
+    let x = ebay_action::post(&ebay_auth, &pgpool, &listing).await;
     HttpResponse::Gone().body("todo")
 }
