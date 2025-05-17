@@ -18,7 +18,6 @@ static EBAY_OAUTH_AUTHORIZATION_URL: LazyLock<&str> = LazyLock::new(|| match Run
     RuntimeEnvironment::Production => "todo", // todo: update this and the testing url when we have an official eBay account.
 });
 
-const EBAY_APPLICATION_ACCESS_TOKEN_COOKIE_NAME: &str = "ebay_application_access_token";
 const EBAY_USER_ACCESS_TOKEN_COOKIE_NAME: &str = "ebay_user_access_token";
 const EBAY_USER_REFRESH_TOKEN_COOKIE_NAME: &str = "ebay_user_refresh_token";
 
@@ -37,9 +36,11 @@ async fn get_application_token() -> impl Responder {
     let token_response: ClientCredentialsResponse = unwrap_result_else_500!(
         client::get_application_token().await
     );
-    HttpResponse::Ok()
-        .append_header(http::header_set_cookie_secure(EBAY_APPLICATION_ACCESS_TOKEN_COOKIE_NAME, &token_response.access_token, token_response.expires_in))
-        .json(token_response)
+
+    /* Don't set a cookie here. The client does not need it.
+        If both application and user tokens are present, their sum is >4kB which triggers 431 from Actix.
+        It seems Actix does not allow configuration of this 4kB maximum. */
+    HttpResponse::Ok().json(token_response)
 }
 
 async fn get_user_token(

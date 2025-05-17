@@ -38,7 +38,7 @@ pub fn header_set_cookie_secure(name: &str, token: &str, lifetime: u64) -> (&'st
     (
         "Set-Cookie",
         format!(
-            "{}={}; Domain={}; HttpOnly; Max-Age={}; Path=/api/ebay; Secure; Partitioned;",
+            "{}={}; Domain={}; HttpOnly; Max-Age={}; Path=/api/ebay; Secure; SameSite=Strict; Partitioned;",
             name,
             token,
             DOMAIN.deref(),
