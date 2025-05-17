@@ -11,9 +11,10 @@ const OAUTH_API_BASE_PATH: &str = "/identity/v1/oauth2";
 
 #[derive(Serialize, Deserialize)]
 pub struct ClientCredentialsResponse {
-    access_token: String,
-    expires_in: u64,
-    token_type: String,
+    pub access_token: String,
+    /// Seconds
+    pub expires_in: u64,
+    pub token_type: String,
 }
 
 pub async fn get_application_token() -> Result<ClientCredentialsResponse, ShopError> {
@@ -34,11 +35,13 @@ pub async fn get_application_token() -> Result<ClientCredentialsResponse, ShopEr
 
 #[derive(Serialize, Deserialize)]
 pub struct AuthorizationCodeResponse {
-    access_token: String,
-    expires_in: u64,
-    refresh_token: String,
-    refresh_token_expires_in: u64,
-    token_type: String,
+    pub access_token: String,
+    /// Seconds
+    pub expires_in: u64,
+    pub refresh_token: String,
+    /// Seconds
+    pub refresh_token_expires_in: u64,
+    pub token_type: String,
 }
 
 pub async fn get_user_token(authorization_code: &str) -> Result<AuthorizationCodeResponse, ShopError> {

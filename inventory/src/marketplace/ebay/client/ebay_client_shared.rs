@@ -12,7 +12,10 @@ pub static EBAY_BASE_URL: LazyLock<&str> = LazyLock::new(|| match RuntimeEnviron
 // This value pertains to my testing "zach" account. Presumably this will change to an official eBay account.
 // This value pertains to my testing "zach" account. Presumably this will change to an official eBay account.
 /// Presented as a UTF-8-encoded string because this secret must be re-encoded with the client ID in base64 to form the basic authentication credential
-pub static EBAY_CLIENT_SECRET: LazyLock<String> = LazyLock::new(|| String::from_utf8(master_decrypt("ebay__zach.sandbox.cert_id").unwrap()).unwrap());
+pub static EBAY_CLIENT_SECRET: LazyLock<String> = LazyLock::new(||
+    String::from_utf8(master_decrypt("ebay__zach.sandbox.cert_id").unwrap())
+        .unwrap()
+);
 
 pub const EBAY_CLIENT_ID: &str = "ZacharyS-shop-SBX-9a6e149a0-59597965";
 

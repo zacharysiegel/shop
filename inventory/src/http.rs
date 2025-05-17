@@ -1,10 +1,19 @@
+use crate::environment::RuntimeEnvironment;
 use crate::error::ShopError;
 use reqwest::{Client, Request, Response, StatusCode};
+use std::ops::Deref;
 use std::sync::LazyLock;
 
 pub const BASE64: base64::engine::GeneralPurpose = crypt::BASE64;
 
 pub static HTTP_CLIENT: LazyLock<Client> = LazyLock::new(|| Client::builder().build().unwrap());
+pub static DOMAIN: LazyLock<&'static str> = LazyLock::new(||
+    match RuntimeEnvironment::default() {
+        RuntimeEnvironment::Local => "127.0.0.1",
+        RuntimeEnvironment::Stage => "todo",
+        RuntimeEnvironment::Production => "todo",
+    }
+);
 
 /// Standard wrapper for the reqwest::Client::execute method.
 /// Converts I/O errors to standard ShopError structs.
@@ -23,4 +32,17 @@ pub async fn execute_checked(request: Request) -> Result<Response, ShopError> {
     }
 
     Ok(response)
+}
+
+pub fn header_set_cookie_secure(name: &str, token: &str, lifetime: u64) -> (&'static str, String) {
+    (
+        "Set-Cookie",
+        format!(
+            "{}={}; Domain={}; HttpOnly; Max-Age={}; Path=/api/ebay; Secure; Partitioned;",
+            name,
+            token,
+            DOMAIN.deref(),
+            lifetime,
+        )
+    )
 }
