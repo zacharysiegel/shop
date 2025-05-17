@@ -67,7 +67,6 @@ async fn refresh_user_token(
             .insert_header(("Location", EBAY_OAUTH_AUTHORIZATION_URL.to_string()))
             .body("Invalid eBay refresh token"),
     };
-    log::info!("{:?}", refresh_token);
 
     let refresh_token_response: RefreshTokenResponse = match client::refresh_user_token(refresh_token.value()).await {
         Ok(value) => value,
@@ -96,7 +95,6 @@ async fn put_listing(
             .insert_header(("Location", EBAY_OAUTH_AUTHORIZATION_URL.to_string()))
             .body("Invalid eBay access token"),
     };
-    log::info!("{:?}", user_token);
 
     let listing_id: Uuid = unwrap_result_else_400!(Uuid::try_parse(&listing_id));
     let listing: Option<ListingEntity> = unwrap_result_else_500!(
