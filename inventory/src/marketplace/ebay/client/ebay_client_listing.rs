@@ -5,7 +5,7 @@ use crate::product::Product;
 
 const INVENTORY_API_BASE_PATH: &str = "/sell/inventory/v1";
 
-pub async fn create_listing(
+pub async fn create_or_replace_inventory_item(
     listing: &Listing,
     item: &Item,
     product: &Product,

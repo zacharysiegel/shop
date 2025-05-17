@@ -27,7 +27,7 @@ pub async fn post(pgpool: &PgPool, listing: &Listing) -> Result<(), ShopError> {
     let (item, product): (Item, Product) = listing_action::get_item_and_product_for_listing(pgpool, listing).await?;
     log::info!("Posting listing to {}; [listing_id: {}]; [marketplace_id: {}]", MARKETPLACE_INTERNAL_NAME, listing.id, MARKETPLACE_ID.get().unwrap());
 
-    super::client::create_listing(listing, &item, &product).await
+    super::client::create_or_replace_inventory_item(listing, &item, &product).await
 }
 
 /// https://developer.ebay.com/api-docs/sell/inventory/resources/inventory_item/methods/createOrReplaceInventoryItem
