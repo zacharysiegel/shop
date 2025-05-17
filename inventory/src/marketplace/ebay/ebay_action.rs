@@ -1,7 +1,6 @@
 use crate::error::ShopError;
 use crate::item::Item;
 use crate::listing::{listing_action, Listing, ListingStatus};
-use crate::marketplace::ebay::ebay_client;
 use crate::marketplace::marketplace_db;
 use crate::product::Product;
 use sqlx::PgPool;
@@ -28,7 +27,7 @@ pub async fn post(pgpool: &PgPool, listing: &Listing) -> Result<(), ShopError> {
     let (item, product): (Item, Product) = listing_action::get_item_and_product_for_listing(pgpool, listing).await?;
     log::info!("Posting listing to {}; [listing_id: {}]; [marketplace_id: {}]", MARKETPLACE_INTERNAL_NAME, listing.id, MARKETPLACE_ID.get().unwrap());
 
-    ebay_client::create_listing(listing, &item, &product).await
+    super::client::create_listing(listing, &item, &product).await
 }
 
 /// https://developer.ebay.com/api-docs/sell/inventory/resources/inventory_item/methods/createOrReplaceInventoryItem
@@ -38,7 +37,7 @@ pub async fn publish(pgpool: &PgPool, listing: &Listing) -> Result<(), ShopError
     let (item, product): (Item, Product) = listing_action::get_item_and_product_for_listing(pgpool, listing).await?;
     log::info!("Publishing listing to {}; [listing_id: {}]; [marketplace_id: {}]", MARKETPLACE_INTERNAL_NAME, listing.id, MARKETPLACE_ID.get().unwrap());
 
-    ebay_client::publish_listing(listing, &item, &product).await
+    super::client::publish_listing(listing, &item, &product).await
 }
 
 fn validate_listing(listing: &Listing) -> Result<(), ShopError> {
