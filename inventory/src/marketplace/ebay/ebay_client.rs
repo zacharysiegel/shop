@@ -1,13 +1,14 @@
 use crate::decrypt::master_decrypt;
 use crate::environment::RuntimeEnvironment;
 use crate::error::ShopError;
+use crate::http;
+use crate::http::BASE64;
 use crate::item::Item;
 use crate::listing::Listing;
 use crate::product::Product;
-use crate::registry::{BASE64, REGISTRY};
 use base64::Engine;
 use reqwest::header::{AUTHORIZATION, CONTENT_TYPE};
-use reqwest::Request;
+use reqwest::{Request, Response, StatusCode};
 use serde::Deserialize;
 use std::sync::LazyLock;
 
@@ -49,7 +50,7 @@ struct ClientCredentialsResponse {
 }
 
 pub(super) async fn get_application_token() -> Result<String, ShopError> {
-    let request: Request = REGISTRY.http_client
+    let request: Request = http::HTTP_CLIENT
         .post(format!("{}{}/token", *EBAY_BASE_URL, OAUTH_API_BASE_PATH))
         .header(CONTENT_TYPE, "x-www-form-urlencoded")
         .header(AUTHORIZATION, format!("Basic {}", basic_auth()))
@@ -57,13 +58,14 @@ pub(super) async fn get_application_token() -> Result<String, ShopError> {
         .build()
         .map_err(|error| ShopError::from_error("malformed request", Box::new(error)))?;
 
-    let response = REGISTRY.http_client.execute(request)
+    let response: Response = http::HTTP_CLIENT
+        .execute(request)
         .await
         .map_err(|error| ShopError::from_error("request failed", Box::new(error)))?;
 
     if response.status().is_client_error() || response.status().is_server_error() {
-        let status = response.status();
-        let text = response.text().await
+        let status: StatusCode = response.status();
+        let text: String = response.text().await
             .map_err(|error| ShopError::from_error("reading http response", Box::new(error)))?;
         return Err(ShopError::new(&format!("http error; [{}]; [{}];", status, text)));
     }

@@ -23,7 +23,7 @@ pub mod error;
 pub mod object;
 pub mod pagination;
 pub mod environment;
-pub mod registry;
+pub mod http;
 pub mod decrypt;
 
 pub use object::*;
