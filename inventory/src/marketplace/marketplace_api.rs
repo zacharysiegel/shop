@@ -1,4 +1,4 @@
-use crate::marketplace::{marketplace_db, MarketplaceEntity, MarketplaceSerial};
+use crate::marketplace::{ebay, marketplace_db, MarketplaceEntity, MarketplaceSerial};
 use crate::object::JsonHttpResponse;
 use crate::{unwrap_option_else_404, unwrap_result_else_400, unwrap_result_else_500, ShopModel, ShopSerial};
 use actix_web::web::ServiceConfig;
@@ -13,6 +13,7 @@ pub fn configurer(config: &mut ServiceConfig) {
             .route("", web::get().to(get_all_marketplaces))
             .route("", web::post().to(create_marketplace))
             .route("/{id}", web::get().to(get_marketplace))
+            .configure(ebay::ebay_api::configurer)
     );
 }
 

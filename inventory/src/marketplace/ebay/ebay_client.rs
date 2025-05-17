@@ -8,8 +8,8 @@ use crate::registry::{BASE64, REGISTRY};
 use base64::Engine;
 use reqwest::header::{AUTHORIZATION, CONTENT_TYPE};
 use reqwest::Request;
-use std::sync::LazyLock;
 use serde::Deserialize;
+use std::sync::LazyLock;
 
 static EBAY_BASE_URL: LazyLock<&str> = LazyLock::new(|| match RuntimeEnvironment::default() {
     RuntimeEnvironment::Local | RuntimeEnvironment::Stage => "https://api.sandbox.ebay.com",
