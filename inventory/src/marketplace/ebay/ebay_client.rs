@@ -57,22 +57,10 @@ pub(super) async fn get_application_token() -> Result<String, ShopError> {
         .body("grant_type=client_credentials&scope=https://api.ebay.com/oauth/api_scope+https://api.ebay.com/oauth/api_scope/buy.guest.order+https://api.ebay.com/oauth/api_scope/buy.item.feed+https://api.ebay.com/oauth/api_scope/buy.marketing+https://api.ebay.com/oauth/api_scope/buy.product.feed+https://api.ebay.com/oauth/api_scope/buy.marketplace.insights+https://api.ebay.com/oauth/api_scope/buy.proxy.guest.order+https://api.ebay.com/oauth/api_scope/buy.item.bulk+https://api.ebay.com/oauth/api_scope/buy.deal")
         .build()
         .map_err(|error| ShopError::from_error("malformed request", Box::new(error)))?;
-
-    let response: Response = http::HTTP_CLIENT
-        .execute(request)
-        .await
-        .map_err(|error| ShopError::from_error("request failed", Box::new(error)))?;
-
-    if response.status().is_client_error() || response.status().is_server_error() {
-        let status: StatusCode = response.status();
-        let text: String = response.text().await
-            .map_err(|error| ShopError::from_error("reading http response", Box::new(error)))?;
-        return Err(ShopError::new(&format!("http error; [{}]; [{}];", status, text)));
-    }
+    let response: Response = http::execute_checked(request).await?;
 
     let client_credentials_response: ClientCredentialsResponse = response.json::<ClientCredentialsResponse>().await
         .map_err(|error| ShopError::from_error("parsing response", Box::new(error)))?;
-
     Ok(client_credentials_response.access_token)
 }
 
