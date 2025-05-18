@@ -22,7 +22,7 @@ pub struct ClientCredentialsResponse {
 pub async fn get_application_token() -> Result<ClientCredentialsResponse, ShopError> {
     let request: Request = http::HTTP_CLIENT
         .post(format!("{}{}/token", *EBAY_BASE_URL, OAUTH_API_BASE_PATH))
-        .header(CONTENT_TYPE, "x-www-form-urlencoded")
+        .header(CONTENT_TYPE, "application/x-www-form-urlencoded")
         .header(AUTHORIZATION, format!("Basic {}", ebay_basic_auth()))
         .body(format!("grant_type=client_credentials&scope={}", APPLICATION_SCOPE_ALL))
         .build()
@@ -49,7 +49,7 @@ pub struct AuthorizationCodeResponse {
 pub async fn get_user_token(authorization_code: &str) -> Result<AuthorizationCodeResponse, ShopError> {
     let request: Request = http::HTTP_CLIENT
         .post(format!("{}{}/token", *EBAY_BASE_URL, OAUTH_API_BASE_PATH))
-        .header(CONTENT_TYPE, "x-www-form-urlencoded")
+        .header(CONTENT_TYPE, "application/x-www-form-urlencoded")
         .header(AUTHORIZATION, format!("Basic {}", ebay_basic_auth()))
         .body(format!("grant_type=authorization_code&redirect_uri={}&code={}", EBAY_REDIRECT_URL_NAME, authorization_code))
         .build()
@@ -73,7 +73,7 @@ pub struct RefreshTokenResponse {
 pub async fn refresh_user_token(refresh_token: &str) -> Result<RefreshTokenResponse, ShopError> {
     let request: Request = http::HTTP_CLIENT
         .post(format!("{}{}/token", *EBAY_BASE_URL, OAUTH_API_BASE_PATH))
-        .header(CONTENT_TYPE, "x-www-form-urlencoded")
+        .header(CONTENT_TYPE, "application/x-www-form-urlencoded")
         .header(AUTHORIZATION, format!("Basic {}", ebay_basic_auth()))
         .body(format!("grant_type=refresh_token&refresh_token={}&scope={}", refresh_token, USER_SCOPE_ALL))
         .build()

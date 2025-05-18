@@ -103,6 +103,6 @@ async fn put_listing(
     let listing: ListingEntity = unwrap_option_else_404!(listing);
     let listing: Listing = unwrap_result_else_500!(listing.try_to_model());
 
-    let _result = ebay_action::post(user_token.value(), &pgpool, &listing).await;
-    HttpResponse::Gone().body("todo")
+    unwrap_result_else_500!(ebay_action::post(&pgpool, &user_token.value(), &listing).await);
+    HttpResponse::Ok().finish()
 }

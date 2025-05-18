@@ -93,16 +93,9 @@ async fn delete_product(
 
 async fn create_product_json(
     pgpool: web::Data<PgPool>,
-    body: web::Json<ProductSerial>,
-) -> impl Responder {
-    create_product(pgpool, body.into_inner()).await
-}
-
-async fn create_product(
-    pgpool: web::Data<PgPool>,
-    product_serial: ProductSerial,
+    product: web::Json<ProductSerial>,
 ) -> HttpResponse {
-    let Ok(product) = ProductEntity::try_from_serial(&product_serial) else {
+    let Ok(product) = ProductEntity::try_from_serial(&product) else {
         return HttpResponseBuilder::new(StatusCode::BAD_REQUEST).finish();
     };
 

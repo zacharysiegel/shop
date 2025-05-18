@@ -10,6 +10,7 @@ use uuid::Uuid;
 
 #[derive(Debug)]
 pub struct Item {
+    /// SKU
     pub id: Uuid,
     pub product_id: Uuid,
     pub inventory_location_id: Uuid,

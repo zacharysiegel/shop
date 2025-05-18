@@ -6,6 +6,7 @@ use crate::product::Product;
 use sqlx::PgPool;
 use std::sync::OnceLock;
 use uuid::Uuid;
+use super::client;
 
 static MARKETPLACE_ID: OnceLock<Uuid> = OnceLock::new();
 
@@ -21,23 +22,24 @@ pub async fn init(pgpool: &PgPool) {
     _ = MARKETPLACE_ID.set(entity.id);
 }
 
-pub async fn post(ebay_user_token: &str, pgpool: &PgPool, listing: &Listing) -> Result<(), ShopError> {
+/// https://developer.ebay.com/api-docs/sell/inventory/resources/inventory_item/methods/createOrReplaceInventoryItem
+pub async fn post(pgpool: &PgPool, user_access_token: &str, listing: &Listing) -> Result<(), ShopError> {
     validate_listing(listing)?;
 
     let (item, product): (Item, Product) = listing_action::get_item_and_product_for_listing(pgpool, listing).await?;
     log::info!("Posting listing to {}; [listing_id: {}]; [marketplace_id: {}]", MARKETPLACE_INTERNAL_NAME, listing.id, MARKETPLACE_ID.get().unwrap());
 
-    super::client::create_or_replace_inventory_item(listing, &item, &product).await
+    client::create_or_replace_inventory_item(user_access_token, &item, &product).await
 }
 
-/// https://developer.ebay.com/api-docs/sell/inventory/resources/inventory_item/methods/createOrReplaceInventoryItem
 pub async fn publish(pgpool: &PgPool, listing: &Listing) -> Result<(), ShopError> {
     validate_listing(listing)?;
 
     let (item, product): (Item, Product) = listing_action::get_item_and_product_for_listing(pgpool, listing).await?;
     log::info!("Publishing listing to {}; [listing_id: {}]; [marketplace_id: {}]", MARKETPLACE_INTERNAL_NAME, listing.id, MARKETPLACE_ID.get().unwrap());
 
-    super::client::publish_listing(listing, &item, &product).await
+    // todo: publish offer
+    Ok(())
 }
 
 fn validate_listing(listing: &Listing) -> Result<(), ShopError> {

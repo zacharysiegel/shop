@@ -1,0 +1,59 @@
+{
+  // https://developer.ebay.com/api-docs/sell/inventory/resources/inventory_item/methods/createOrReplaceInventoryItem#request.availability.pickupAtLocationAvailability.availabilityType
+  "availability": {
+//    "pickupAtLocationAvailability": [],
+    "shipToLocationAvailability": {
+      "availabilityDistributions": [
+        {
+//          "fulfillmentTime": {
+//            "unit": "DAYS",
+//            "value": 7
+//          },
+          "merchantLocationKey": "{inventory_location_id}",
+          "quantity": 1
+        }
+      ],
+      "quantity": 1
+    }
+  },
+  "condition": "USED_EXCELLENT", // https://developer.ebay.com/api-docs/sell/inventory/types/slr:ConditionEnum
+//  "conditionDescription": "",
+//  "conditionDescriptors": [ // Structured condition description; Used for trading card "grade" classification;
+//    { // https://developer.ebay.com/api-docs/sell/inventory/types/slr:ConditionDescriptor
+//      "additionalInfo": "ut in velit",
+//      "name": "Duis",
+//      "values": [
+//        "Ex",
+//        "cillum ipsum culpa Excepteur reprehenderit"
+//      ]
+//    }
+//  ],
+//  "packageWeightAndSize": {}, // https://developer.ebay.com/api-docs/sell/inventory/types/slr:PackageWeightAndSize
+  "product": {
+//  "aspects": { // See "get_item_aspects_for_category" in Taxonomy API
+//    "Brand": ["GoPro"],
+//    "Storage Type": ["Removable"]
+//  },
+//    "description": "",
+//    "ean": [
+//      "reprehenderit"
+//    ],
+//    "epid": "labore",
+//    "imageUrls": [ // https://developer.ebay.com/Devzone/XML/docs/Reference/eBay/UploadSiteHostedPictures.html
+//      "labore id elit reprehenderit"
+//    ],
+//    "isbn": [
+//      "sint laboris"
+//    ],
+//    "brand": "cupidatat ut",
+//    "mpn": "Duis esse voluptate",
+//    "subtitle": "reprehenderit sunt veniam Ut", // Additional listing fee
+    "title": "{product.display_name}",
+    "upc": [
+      "{product.upc}"
+    ]
+//    "videoIds": [
+//      "proident aute et"
+//    ]
+  }
+}
