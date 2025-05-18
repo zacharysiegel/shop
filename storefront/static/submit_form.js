@@ -14,14 +14,17 @@ function submit_form(submit_event) {
     for (let entry of form_data) {
         let [key, value] = entry;
         if (value) {
-            const intValue = Number(value);
-            if (!isNaN(intValue)) {
-                value = intValue;
-            }
-
             const dateValue = Date.parse(value);
             if (typeof value === 'string' && !isNaN(dateValue)) {
-                value = new Date(dateValue).toISOString();
+                const date = new Date(dateValue);
+                const input_element = form.getElementsByTagName('input')
+                    .namedItem(key);
+
+                if (input_element.type === 'date') {
+                    value = date.toISOString().slice(0, -14); // Remove the time
+                } else if (input_element.type === 'datetime-local') {
+                    value = date.toISOString();
+                }
             }
 
             form_data_as_object[key] = value;

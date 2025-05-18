@@ -87,7 +87,7 @@ async fn left(pagination_options: Option<KeysetPaginationOptionsForString>) -> M
 
 async fn right() -> Markup {
     html! {
-        (create_form())
+        (create_product_form())
         (delete_form())
         (create_item_form().await)
         (category_details().await)
@@ -129,7 +129,7 @@ async fn table(elements: &Vec<ProductSerial>) -> Markup {
     }
 }
 
-fn create_form() -> Markup {
+fn create_product_form() -> Markup {
     form::form("Create product", "/product", Method::POST, html! {
         label {
             "Display name"
@@ -266,7 +266,7 @@ async fn category_details() -> Markup {
 // These scripts could be defined as global functions in a .js file instead
 fn activate_delete_form_script(element_id: &str, product: &ProductSerial) -> String {
     let activate_form: String = reactivity::activate_element_handler(element_id);
-    let update_form: String = reactivity::update_form_from_serialize("/item", product);
+    let update_form: String = reactivity::update_form_from_serialize(&format!("/product/{}", product.id), product);
     activate_form + &update_form
 }
 
