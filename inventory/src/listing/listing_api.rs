@@ -1,4 +1,4 @@
-use crate::listing::{listing_db, ListingEntity, Listing, ListingSerial};
+use crate::listing::{listing_db, Listing, ListingEntity, ListingSerial};
 use crate::object::JsonHttpResponse;
 use crate::{marketplace, unwrap_option_else_404, unwrap_result_else_400, unwrap_result_else_500, ShopEntity, ShopModel, ShopSerial};
 use actix_web::web::ServiceConfig;
@@ -26,6 +26,8 @@ async fn create_listing(
 
     let query_result: PgQueryResult =
         unwrap_result_else_500!(listing_db::create_listing(&pgpool, &listing.to_entity()).await);
+
+    // todo: refactor the create endpoints to return the created item (contains the generated id)
     HttpResponse::Ok().body(query_result.rows_affected().to_string())
 }
 

@@ -20,7 +20,7 @@ pub fn configurer(config: &mut web::ServiceConfig) {
             .configure(configurer_public)
             .route("", web::post()
                 .guard(guard::Header("content-type", "application/json"))
-                .to(create_product_json))
+                .to(create_product))
             .route("/{product_id}", web::delete().to(delete_product))
             .route("/{product_id}/category", web::post().to(create_product_category_association_body))
             .route("/{product_id}/category/{category_id}", web::post().to(create_product_category_association_path))
@@ -91,7 +91,7 @@ async fn delete_product(
     HttpResponse::Ok().body(query_result.rows_affected().to_string())
 }
 
-async fn create_product_json(
+async fn create_product(
     pgpool: web::Data<PgPool>,
     product: web::Json<ProductSerial>,
 ) -> HttpResponse {
