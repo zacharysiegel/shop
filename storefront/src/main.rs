@@ -1,6 +1,5 @@
 use inventory::environment::RuntimeEnvironment;
 use log::LevelFilter;
-use std::io;
 
 #[actix_web::main]
 async fn main() -> Result<(), impl std::error::Error> {
