@@ -248,11 +248,12 @@ fn listing_update() -> Markup {
                         "URI"
                         input type="text" name="uri";
                     }
-                    input type="hidden" name="updated" value=(form::get_current_datetime_string());
 
-                    input type="hidden" name="item_id";
-                    input type="hidden" name="marketplace_id";
-                    input type="hidden" name="created";
+                    // Need to use number/datetime-local instead of hidden type for form_data mutators; see submit_form.js;
+                    input style="display: none;" type="datetime-local" name="updated" value=(form::get_current_datetime_string());
+                    input style="display: none;" type="text" name="item_id";
+                    input style="display: none;" type="text" name="marketplace_id";
+                    input style="display: none;" type="datetime-local" name="created";
                     input type="submit";
                 }
             }))

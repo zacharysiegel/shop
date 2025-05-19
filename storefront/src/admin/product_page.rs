@@ -220,10 +220,11 @@ async fn create_item_form() -> Markup {
                     "Acquisition location (optional)"
                     input type="text" name="acquisition_location";
                 }
+
                 // Need to use number/datetime-local instead of hidden type for form_data mutators; see submit_form.js;
-                input type="number" name="status" value="1" style="display: none;";
-                input type="datetime-local" name="created" value=(form::get_current_datetime_string()) style="display: none;";
-                input type="datetime-local" name="updated" value=(form::get_current_datetime_string()) style="display: none;";
+                input style="display: none;" type="number" name="status" value="1";
+                input style="display: none;" type="datetime-local" name="created" value=(form::get_current_datetime_string());
+                input style="display: none;" type="datetime-local" name="updated" value=(form::get_current_datetime_string());
                 input type="submit";
             }))
             button onclick=(reactivity::hide_element_handler(CREATE_ITEM_FORM_CONTAINER_ID)) { "Cancel" }

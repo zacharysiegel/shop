@@ -178,8 +178,10 @@ async fn create_listing_form() -> Markup {
                     "URI (optional)"
                     input type="text" name="uri";
                 }
-                input type="hidden" name="created" value=(form::get_current_datetime_string());
-                input type="hidden" name="updated" value=(form::get_current_datetime_string());
+
+                // Need to use number/datetime-local instead of hidden type for form_data mutators; see submit_form.js;
+                input style="display: none;" type="datetime-local" name="created" value=(form::get_current_datetime_string());
+                input style="display: none;" type="datetime-local" name="updated" value=(form::get_current_datetime_string());
                 input type="submit";
             }))
             button onclick=(reactivity::hide_element_handler(CREATE_LISTING_FORM_CONTAINER_ID)) { "Close" }
