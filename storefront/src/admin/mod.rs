@@ -10,3 +10,4 @@ mod item_page;
 mod inventory_location_page;
 mod listing_page;
 mod marketplace_page;
+mod ebay_page;

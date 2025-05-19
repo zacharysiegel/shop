@@ -10,6 +10,14 @@ pub struct Page<'a> {
     pub configurer: fn(&mut ServiceConfig) -> (),
 }
 
+impl Page<'_> {
+	pub fn create_anchor(&self) -> Markup {
+		html! {
+			a href=(self.relative_path) { (self.name) }
+		}
+	}
+}
+
 pub fn page(
     current_page_branch: &Vec<BreadcrumbItem>,
     head_content: Markup,

@@ -42,3 +42,16 @@ macro_rules! unwrap_option_else_404 {
 		}
 	};
 }
+
+#[macro_export]
+macro_rules! unwrap_option_else_400 {
+	($e:expr) => {
+		match $e {
+			::std::option::Option::Some(content) => content,
+			::std::option::Option::None => {
+				::log::error!("Error unwrapping Option; Returning 400 Bad Request;");
+				return ::actix_web::HttpResponse::BadRequest().finish();
+			}
+		}
+	};
+}

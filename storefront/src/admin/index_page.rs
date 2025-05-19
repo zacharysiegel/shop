@@ -1,5 +1,5 @@
 use crate::admin::structure::page;
-use crate::admin::{category_page, inventory_location_page, item_page, listing_page, marketplace_page, product_page};
+use crate::admin::{category_page, ebay_page, inventory_location_page, item_page, listing_page, marketplace_page, product_page};
 use actix_web::web;
 use actix_web::web::ServiceConfig;
 use maud::{html, Markup};
@@ -11,10 +11,11 @@ pub async fn render() -> Markup {
         html! {
 			div {
 				ol {
-					li { a href=(product_page::PAGE.relative_path) { "Product" } }
-					li { a href=(category_page::PAGE.relative_path) { "Category" } }
-					li { a href=(inventory_location_page::PAGE.relative_path) { "Inventory location" } }
-                    li { a href=(marketplace_page::PAGE.relative_path) { "Marketplace" } }
+					li { (product_page::PAGE.create_anchor()) }
+					li { (category_page::PAGE.create_anchor()) }
+					li { (inventory_location_page::PAGE.create_anchor()) }
+                    li { (marketplace_page::PAGE.create_anchor()) }
+                    li { (ebay_page::PAGE.create_anchor()) }
 				}
 			}
 		},
@@ -32,6 +33,7 @@ pub fn configurer(config: &mut ServiceConfig) -> () {
             .configure(inventory_location_page::PAGE.configurer)
             .configure(listing_page::PAGE.configurer)
             .configure(marketplace_page::PAGE.configurer)
+            .configure(ebay_page::PAGE.configurer)
         )
     ;
 }
