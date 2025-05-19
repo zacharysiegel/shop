@@ -1,3 +1,5 @@
+document.addEventListener("submit", submit_form);
+
 /**
  * @param {SubmitEvent} submit_event
  */
@@ -120,7 +122,5 @@ function as_number(form, key, value) {
 
     return int_value;
 }
-
-document.addEventListener("submit", submit_form);
 
 // todo: enable notification of success/failure
