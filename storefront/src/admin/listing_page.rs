@@ -121,7 +121,7 @@ async fn table(elements: &Vec<ListingSerial>) -> Markup {
                             button onclick=(activate_listing_update_form_script(&listing)) { "Update" }
                             @if listing.status == ListingStatus::Draft as u8 {
                                 x-publish-listing
-                                action=(format!("{}/listing/{}/publish", REGISTRY.inventory_external_path, listing.id))
+                                action=(format!("{}/ebay/listing/{}", REGISTRY.inventory_external_path, listing.id))
                                 {}
                             }
                         }
