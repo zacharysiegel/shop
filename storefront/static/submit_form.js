@@ -53,7 +53,7 @@ function submit_form(submit_event) {
     });
     fetch(request)
         .then(response => {
-            response_component.callbacks.update_status(response.status);
+            response_component.callbacks.update_status(response);
         });
 }
 
@@ -136,7 +136,6 @@ function as_number(form, key, value) {
 
 /**
  * @param response {(Response | undefined)}
- * @typedef x (typeof)
  * @return Component
  */
 function form_response_component(response) {
@@ -146,7 +145,7 @@ function form_response_component(response) {
     root.appendChild((() => {
         text = document.createElement("span");
         text.innerText = response
-            ? update_status(response.status)
+            ? update_status(response)
             : `pending`;
         return text;
     })());
@@ -161,10 +160,10 @@ function form_response_component(response) {
     })());
 
     /**
-     * @param status {number}
+     * @param response {Response}
      */
-    function update_status(status) {
-        text.innerText = `Response status: ${status}`;
+    function update_status(response) {
+        text.innerText = `Response status: ${response.status} ${response.statusText}`;
     }
 
     return {
