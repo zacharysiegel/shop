@@ -37,6 +37,10 @@ function submit_form(submit_event) {
         form_data_as_object[key] = value;
     }
 
+    const response_component = form_response_component(undefined);
+    form.getElementsByClassName(response_component.classList.item(0))?.item(0)?.remove();
+    form.appendChild(response_component.element);
+
     /* By default, FormData is converted to the format "multipart/form-data". This representation
         adds significant bloat when each field's data is encoded in UTF-8 and is generally small.
         We convert to JSON instead. */
@@ -49,7 +53,7 @@ function submit_form(submit_event) {
     });
     fetch(request)
         .then(response => {
-            console.log(response);
+            response_component.callbacks.update_status(response.status);
         });
 }
 
@@ -130,4 +134,54 @@ function as_number(form, key, value) {
     return int_value;
 }
 
-// todo: enable notification of success/failure
+/**
+ * @param response {(Response | undefined)}
+ * @typedef x (typeof)
+ * @return Component
+ */
+function form_response_component(response) {
+    const root = document.createElement("div");
+    root.classList.add("form_response_component");
+    let text;
+    root.appendChild((() => {
+        text = document.createElement("span");
+        text.innerText = response
+            ? update_status(response.status)
+            : `pending`;
+        return text;
+    })());
+    root.appendChild((() => {
+        const x_button = document.createElement("button");
+        x_button.innerText = "X";
+        x_button.type = "button";
+        x_button.style.display = "inline";
+        x_button.style.marginLeft = "1rem";
+        x_button.onclick = () => root.parentElement.removeChild(root);
+        return x_button;
+    })());
+
+    /**
+     * @param status {number}
+     */
+    function update_status(status) {
+        text.innerText = `Response status: ${status}`;
+    }
+
+    return {
+        element: root,
+        classList: root.classList,
+        callbacks: {
+            update_status,
+        },
+    };
+}
+
+/**
+ * @typedef Component
+ * @type {{
+ *     element: HTMLElement,
+ *     classList: DOMTokenList,
+ *     callbacks: Object.<string, function>,
+ * }}
+ * // todo: generalize to another file
+ */
