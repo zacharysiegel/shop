@@ -44,7 +44,12 @@ pub fn update_form_from_json_string(path: &str, json_parameters: &str) -> String
         for (let [key, value] of Object.entries(parameters)) {{
             const input = form[key];
             if (input === undefined) continue;
-            input.value = value;
+            
+            if (input.type === "datetime-local") {{
+                input.value = new Date(Date.parse(value)).toISOString().slice(0, 19);
+            }} else {{
+                input.value = value;
+            }}
         }}
         }}"#,
         REGISTRY.inventory_external_path,
@@ -53,6 +58,7 @@ pub fn update_form_from_json_string(path: &str, json_parameters: &str) -> String
     )
 }
 
+#[allow(dead_code)]
 pub fn update_form_action(path: &str) -> String {
     let json = "{}";
     update_form_from_json_string(path, json)
