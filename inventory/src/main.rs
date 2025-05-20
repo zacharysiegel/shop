@@ -1,16 +1,11 @@
 use inventory::{environment, marketplace, server};
-use log::LevelFilter;
 use sqlx::{Pool, Postgres};
 
 #[actix_web::main]
 async fn main() -> Result<(), std::io::Error> {
     environment::load_env()?;
-
-    env_logger::builder()
-        .filter_level(LevelFilter::Info)
-        .filter_module("actix_server", LevelFilter::Debug)
-        .filter_module("actix_web::middleware::logger", LevelFilter::Info)
-        .init();
+    environment::init_logger()
+        .map_err(|err| std::io::Error::new(std::io::ErrorKind::Other, err))?;
 
     log::info!("Runtime environment: {:?}", environment::RuntimeEnvironment::default());
 

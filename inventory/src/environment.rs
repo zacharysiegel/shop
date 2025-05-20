@@ -1,4 +1,5 @@
 use crate::error::ShopError;
+use log::{LevelFilter, SetLoggerError};
 use std::env;
 use std::ops::Deref;
 use std::sync::LazyLock;
@@ -44,4 +45,13 @@ pub fn load_env() -> Result<(), std::io::Error> {
         Ok(_) => Ok(()),
         Err(error) => Err(std::io::Error::new(std::io::ErrorKind::Other, error))?,
     }
+}
+
+pub fn init_logger() -> Result<(), SetLoggerError> {
+    env_logger::builder()
+        .filter_level(LevelFilter::Info)
+        .filter_module("actix_server", LevelFilter::Debug)
+        .filter_module("actix_web::middleware::logger", LevelFilter::Info)
+        .format_source_path(true)
+        .try_init()
 }
