@@ -19,6 +19,8 @@ pub static DOMAIN: LazyLock<&'static str> = LazyLock::new(||
 /// Converts I/O errors to standard ShopError structs.
 /// Converts error responses (4xx/5xx) to ShopError structs.
 pub async fn execute_checked(request: Request) -> Result<Response, ShopError> {
+    log::debug!("{:#?}", request);
+
     let response: Response = HTTP_CLIENT
         .execute(request)
         .await

@@ -30,7 +30,7 @@ pub async fn create_or_replace_inventory_item(
         "condition": condition,
         "product": {
             "title": product.display_name,
-            "upc": product.upc,
+            "upc": [ product.upc ],
         },
         // todo: product images (required for non-catalog products)
     });
@@ -40,7 +40,7 @@ pub async fn create_or_replace_inventory_item(
         )?;
 
     let request: Request = http::HTTP_CLIENT
-        .post(format!("{}{}/inventory_item/{}", *EBAY_BASE_URL, INVENTORY_API_BASE_PATH, item.id))
+        .put(format!("{}{}/inventory_item/{}", *EBAY_BASE_URL, INVENTORY_API_BASE_PATH, item.id))
         .header(CONTENT_LANGUAGE, super::ebay_client_shared::EBAY_CONTENT_LANGUAGE)
         .header(CONTENT_TYPE, "application/json")
         .header(AUTHORIZATION, format!("Bearer {}", user_access_token))
