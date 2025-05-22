@@ -1,11 +1,12 @@
 use crate::error::ShopError;
 use crate::http;
+use crate::http::HTTP_CLIENT;
 use crate::item::Item;
 use crate::marketplace::ebay::client::ebay_client_shared::EBAY_BASE_URL;
 use crate::product::Product;
 use reqwest::header::{AUTHORIZATION, CONTENT_LANGUAGE, CONTENT_TYPE};
-use reqwest::Request;
-use serde_json::json;
+use reqwest::{Request, Response};
+use serde_json::{json, Value};
 
 const INVENTORY_API_BASE_PATH: &str = "/sell/inventory/v1";
 
@@ -46,8 +47,25 @@ pub async fn create_or_replace_inventory_item(
         .header(AUTHORIZATION, format!("Bearer {}", user_access_token))
         .body(body)
         .build()
-        .map_err(|error| ShopError::from_error("malformed request", Box::new(error)))?;
+        .map_err(|e| ShopError::from_error("malformed request", Box::new(e)))?;
 
     http::execute_checked(request).await?;
     Ok(())
+}
+
+pub async fn get_inventory_item(
+    user_access_token: &str,
+    item_id: &str,
+) -> Result<Value, ShopError> {
+    let request: Request = HTTP_CLIENT
+        .get(format!("{}{}/inventory_item/{}", *EBAY_BASE_URL, INVENTORY_API_BASE_PATH, item_id))
+        .header(AUTHORIZATION, format!("Bearer {}", user_access_token))
+        .build()
+        .map_err(|e| ShopError::from_error("malformed request", Box::new(e)))?;
+
+    let response: Response = http::execute_checked(request).await?;
+    let response_body: Value = response.json()
+        .await
+        .map_err(|e| ShopError::from_error("deserializing inventory item response", Box::new(e)))?;
+    Ok(response_body)
 }

@@ -28,8 +28,18 @@ pub fn configurer(config: &mut ServiceConfig) {
             .route("/auth/user/token", web::put().to(get_user_token))
             .route("/auth/user/redirect", web::get().to(get_oauth_redirect))
             .route("/auth/user/refresh", web::put().to(refresh_user_token))
-            .route("/listing/{listing_id}", web::put().to(put_listing))
+            .route("/listing/{item_id}", web::put().to(put_listing))
+            .route("/listing/{item_id}", web::get().to(get_listing))
     );
+}
+
+fn extract_user_token(request: &HttpRequest) -> Result<Cookie, HttpResponse> {
+    match request.cookie(EBAY_USER_ACCESS_TOKEN_COOKIE_NAME) {
+        Some(value) => Ok(value),
+        None => Err(HttpResponse::build(StatusCode::UNAUTHORIZED)
+            .insert_header(("Location", EBAY_OAUTH_AUTHORIZATION_URL.to_string()))
+            .body("Invalid eBay access token")),
+    }
 }
 
 async fn get_application_token() -> impl Responder {
@@ -93,17 +103,15 @@ async fn get_oauth_redirect() -> impl Responder {
 
 async fn put_listing(
     pgpool: web::Data<PgPool>,
-    listing_id: web::Path<String>,
+    item_id: web::Path<String>,
     request: HttpRequest,
 ) -> impl Responder {
-    let user_token: Cookie = match request.cookie(EBAY_USER_ACCESS_TOKEN_COOKIE_NAME) {
-        Some(value) => value,
-        None => return HttpResponse::build(StatusCode::UNAUTHORIZED)
-            .insert_header(("Location", EBAY_OAUTH_AUTHORIZATION_URL.to_string()))
-            .body("Invalid eBay access token"),
+    let user_token: Cookie = match extract_user_token(&request) {
+        Ok(value) => value,
+        Err(response) => return response,
     };
 
-    let listing_id: Uuid = unwrap_result_else_400!(Uuid::try_parse(&listing_id));
+    let listing_id: Uuid = unwrap_result_else_400!(Uuid::try_parse(&item_id));
     let listing: Option<ListingEntity> = unwrap_result_else_500!(
         listing_db::get_listing(&pgpool, &listing_id).await
     );
@@ -112,4 +120,17 @@ async fn put_listing(
 
     unwrap_result_else_500!(ebay_action::post(&pgpool, &user_token.value(), &listing).await);
     HttpResponse::Ok().finish()
+}
+
+async fn get_listing(
+    item_id: web::Path<String>,
+    request: HttpRequest,
+) -> impl Responder {
+    let user_token: Cookie = match extract_user_token(&request) {
+        Ok(value) => value,
+        Err(response) => return response,
+    };
+
+    let json: Value = unwrap_result_else_500!(client::get_inventory_item(&user_token.value(), &item_id).await);
+    HttpResponse::Ok().body(json.to_string())
 }
