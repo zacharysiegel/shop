@@ -14,7 +14,7 @@ repo_path=$(git rev-parse --show-toplevel)
 cd "${repo_path}/identity" || exit
 
 if test -e .env; then
-	echo "Environment file_name already exists; Copying to .env.bak;"
+	echo "Environment file .env already exists; Copying to .env.bak;"
 	cp .env .env.bak
 	rm .env
 fi
