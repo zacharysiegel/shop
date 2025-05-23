@@ -58,3 +58,9 @@ Environment variables are specified in `.env`. If you need to add an environment
 The `crypt` application/library manages nearly all secrets within the application. The ciphertext for application secrets (e.g. the eBay client secret) are stored within `crypt`. The secrets can be manually decrypted using the CLI provided by `crypt`. They are decrypted within the other applications via the `MASTER_SECRET` environment variable.
 
 You must be given the master secret and save it into your local `.env` file (not committed to Git) before you can run the server properly.
+
+To add a new secret, use the `crypt` CLI:
+
+	cargo run -p crypt -- encrypt "$plaintext" --key "$master_key"
+
+The command produces literal Rust code which should be copied and pasted into `crypt/src/data.rs`.
