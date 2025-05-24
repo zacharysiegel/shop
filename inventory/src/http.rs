@@ -1,6 +1,6 @@
 use crate::environment::RuntimeEnvironment;
 use crate::error::ShopError;
-use reqwest::{Client, Request, Response, StatusCode};
+use reqwest::{Client, Request, RequestBuilder, Response, StatusCode};
 use std::ops::Deref;
 use std::sync::LazyLock;
 
@@ -47,4 +47,14 @@ pub fn header_set_cookie_secure(name: &str, token: &str, lifetime: u64) -> (&'st
             lifetime,
         )
     )
+}
+
+pub trait WithBearer {
+    fn with_bearer(self, token: &str) -> Self;
+}
+
+impl WithBearer for RequestBuilder {
+    fn with_bearer(self, token: &str) -> Self {
+        self.header("Authorization", format!("Bearer {}", token))
+    }
 }

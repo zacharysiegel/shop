@@ -30,6 +30,7 @@ pub fn configurer(config: &mut ServiceConfig) {
             .route("/auth/user/refresh", web::put().to(refresh_user_token))
             .route("/listing/{item_id}", web::put().to(put_listing))
             .route("/listing/{item_id}", web::get().to(get_listing))
+            .route("/location", web::get().to(get_all_locations))
     );
 }
 
@@ -133,4 +134,15 @@ async fn get_listing(
 
     let json: Value = unwrap_result_else_500!(client::get_inventory_item(&user_token.value(), &item_id).await);
     HttpResponse::Ok().body(json.to_string())
+}
+
+async fn get_all_locations(
+    request: HttpRequest,
+) -> impl Responder {
+    let user_token: Cookie = match extract_user_token(&request) {
+        Ok(value) => value,
+        Err(response) => return response,
+    };
+    
+    
 }

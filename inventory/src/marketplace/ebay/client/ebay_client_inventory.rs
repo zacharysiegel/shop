@@ -1,6 +1,6 @@
 use crate::error::ShopError;
 use crate::http;
-use crate::http::HTTP_CLIENT;
+use crate::http::{WithBearer, HTTP_CLIENT};
 use crate::item::Item;
 use crate::marketplace::ebay::client::ebay_client_shared::EBAY_BASE_URL;
 use crate::product::Product;
@@ -44,7 +44,7 @@ pub async fn create_or_replace_inventory_item(
         .put(format!("{}{}/inventory_item/{}", *EBAY_BASE_URL, INVENTORY_API_BASE_PATH, item.id))
         .header(CONTENT_LANGUAGE, super::ebay_client_shared::EBAY_CONTENT_LANGUAGE)
         .header(CONTENT_TYPE, "application/json")
-        .header(AUTHORIZATION, format!("Bearer {}", user_access_token))
+        .with_bearer(user_access_token)
         .body(body)
         .build()
         .map_err(|e| ShopError::from_error("malformed request", Box::new(e)))?;
@@ -59,7 +59,7 @@ pub async fn get_inventory_item(
 ) -> Result<Value, ShopError> {
     let request: Request = HTTP_CLIENT
         .get(format!("{}{}/inventory_item/{}", *EBAY_BASE_URL, INVENTORY_API_BASE_PATH, item_id))
-        .header(AUTHORIZATION, format!("Bearer {}", user_access_token))
+        .with_bearer(user_access_token)
         .build()
         .map_err(|e| ShopError::from_error("malformed request", Box::new(e)))?;
 
@@ -69,3 +69,16 @@ pub async fn get_inventory_item(
         .map_err(|e| ShopError::from_error("deserializing inventory item response", Box::new(e)))?;
     Ok(response_body)
 }
+
+pub async fn get_all_inventory_locations(
+    user_access_token: &str,
+) -> Result<Value, ShopError> {
+    let request: Request = HTTP_CLIENT
+        .get(format!("{}{}/location", *EBAY_BASE_URL, INVENTORY_API_BASE_PATH))
+        .with_bearer(user_access_token)
+        .build()
+        .map_err(|e| ShopError::from_error("malformed request", Box::new(e)))?;
+
+    ""
+}
+
