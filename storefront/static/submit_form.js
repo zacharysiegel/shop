@@ -1,3 +1,5 @@
+import "/component.js"
+
 document.addEventListener("submit", submit_form);
 
 /**
@@ -174,13 +176,3 @@ function form_response_component(response) {
         },
     };
 }
-
-/**
- * @typedef Component
- * @type {{
- *     element: HTMLElement,
- *     classList: DOMTokenList,
- *     callbacks: Object.<string, function>,
- * }}
- * // todo: generalize to another file
- */

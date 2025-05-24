@@ -1,1 +1,1 @@
-import "./page/listing.js";
+import "/submit_form.js"
