@@ -143,6 +143,7 @@ async fn get_all_locations(
         Ok(value) => value,
         Err(response) => return response,
     };
-    
-    
+
+    let json: Value = unwrap_result_else_500!(client::get_all_inventory_locations(&user_token.value()).await);
+    HttpResponse::Ok().body(json.to_string())
 }

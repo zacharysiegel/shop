@@ -11,14 +11,23 @@ pub async fn wrapped_get<SerialT: DeserializeOwned>(path_and_query: &str) -> Res
     let response = match result {
         Ok(response) => response,
         Err(error) => {
+            log::error!("{:#}", error);
             return Err(error_markup(error));
         }
     };
-    let serial = match response.json::<SerialT>().await {
-        Ok(element) => element,
+    let text: String = match response.text().await {
+        Ok(value) => value,
         Err(error) => {
+            log::error!("{:#}", error);
             return Err(error_markup(error));
         }
     };
-    Ok(serial)
+    let json = match serde_json::from_str(text.as_str()) {
+        Ok(value) => value,
+        Err(error) => {
+            log::error!("{:#}; [body: \"{}\"]", error, text);
+            return Err(error_markup(error));
+        }
+    };
+    Ok(json)
 }

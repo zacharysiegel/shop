@@ -6,7 +6,7 @@ use std::sync::LazyLock;
 
 pub const BASE64: base64::engine::GeneralPurpose = crypt::BASE64;
 
-pub static HTTP_CLIENT: LazyLock<Client> = LazyLock::new(|| Client::builder().build().unwrap());
+pub(crate) static HTTP_CLIENT: LazyLock<Client> = LazyLock::new(|| Client::builder().build().unwrap());
 pub static DOMAIN: LazyLock<&'static str> = LazyLock::new(||
     match RuntimeEnvironment::default() {
         RuntimeEnvironment::Local => "127.0.0.1",

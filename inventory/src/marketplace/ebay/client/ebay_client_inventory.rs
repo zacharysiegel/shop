@@ -4,7 +4,7 @@ use crate::http::{WithBearer, HTTP_CLIENT};
 use crate::item::Item;
 use crate::marketplace::ebay::client::ebay_client_shared::EBAY_BASE_URL;
 use crate::product::Product;
-use reqwest::header::{AUTHORIZATION, CONTENT_LANGUAGE, CONTENT_TYPE};
+use reqwest::header::{CONTENT_LANGUAGE, CONTENT_TYPE};
 use reqwest::{Request, Response};
 use serde_json::{json, Value};
 
@@ -79,6 +79,9 @@ pub async fn get_all_inventory_locations(
         .build()
         .map_err(|e| ShopError::from_error("malformed request", Box::new(e)))?;
 
-    ""
+    let response: Response = http::execute_checked(request).await?;
+    let response_body: Value = response.json().await
+        .map_err(|e| ShopError::from_error("deserializing inventory location response", Box::new(e)))?;
+    Ok(response_body)
 }
 
