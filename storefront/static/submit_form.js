@@ -1,5 +1,3 @@
-import "/component.js"
-
 document.addEventListener("submit", submit_form);
 
 /**
@@ -55,7 +53,7 @@ function submit_form(submit_event) {
     });
     fetch(request)
         .then(response => {
-            response_component.callbacks.update_status(response);
+            response_component.callbacks.set_status(response);
         });
 }
 
@@ -145,9 +143,7 @@ function form_response_component(response) {
     let text;
     root.appendChild((() => {
         text = document.createElement("span");
-        text.innerText = response
-            ? update_status(response)
-            : `pending`;
+        set_status(response);
         return text;
     })());
     root.appendChild((() => {
@@ -163,15 +159,17 @@ function form_response_component(response) {
     /**
      * @param response {Response}
      */
-    function update_status(response) {
-        text.innerText = `Response status: ${response.status} ${response.statusText}`;
+    function set_status(response) {
+        text.innerText = response
+            ? `Response status: ${response.status} ${response.statusText}`
+            : "pending";
     }
 
     return {
         element: root,
         classList: root.classList,
         callbacks: {
-            update_status,
+            set_status,
         },
     };
 }
