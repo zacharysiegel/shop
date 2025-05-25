@@ -33,7 +33,7 @@ pub fn page(
 				link rel="stylesheet" type="text/css" href="/reset.css";
 				link rel="stylesheet" type="text/css" href="/base.css";
 				link rel="stylesheet" type="text/css" href="/tree.css";
-				script src="/index.js" type="module" {};
+				script type="module" src="/index.js" {};
 				(head_content)
 			}
 			body style=(concat!(

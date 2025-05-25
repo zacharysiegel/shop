@@ -54,7 +54,7 @@ async fn render(pagination_options: Option<KeysetPaginationOptionsForString>) ->
     page::page(
         &vec!(BreadcrumbItem::from(PAGE)),
         html! {
-            script src="/page/product.js" {}
+            script type="module" src="/page/product.js" {}
         },
         split::split(left(pagination_options).await, right().await),
     )
