@@ -54,7 +54,9 @@ async fn render(
             BreadcrumbItem::new("Item", &item_page::PAGE.relative_path.replace("{product_id}", &product_id)),
             BreadcrumbItem::new(PAGE.name, &this_path),
         ),
-        Markup::default(),
+        html! {
+            script type="module" src="/page/listing.js" {}
+        },
         split::split(
             left(&product_id, &item_id).await,
             right(&item_id).await,

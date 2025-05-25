@@ -1,29 +1,15 @@
-const template = document.createElement("template");
-template.innerHTML = `
-    <form data-method="PUT">
-        <button type="submit" style="margin-right: .5rem;">Publish</button>
-    </form>
-`;
+import {register} from "../build/component-register.js";
 
-// noinspection JSUnusedGlobalSymbols
-class PublishListingComponent extends HTMLElement {
+const publish_listing_component = register("x-publish-listing")((props, {element}) => {
+    const inner_element = document.createElement("div");
+    inner_element.innerHTML = `
+        <form data-method="PUT">
+            <button type="submit" style="margin-right: .5rem;">Publish</button>
+        </form>
+    `;
 
-    /**
-     * @type DocumentFragment
-     */
-    #content;
+    const form = inner_element.querySelector("form");
+    form.action = element.getAttribute("action");
 
-    connectedCallback() {
-        if (this.#content) return;
-
-        this.#content = template.content.cloneNode(true);
-
-        const form = this.#content.querySelector("form");
-        form.action = this.getAttribute("action");
-
-        this.appendChild(this.#content);
-    }
-
-}
-
-window.customElements.define("x-publish-listing", PublishListingComponent);
+    element.appendChild(inner_element);
+});
