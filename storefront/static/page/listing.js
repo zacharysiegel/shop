@@ -1,6 +1,6 @@
 import {register} from "../build/component-register.js";
 
-const publish_listing_component = register("x-publish-listing")((props, {element}) => {
+register("x-publish-listing")((props, {element}) => {
     const inner_element = document.createElement("div");
     inner_element.innerHTML = `
         <form data-method="PUT">

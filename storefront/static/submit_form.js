@@ -138,7 +138,6 @@ function as_number(form, key, value) {
 
 /**
  * @param response {(Response | undefined)}
- * @return Component
  */
 function form_response_component(response) {
     const root = document.createElement("div");
