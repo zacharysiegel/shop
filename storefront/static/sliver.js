@@ -198,6 +198,7 @@ function component() {
                 connectedCallback() {
                     if (this.__instance) return;
 
+                    // Read HTML attributes which correspond to declared properties
                     const component_properties = {};
                     for (const key of Object.getOwnPropertyNames(property_defaults)) {
                         const attr = this.getAttribute(key);
@@ -215,9 +216,9 @@ function component() {
 
                     // Expose callbacks as element methods
                     this.__callbacks = this.__instance.callbacks;
-                    Object.keys(this.__callbacks).forEach(name => {
+                    for (const name of Object.getOwnPropertyNames(this.__callbacks)) {
                         this[name] = this.__callbacks[name];
-                    });
+                    }
                 }
 
                 /**
