@@ -15,4 +15,5 @@ component()
 
         fragment.appendChild(inner_element);
     })
-    .define("x-publish-listing");
+    .define("x-publish-listing")
+    .build();

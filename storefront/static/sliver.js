@@ -200,11 +200,10 @@ function component() {
                 connectedCallback() {
                     if (this.__instance) return;
 
-                    // Read HTML attributes which correspond to declared properties
                     const component_properties = {};
-                    for (const key of Object.getOwnPropertyNames(property_defaults)) {
-                        const attr = this.getAttribute(key);
-                        component_properties[key] = attr !== null ? attr : property_defaults[key];
+                    Object.assign(component_properties, property_defaults);
+                    for (const attr of this.attributes) {
+                        component_properties[attr.name] = attr.value;
                     }
 
                     const component_fn = builder.build();
