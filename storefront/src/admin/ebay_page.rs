@@ -1,12 +1,9 @@
-use crate::admin::api::wrapped_get;
 use crate::admin::structure::breadcrumb::BreadcrumbItem;
 use crate::admin::structure::page::Page;
 use crate::admin::structure::{form, page};
-use crate::unwrap_result_else_markup;
 use actix_web::web;
 use actix_web::web::ServiceConfig;
 use inventory::environment::RuntimeEnvironment;
-use inventory::item::ItemSerial;
 use maud::{html, Markup};
 use reqwest::Method;
 use std::ops::Deref;
@@ -24,7 +21,9 @@ fn configurer(config: &mut ServiceConfig) {
 async fn render() -> Markup {
     page::page(
         &vec!(BreadcrumbItem::from(PAGE)),
-        Markup::default(),
+        html! {
+            script type="module" src="/page/ebay.js" {}
+        },
         content().await,
     )
 }
@@ -40,8 +39,9 @@ async fn content() -> Markup {
             (auth_local())
             (refresh())
         }
-        
-        (inventory_locations().await)
+
+        hr;
+        x-ebay-locations {}
     }
 }
 
@@ -64,17 +64,6 @@ fn auth_local() -> Markup {
             }
             input type="submit";
         }))
-    }
-}
-
-async fn inventory_locations() -> Markup {
-    let inventory_locations: serde_json::Value = unwrap_result_else_markup!(
-        wrapped_get("/ebay/location").await
-    );
-
-    html! {
-        h2 { "Inventory locations" }
-        pre { (format!("{}", inventory_locations)) }
     }
 }
 

@@ -163,17 +163,20 @@ function component() {
                     },
                 }));
 
+                const elements = Array.from(fragment.children);
+                const nodes = Array.from(fragment.childNodes);
+
                 return {
-                    elements: fragment.children,
-                    nodes: fragment.childNodes,
+                    elements,
+                    nodes,
                     callbacks,
                     append_self: (parent) => {
-                        for (let node of fragment.childNodes) {
+                        for (let node of nodes) {
                             parent.appendChild(node);
                         }
                     },
                     remove_self: (parent) => {
-                        for (let node of fragment.childNodes) {
+                        for (let node of nodes) {
                             parent.removeChild(node);
                         }
                     },

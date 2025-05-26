@@ -84,4 +84,3 @@ pub async fn get_all_inventory_locations(
         .map_err(|e| ShopError::from_error("deserializing inventory location response", Box::new(e)))?;
     Ok(response_body)
 }
-
