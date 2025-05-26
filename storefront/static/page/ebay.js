@@ -21,3 +21,5 @@ component()
             .catch(() => null);
     })
     .define("x-ebay-locations");
+
+// todo: button to sync inventory locations with ebay (create + update existing)
