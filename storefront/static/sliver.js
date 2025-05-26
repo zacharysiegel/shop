@@ -57,8 +57,11 @@
 
 /**
  * @typedef {Object} ComponentInstance
- * @property {DocumentFragment} fragment - The component's document fragment root
+ * @property {HTMLCollection} elements - The collection of {@link Element} children of the internal {@link DocumentFragment}
+ * @property {NodeList} nodes - The collection of {@link Node} children of the internal {@link DocumentFragment}
  * @property {Object.<string, function>} callbacks - Object containing registered callbacks
+ * @property {function(Node): void} append_self - Append the component's {@link NodeList} to a provided parent {@link Node}
+ * @property {function(Node): void} remove_self - Remove the component's {@link NodeList} from a provided parent {@link Node}
  */
 
 /**
@@ -161,8 +164,19 @@ function component() {
                 }));
 
                 return {
-                    fragment,
+                    elements: fragment.children,
+                    nodes: fragment.childNodes,
                     callbacks,
+                    append_self: (parent) => {
+                        for (let node of fragment.childNodes) {
+                            parent.appendChild(node);
+                        }
+                    },
+                    remove_self: (parent) => {
+                        for (let node of fragment.childNodes) {
+                            parent.removeChild(node);
+                        }
+                    },
                 };
             };
             return component_fn;
@@ -213,7 +227,7 @@ function component() {
                     const root = use_shadow
                         ? this.attachShadow({mode: "open"})
                         : this;
-                    root.appendChild(this.__instance.fragment);
+                    this.__instance.append_self(root);
 
                     // Expose callbacks as element methods
                     this.__callbacks = this.__instance.callbacks;
