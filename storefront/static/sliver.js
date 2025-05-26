@@ -1,4 +1,45 @@
 /**
+ * @module sliver
+ * @description A truly minimal, opinionated UI component framework for operating directly with the browser.
+ *
+ * @author Zachary Siegel
+ * @version 0.1.0
+ *
+ * @example
+ * // Definition
+ * const Counter = component()
+ *   .properties({ count: 0 })
+ *   .factory(({ fragment, properties, add_callback }) => {
+ *     let count = properties.count;
+ *
+ *     const span = document.createElement('span');
+ *     span.textContent = properties.count;
+ *
+ *     add_callback('increment', () => {
+ *       count += 1;
+ *       span.textContent = count;
+ *     });
+ *
+ *     fragment.appendChild(span);
+ *   })
+ *   .build();
+ *
+ * // Instantiation
+ * const counter = Counter();
+ * const btn = document.createElement('button');
+ * btn.textContent = '+';
+ * btn.onclick = counter.callbacks.increment;
+ *
+ * document.body.appendChild(counter.element);
+ * document.body.appendChild(btn);
+ *
+ * // Or as Web Component
+ * component().properties({ count: 0 }).factory(...).define('my-counter');
+ * // <my-counter count="5"></my-counter>
+ * // <button onclick="document.querySelector('my-counter').increment()">+</button>
+ */
+
+/**
  * @typedef {Object} ComponentFactoryProperties
  * @readonly
  * @property {DocumentFragment} fragment - The document fragment root of the component
@@ -86,7 +127,7 @@ function component() {
          * @returns {ComponentBuilder}
          */
         factory: (fn) => {
-            if (_component_fn) throw new Error('Cannot modify factory after component is built');
+            if (_component_fn) throw new Error("Cannot modify factory after component is built");
 
             factory_function = fn;
             return builder;
