@@ -108,12 +108,13 @@ function component() {
 
         /**
          * Enable or disable shadow DOM for web components.
+         * Disabled by default.
          * This property has no effect if {@link ComponentBuilder#define} is not also used.
          * @memberof ComponentBuilder
-         * @param {boolean} [enabled=true]
+         * @param {boolean} enabled
          * @returns {ComponentBuilder}
          */
-        shadow: (enabled = true) => {
+        shadow: (enabled) => {
             if (_component_fn) throw new Error("Cannot modify shadow DOM setting after component is built");
 
             use_shadow = enabled;
