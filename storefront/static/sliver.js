@@ -69,11 +69,11 @@
 
 /**
  * @typedef {Object} ComponentBuilder
- * @property {function(Object): ComponentBuilder} properties - {@link ComponentBuilder#properties}
- * @property {function(boolean=): ComponentBuilder} shadow - {@link ComponentBuilder#shadow}
- * @property {function(ComponentFactory): ComponentBuilder} factory - {@link ComponentBuilder#factory}
- * @property {function(): Component} build - {@link ComponentBuilder#build}
- * @property {function(string, Object=): Component} define - {@link ComponentBuilder#define}
+ * @property {function(Object): ComponentBuilder} properties - {@link ComponentBuilder~properties}
+ * @property {function(boolean=): ComponentBuilder} shadow - {@link ComponentBuilder~shadow}
+ * @property {function(ComponentFactory): ComponentBuilder} factory - {@link ComponentBuilder~factory}
+ * @property {function(): Component} build - {@link ComponentBuilder~build}
+ * @property {function(string, Object=): Component} define - {@link ComponentBuilder~define}
  */
 
 /**
@@ -111,7 +111,7 @@ function component() {
         /**
          * Enable or disable shadow DOM for web components.
          * Disabled by default.
-         * This property has no effect if {@link ComponentBuilder#define} is not also used.
+         * This property has no effect if {@link ComponentBuilder~define} is not also used.
          * @memberof ComponentBuilder
          * @param {boolean} enabled
          * @returns {ComponentBuilder}
