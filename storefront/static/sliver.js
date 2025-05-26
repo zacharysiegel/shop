@@ -91,7 +91,7 @@ function component() {
     let factory_function = null;
 
     /** @type {(Component|null)} */
-    let _component_fn = null;
+    let component_fn = null;
 
     /** @type {ComponentBuilder} */
     const builder = {
@@ -102,7 +102,7 @@ function component() {
          * @returns {ComponentBuilder}
          */
         properties: (properties) => {
-            if (_component_fn) throw new Error("Cannot modify properties after component is built");
+            if (component_fn) throw new Error("Cannot modify properties after component is built");
 
             property_defaults = {...property_defaults, ...properties};
             return builder;
@@ -117,7 +117,7 @@ function component() {
          * @returns {ComponentBuilder}
          */
         shadow: (enabled) => {
-            if (_component_fn) throw new Error("Cannot modify shadow DOM setting after component is built");
+            if (component_fn) throw new Error("Cannot modify shadow DOM setting after component is built");
 
             use_shadow = enabled;
             return builder;
@@ -130,7 +130,7 @@ function component() {
          * @returns {ComponentBuilder}
          */
         factory: (fn) => {
-            if (_component_fn) throw new Error("Cannot modify factory after component is built");
+            if (component_fn) throw new Error("Cannot modify factory after component is built");
 
             factory_function = fn;
             return builder;
@@ -143,11 +143,11 @@ function component() {
          * @returns {Component}
          */
         build: () => {
-            if (_component_fn) {
-                return _component_fn;
+            if (component_fn) {
+                return component_fn;
             }
 
-            _component_fn = (properties = {}) => {
+            component_fn = (properties = {}) => {
                 const merged_properties = {...property_defaults, ...properties};
                 const fragment = document.createDocumentFragment();
                 const callbacks = {};
@@ -165,7 +165,7 @@ function component() {
                     callbacks: callbacks,
                 };
             };
-            return _component_fn;
+            return component_fn;
         },
 
         /**
@@ -248,7 +248,7 @@ function component() {
             }
 
             window.customElements.define(tag_name, CustomElement, options);
-            return _component_fn;
+            return component_fn;
         }
     };
 
