@@ -72,8 +72,8 @@
  * @property {function(Object): ComponentBuilder} properties - {@link ComponentBuilder#properties}
  * @property {function(boolean=): ComponentBuilder} shadow - {@link ComponentBuilder#shadow}
  * @property {function(ComponentFactory): ComponentBuilder} factory - {@link ComponentBuilder#factory}
- * @property {function(string, Object=): ComponentBuilder} define - {@link ComponentBuilder#define}
  * @property {function(): Component} build - {@link ComponentBuilder#build}
+ * @property {function(string, Object=): Component} define - {@link ComponentBuilder#define}
  */
 
 /**
@@ -174,7 +174,7 @@ function component() {
          * @memberof ComponentBuilder
          * @param {string} tag_name
          * @param {ElementDefinitionOptions} [options={}] - The same options as are available on {@link CustomElementRegistry.define}
-         * @returns {ComponentBuilder}
+         * @returns {Component}
          */
         define: (tag_name, options = {}) => {
             // noinspection JSClosureCompilerSyntax; JetBrains warns about unimplemented HTMLElement methods.
@@ -223,7 +223,8 @@ function component() {
                 }
 
                 /**
-                 * Get list of observed attributes
+                 * Get list of observed attributes.
+                 * Only declared default properties will be observed.
                  * @returns {string[]} Array of attribute names to observe
                  * @static
                  */
@@ -232,7 +233,8 @@ function component() {
                 }
 
                 /**
-                 * Called when an observed attribute changes
+                 * Called when an observed attribute changes.
+                 * Only declared default properties will be observed.
                  * @param {string} name - Attribute name
                  * @param {string|null} old_value - Previous value
                  * @param {string|null} new_value - New value
@@ -246,7 +248,7 @@ function component() {
             }
 
             window.customElements.define(tag_name, CustomElement, options);
-            return builder;
+            return _component_fn;
         }
     };
 
