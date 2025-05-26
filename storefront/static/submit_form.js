@@ -1,3 +1,5 @@
+import {component} from "./sliver.js";
+
 document.addEventListener("submit", submit_form);
 
 /**
@@ -37,9 +39,9 @@ function submit_form(submit_event) {
         form_data_as_object[key] = value;
     }
 
-    const response_component = form_response_component(undefined);
-    form.getElementsByClassName(response_component.classList.item(0))?.item(0)?.remove();
-    form.appendChild(response_component.element);
+    const response_component = form_response_component();
+    form.getElementsByClassName(response_component.elements[0].classList.item(0))?.item(0)?.remove();
+    response_component.append_self(form);
 
     /* By default, FormData is converted to the format "multipart/form-data". This representation
         adds significant bloat when each field's data is encoded in UTF-8 and is generally small.
@@ -79,9 +81,9 @@ function as_iso_date_or_datetime(form, key, value) {
         return undefined;
     }
 
-    if (form_control.type === "date") {
+    if (form_control.getAttribute("type") === "date") {
         return new Date(dateValue).toISOString().slice(0, -14); // Remove the time
-    } else if (form_control.type === "datetime-local") {
+    } else if (form_control.getAttribute("type") === "datetime-local") {
         return new Date(dateValue).toISOString();
     }
 
@@ -135,25 +137,34 @@ function as_number(form, key, value) {
 }
 
 /**
- * @param response {(Response | undefined)}
+ * @type {ComponentFactory}
+ * @param parameters
+ * @param {{
+ *     response: Response,
+ * }} parameters.properties
  */
-function form_response_component(response) {
-    const root = document.createElement("div");
-    root.classList.add("form_response_component");
+const form_response_component_factory = ({fragment, properties, add_callback}) => {
+    const {response} = properties;
+
     let text;
-    root.appendChild((() => {
-        text = document.createElement("span");
-        set_status(response);
-        return text;
-    })());
-    root.appendChild((() => {
-        const x_button = document.createElement("button");
-        x_button.innerText = "X";
-        x_button.type = "button";
-        x_button.style.display = "inline";
-        x_button.style.marginLeft = "1rem";
-        x_button.onclick = () => root.parentElement.removeChild(root);
-        return x_button;
+    fragment.append((() => {
+        const root = document.createElement("div");
+        root.classList.add("form_response_component");
+        root.append((() => {
+            text = document.createElement("span");
+            set_status(response);
+            return text;
+        })());
+        root.append((() => {
+            const x_button = document.createElement("button");
+            x_button.innerText = "X";
+            x_button.type = "button";
+            x_button.style.display = "inline";
+            x_button.style.marginLeft = "1rem";
+            x_button.onclick = () => root.parentElement.removeChild(root);
+            return x_button;
+        })());
+        return root;
     })());
 
     /**
@@ -165,11 +176,9 @@ function form_response_component(response) {
             : "pending";
     }
 
-    return {
-        element: root,
-        classList: root.classList,
-        callbacks: {
-            set_status,
-        },
-    };
-}
+    add_callback("set_status", set_status);
+};
+
+const form_response_component = component()
+    .factory(form_response_component_factory)
+    .build();
