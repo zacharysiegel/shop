@@ -42,7 +42,7 @@
 // todo: move to external repository
 
 /**
- * @typedef {Object} ComponentFactoryProperties
+ * @typedef {Object} ComponentFactoryParameters
  * @readonly
  * @property {DocumentFragment} fragment - The document fragment root of the component
  * @property {Object} properties - Component properties merged with defaults
@@ -51,7 +51,7 @@
 
 /**
  * @callback ComponentFactory
- * @param {ComponentFactoryProperties} params - Component creation parameters
+ * @param {ComponentFactoryParameters} parameters - Component creation parameters
  * @returns {void}
  */
 
