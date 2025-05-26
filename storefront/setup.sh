@@ -18,4 +18,4 @@ if ! npm --version 1>/dev/null 2>&1; then
 	echo "The NPM program must be available on the PATH in order to build /lib/component-register"
 fi;
 
-lib_component_register
+lib_component_register # todo: remove
