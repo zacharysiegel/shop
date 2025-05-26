@@ -57,7 +57,7 @@
 
 /**
  * @typedef {Object} ComponentInstance
- * @property {DocumentFragment} element - The component's document fragment root
+ * @property {DocumentFragment} fragment - The component's document fragment root
  * @property {Object.<string, function>} callbacks - Object containing registered callbacks
  */
 
@@ -161,8 +161,8 @@ function component() {
                 }));
 
                 return {
-                    element: fragment,
-                    callbacks: callbacks,
+                    fragment,
+                    callbacks,
                 };
             };
             return component_fn;
@@ -213,7 +213,7 @@ function component() {
                     const root = use_shadow
                         ? this.attachShadow({mode: "open"})
                         : this;
-                    root.appendChild(this.__instance.element);
+                    root.appendChild(this.__instance.fragment);
 
                     // Expose callbacks as element methods
                     this.__callbacks = this.__instance.callbacks;
