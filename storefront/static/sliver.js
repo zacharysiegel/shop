@@ -39,6 +39,8 @@
  * // <button onclick="document.querySelector('my-counter').increment()">+</button>
  */
 
+// todo: move to external repository
+
 /**
  * @typedef {Object} ComponentFactoryProperties
  * @readonly
