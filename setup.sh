@@ -10,4 +10,3 @@ git submodule update
 
 # All setup scripts should be idempotent and callable from the repo root directory
 zsh ./identity/setup.sh # todo: master_secret missing
-zsh ./storefront/setup.sh

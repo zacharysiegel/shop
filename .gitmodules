@@ -1,4 +1,0 @@
-[submodule "lib/component-register"]
-	path = lib/component-register
-	url = git@github.com:ryansolid/component-register.git
-	branch = master
