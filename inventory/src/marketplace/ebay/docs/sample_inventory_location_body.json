@@ -1,0 +1,30 @@
+{ // https://developer.ebay.com/api-docs/sell/inventory/resources/location/methods/createInventoryLocation
+  "location": {
+    "address": {
+      "addressLine1": "{street_address}",
+//      "addressLine2": "nos",
+      "city": "{municipality}",
+      "country": "{country}",
+//      "county": "laboris ad labore",
+      "postalCode": "{postal_area}", // Only required if in-store pickup or not both city and state;
+      "stateOrProvince": "{district}"
+    }
+//    "geoCoordinates": { // Required for in-store pickup only;
+//      "latitude": 67564158.20713016,
+//      "longitude": 26892676.662282392
+//    }
+  },
+//  "locationAdditionalInformation": "{display_name}",
+//  "locationInstructions": "incididunt deserunt pariatur", // Useful for in-store pickup
+  "locationTypes": [ // https://developer.ebay.com/api-docs/sell/inventory/types/api:StoreTypeEnum
+    "WAREHOUSE"
+  ],
+//  "locationWebUrl": "https://{domain}/api/inventory_location/{id}",
+  "merchantLocationStatus": "ENABLED", // https://developer.ebay.com/api-docs/sell/inventory/types/api:StatusEnum
+  "name": "{display_name}",
+//  "operatingHours": [{}], // https://developer.ebay.com/api-docs/sell/inventory/types/api:OperatingHours
+  "phone": "+10000000000", // todo: contact information, use personal phone for now
+//  "specialHours": [{}], // https://developer.ebay.com/api-docs/sell/inventory/types/api:SpecialHours
+  "timeZoneId": "America/Chicago", // Austin + Nashville; IANA Timezone Identifier;
+//  "fulfillmentCenterSpecifications": {} // Required for FULFILLMENT_CENTER type; https://developer.ebay.com/api-docs/sell/inventory/types/api:FulfillmentCenterSpecifications
+}
