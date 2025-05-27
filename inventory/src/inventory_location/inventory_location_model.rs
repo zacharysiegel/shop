@@ -9,6 +9,12 @@ pub struct InventoryLocationEntity {
     pub id: Uuid,
     pub display_name: String,
     pub internal_name: String,
+    pub time_zone_id: String,
+    pub street_address: String,
+    pub municipality: String,
+    pub district: String,
+    pub postal_area: String,
+    pub country: String,
 }
 
 impl ShopEntity for InventoryLocationEntity {
@@ -26,6 +32,12 @@ impl ShopModel for InventoryLocation {
             id: self.id,
             display_name: self.display_name.clone(),
             internal_name: self.internal_name.clone(),
+            time_zone_id: self.time_zone_id.clone(),
+            street_address: self.street_address.clone(),
+            municipality: self.municipality.clone(),
+            district: self.district.clone(),
+            postal_area: self.postal_area.clone(),
+            country: self.country.clone(),
         }
     }
 
@@ -34,6 +46,12 @@ impl ShopModel for InventoryLocation {
             id: object::random_uuid(),
             display_name: serial.display_name.clone(),
             internal_name: serial.internal_name.clone(),
+            time_zone_id: serial.time_zone_id.clone(),
+            street_address: serial.street_address.clone(),
+            municipality: serial.municipality.clone(),
+            district: serial.district.clone(),
+            postal_area: serial.postal_area.clone(),
+            country: serial.country.clone(),
         })
     }
 
@@ -52,6 +70,12 @@ pub struct InventoryLocationSerial {
     pub id: Uuid,
     pub display_name: String,
     pub internal_name: String,
+    pub time_zone_id: String,
+    pub street_address: String,
+    pub municipality: String,
+    pub district: String,
+    pub postal_area: String,
+    pub country: String,
 }
 
 impl ShopSerial for InventoryLocationSerial {
