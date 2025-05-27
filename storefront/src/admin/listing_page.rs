@@ -240,7 +240,7 @@ fn listing_update() -> Markup {
     html! {
         div #(LISTING_UPDATE_CONTAINER_ID) style="display: none;" {
             hr {}
-            (form::form("Listing modifications", "", reqwest::Method::PUT, html! {
+            (form::form(Some("Listing modifications"), "", reqwest::Method::PUT, html! {
                 label {
                     label {
                         "ID"

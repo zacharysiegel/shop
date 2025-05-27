@@ -5,10 +5,12 @@ use reqwest::Method;
 use std::fmt::Debug;
 use strum::VariantArray;
 
-pub fn form(heading: &str, path: &str, method: Method, content: Markup) -> Markup {
+pub fn form(heading: Option<&str>, path: &str, method: Method, content: Markup) -> Markup {
     html! {
         div {
-            h2 { (heading) }
+            @if let Some(heading) = heading {
+                h2 { (heading) }
+            }
 
             form
             action=(format!("{}{}", REGISTRY.inventory_external_path, path))

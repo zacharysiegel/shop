@@ -43,7 +43,7 @@ async fn left() -> Markup {
 }
 
 fn right() -> Markup {
-    form::form("Create inventory location", "/inventory_location", Method::POST, html! {
+    form::form(Some("Create inventory location"), "/inventory_location", Method::POST, html! {
         label {
             "Display name"
             input type="text" name="display_name";

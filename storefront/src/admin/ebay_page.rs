@@ -42,13 +42,16 @@ async fn content() -> Markup {
 
         hr;
         x-ebay-locations {}
+        (form::form(None, "/ebay/location", Method::PUT, html! {
+            button type="submit" { "Sync" }
+        }))
     }
 }
 
 fn auth_local() -> Markup {
     let oauth_url: &&str = inventory::marketplace::ebay::ebay_api::EBAY_OAUTH_AUTHORIZATION_URL.deref();
     html! {
-        (form::form("Authenticate", "/ebay/auth/user/token", Method::PUT, html! {
+        (form::form(Some("Authenticate"), "/ebay/auth/user/token", Method::PUT, html! {
             h3 { "Fetch authorization code"}
             p {
                 a href=(oauth_url) target="_blank" rel="noopener noreferrer" { "Authorization code redirect" }
@@ -70,7 +73,7 @@ fn auth_local() -> Markup {
 fn refresh() -> Markup {
     html! {
         hr;
-        (form::form("Refresh user access token", "/ebay/auth/user/refresh", Method::PUT, html! {
+        (form::form(Some("Refresh user access token"), "/ebay/auth/user/refresh", Method::PUT, html! {
             button type="submit" { "Refresh" }
         }))
     }

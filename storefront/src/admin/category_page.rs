@@ -43,7 +43,7 @@ async fn left() -> Markup {
 }
 
 fn right() -> Markup {
-    form::form("Create category", "/category", Method::POST, html! {
+    form::form(Some("Create category"), "/category", Method::POST, html! {
         label {
             "Display name"
             input type="text" name="display_name";

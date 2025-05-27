@@ -1,12 +1,14 @@
 use crate::error::ShopError;
 use crate::http;
 use crate::http::{WithBearer, HTTP_CLIENT};
+use crate::inventory_location::InventoryLocation;
 use crate::item::Item;
 use crate::marketplace::ebay::client::ebay_client_shared::EBAY_BASE_URL;
 use crate::product::Product;
 use reqwest::header::{CONTENT_LANGUAGE, CONTENT_TYPE};
 use reqwest::{Request, Response};
 use serde_json::{json, Value};
+use std::ops::Deref;
 
 const INVENTORY_API_BASE_PATH: &str = "/sell/inventory/v1";
 
@@ -40,7 +42,7 @@ pub async fn create_or_replace_inventory_item(
             ShopError::from_error("serializing inventory item", Box::new(e))
         )?;
 
-    let request: Request = http::HTTP_CLIENT
+    let request: Request = HTTP_CLIENT
         .put(format!("{}{}/inventory_item/{}", *EBAY_BASE_URL, INVENTORY_API_BASE_PATH, item.id))
         .header(CONTENT_LANGUAGE, super::ebay_client_shared::EBAY_CONTENT_LANGUAGE)
         .header(CONTENT_TYPE, "application/json")
@@ -83,4 +85,86 @@ pub async fn get_all_inventory_locations(
     let response_body: Value = response.json().await
         .map_err(|e| ShopError::from_error("deserializing inventory location response", Box::new(e)))?;
     Ok(response_body)
+}
+
+pub async fn get_inventory_location(
+    user_access_token: &str,
+    inventory_location_id: &str,
+) -> Result<Option<Value>, ShopError> {
+    let request: Request = HTTP_CLIENT
+        .get(format!("{}{}/location/{}", EBAY_BASE_URL.deref(), INVENTORY_API_BASE_PATH, inventory_location_id))
+        .with_bearer(user_access_token)
+        .build()
+        .map_err(|e| ShopError::from_error("malformed request", Box::new(e)))?;
+
+    let response: Option<Response> = http::execute_checked_optional(request).await?;
+    let Some(response) = response else {
+        return Ok(None);
+    };
+
+    let response_body: Value = response.json().await
+        .map_err(|e| ShopError::from_error("deserializing inventory location response", Box::new(e)))?;
+    Ok(Some(response_body))
+}
+
+fn inventory_location_body(inventory_location: &InventoryLocation) -> Result<String, ShopError> {
+    let body: Value = json!({
+        "location": {
+            "address": {
+                "addressLine1": &inventory_location.street_address,
+                "city": &inventory_location.municipality,
+                "country": "US", // If we ever have inventory locations outside the United States, this will require a more sophisticated conversion to ISO 3166
+                "postalCode": &inventory_location.postal_area,
+                "stateOrProvince": &inventory_location.district,
+            }
+        },
+        "locationTypes": [ "WAREHOUSE" ],
+        // "merchantLocationStatus": "ENABLED",
+        "name": &inventory_location.display_name,
+        "phone": "+10000000000", // todo: manage contact information
+        "timeZoneId": &inventory_location.time_zone_id
+    });
+    let body: String = serde_json::to_string(&body)
+        .map_err(|e|
+            ShopError::from_error("serializing inventory item", Box::new(e))
+        )?;
+    Ok(body)
+}
+
+pub async fn create_inventory_location(
+    user_access_token: &str,
+    inventory_location: &InventoryLocation,
+) -> Result<(), ShopError> {
+    let body: String = inventory_location_body(inventory_location)?;
+    let merchant_location_key: &String = &inventory_location.id.to_string();
+    let request: Request = HTTP_CLIENT
+        .post(format!("{}{}/location/{}", *EBAY_BASE_URL, INVENTORY_API_BASE_PATH, merchant_location_key))
+        .header(CONTENT_TYPE, "application/json")
+        .with_bearer(user_access_token)
+        .body(body)
+        .build()
+        .map_err(|e| ShopError::from_error("malformed request", Box::new(e)))?;
+
+    http::execute_checked(request).await?;
+    Ok(())
+}
+
+#[allow(unused)]
+pub async fn update_inventory_location(
+    user_access_token: &str,
+    inventory_location: &InventoryLocation,
+) -> Result<(), ShopError> {
+    let body: String = inventory_location_body(inventory_location)?;
+    let merchant_location_key: &String = &inventory_location.id.to_string();
+
+    let request: Request = HTTP_CLIENT
+        .post(format!("{}{}/location/{}/update_location_details", EBAY_BASE_URL.deref(), INVENTORY_API_BASE_PATH, merchant_location_key))
+        .header(CONTENT_TYPE, "application/json")
+        .with_bearer(user_access_token)
+        .body(body)
+        .build()
+        .map_err(|e| ShopError::from_error("malformed request", Box::new(e)))?;
+
+    http::execute_checked(request).await?;
+    Ok(())
 }

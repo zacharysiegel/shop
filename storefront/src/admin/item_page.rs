@@ -161,7 +161,7 @@ async fn create_listing_form() -> Markup {
     html! {
         div #(CREATE_LISTING_FORM_CONTAINER_ID) style=(concat!("display: none;")) {
             hr {}
-            (form::form("Create listing", "/listing", Method::POST, html! {
+            (form::form(Some("Create listing"), "/listing", Method::POST, html! {
                 label {
                     "Item ID"
                     input type="text" readonly[true] name="item_id";

@@ -1,5 +1,6 @@
 use crate::error::ShopError;
 use log::{LevelFilter, SetLoggerError};
+use std::backtrace::Backtrace;
 use std::env;
 use std::ops::Deref;
 use std::sync::LazyLock;
@@ -17,7 +18,9 @@ pub enum RuntimeEnvironment {
 
 impl RuntimeEnvironment {
     pub fn from_env() -> Result<RuntimeEnvironment, ShopError> {
-        RuntimeEnvironment::try_from(env::var("RUNTIME_ENVIRONMENT").unwrap_or(String::new()))
+        RuntimeEnvironment::try_from(
+            env::var("RUNTIME_ENVIRONMENT").unwrap_or(String::from("local"))
+        )
     }
 }
 
@@ -41,10 +44,9 @@ impl TryFrom<String> for RuntimeEnvironment {
 }
 
 pub fn load_env() -> Result<(), std::io::Error> {
-    match dotenvy::dotenv() {
-        Ok(_) => Ok(()),
-        Err(error) => Err(std::io::Error::new(std::io::ErrorKind::Other, error))?,
-    }
+    dotenvy::dotenv()
+        .map_err(|e| std::io::Error::new(std::io::ErrorKind::Other, e))?;
+    Ok(())
 }
 
 pub fn init_logger() -> Result<(), SetLoggerError> {
@@ -54,4 +56,12 @@ pub fn init_logger() -> Result<(), SetLoggerError> {
         .filter_module("actix_web::middleware::logger", LevelFilter::Info)
         .format_source_path(true)
         .try_init()
+}
+
+/// Capture a backtrace, ignoring RUST_BACKTRACE and RUST_LIB_BACKTRACE environment variables in non-production environments.
+pub fn capture_backtrace() -> Backtrace {
+    match RuntimeEnvironment::default() {
+        RuntimeEnvironment::Local | RuntimeEnvironment::Stage => Backtrace::force_capture(),
+        RuntimeEnvironment::Production => Backtrace::capture(),
+    }
 }

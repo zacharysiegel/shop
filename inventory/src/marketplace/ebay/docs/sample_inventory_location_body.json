@@ -4,7 +4,7 @@
       "addressLine1": "{street_address}",
 //      "addressLine2": "nos",
       "city": "{municipality}",
-      "country": "{country}",
+      "country": "US", // https://developer.ebay.com/api-docs/sell/inventory/types/ba:CountryCodeEnum
 //      "county": "laboris ad labore",
       "postalCode": "{postal_area}", // Only required if in-store pickup or not both city and state;
       "stateOrProvince": "{district}"

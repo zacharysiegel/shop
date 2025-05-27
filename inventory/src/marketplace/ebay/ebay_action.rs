@@ -5,7 +5,9 @@ use crate::marketplace::marketplace_db;
 use crate::product::Product;
 use sqlx::PgPool;
 use std::sync::OnceLock;
+use serde_json::Value;
 use uuid::Uuid;
+use crate::inventory_location::{InventoryLocation, InventoryLocationEntity};
 use super::client;
 
 static MARKETPLACE_ID: OnceLock<Uuid> = OnceLock::new();
@@ -52,5 +54,21 @@ fn validate_listing(listing: &Listing) -> Result<(), ShopError> {
             MARKETPLACE_ID.get().unwrap(),
         )))
     }
+    Ok(())
+}
+
+pub async fn sync_all_locations(pgpool: &PgPool, user_token: &str) -> Result<(), ShopError> {
+    let inventory_location_vec: Vec<InventoryLocation> = crate::inventory_location::inventory_location_action::get_all_inventory_locations(pgpool).await?;
+
+    for inventory_location in &inventory_location_vec {
+        let ebay_location: Option<Value> = client::get_inventory_location(user_token, &inventory_location.id.to_string()).await?;
+        if (ebay_location.is_none()) {
+            client::create_inventory_location(user_token, &inventory_location).await?;
+        } else {
+            // todo: This part of eBay's service is broken. Check back in later. For now we can only create.
+            // client::update_inventory_location(user_token, &inventory_location).await?;
+        }
+    }
+
     Ok(())
 }

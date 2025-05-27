@@ -19,12 +19,27 @@ pub static DOMAIN: LazyLock<&'static str> = LazyLock::new(||
 /// Converts I/O errors to standard ShopError structs.
 /// Converts error responses (4xx/5xx) to ShopError structs.
 pub async fn execute_checked(request: Request) -> Result<Response, ShopError> {
+    let optional: Option<Response> = execute_checked_optional(request).await?;
+    let response: Response = optional.ok_or(
+        ShopError::new(&format!("http error; [{}]", StatusCode::NOT_FOUND))
+    )?;
+    Ok(response)
+}
+
+/// Standard wrapper for the reqwest::Client::execute method.
+/// Converts I/O errors to standard ShopError structs.
+/// Converts error responses (4xx/5xx) to ShopError structs, except 404 which is returned as `Ok(None)`.
+pub async fn execute_checked_optional(request: Request) -> Result<Option<Response>, ShopError> {
     log::debug!("{:#?}", request);
 
     let response: Response = HTTP_CLIENT
         .execute(request)
         .await
         .map_err(|error| ShopError::from_error("request failed", Box::new(error)))?;
+
+    if response.status() == StatusCode::NOT_FOUND {
+        return Ok(None);
+    }
 
     if response.status().is_client_error() || response.status().is_server_error() {
         let status: StatusCode = response.status();
@@ -33,7 +48,7 @@ pub async fn execute_checked(request: Request) -> Result<Response, ShopError> {
         return Err(ShopError::new(&format!("http error; [{}]; [{}];", status, text)));
     }
 
-    Ok(response)
+    Ok(Some(response))
 }
 
 pub fn header_set_cookie_secure(name: &str, token: &str, lifetime: u64) -> (&'static str, String) {

@@ -130,7 +130,7 @@ async fn table(elements: &Vec<ProductSerial>) -> Markup {
 }
 
 fn create_product_form() -> Markup {
-    form::form("Create product", "/product", Method::POST, html! {
+    form::form(Some("Create product"), "/product", Method::POST, html! {
         label {
             "Display name"
             input type="text" name="display_name";
@@ -155,7 +155,7 @@ fn delete_form() -> Markup {
     html! {
         div #(DELETE_FORM_CONTAINER_ID) style=(concat!("display: none;")) {
             hr {}
-            (form::form("Delete product", "js", Method::DELETE, html! {
+            (form::form(Some("Delete product"), "js", Method::DELETE, html! {
                 label {
                     "ID"
                     input type="text" name="id" disabled[true];
@@ -175,7 +175,7 @@ async fn create_item_form() -> Markup {
     html! {
         div #(CREATE_ITEM_FORM_CONTAINER_ID) style=(concat!("display: none;")) {
             hr {}
-            (form::form("Create item", "js", Method::POST, html! {
+            (form::form(Some("Create item"), "js", Method::POST, html! {
                 label {
                     "Product ID"
                     input type="text" name="product_id" readonly[true];
@@ -243,7 +243,7 @@ async fn category_details() -> Markup {
             h2 { "Categories" }
             section {}
             hr {}
-            (form::form("Add category", "js", Method::POST, html! {
+            (form::form(Some("Add category"), "js", Method::POST, html! {
                 label {
                     // Placed here for UX, not actually consumed in the HTTP request
                     "Product ID"

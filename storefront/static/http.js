@@ -5,6 +5,7 @@ export const api_url = "https://127.0.0.1:1443/api";
  * @param {Object} options
  * @property {Node} [error_target = null]
  * @property {boolean} [parse = false]
+ * @return {Promise<any | string>}
  */
 export const fetch_checked = (request, {
     error_target,

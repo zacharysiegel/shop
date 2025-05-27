@@ -74,7 +74,7 @@ async fn table(marketplace_vec: &Vec<MarketplaceSerial>) -> Markup {
 }
 
 fn create_marketplace_form() -> Markup {
-    form::form("Create marketplace", "/marketplace", Method::POST, html! {
+    form::form(Some("Create marketplace"), "/marketplace", Method::POST, html! {
         label {
             "Display name"
             input type="text" name="display_name";

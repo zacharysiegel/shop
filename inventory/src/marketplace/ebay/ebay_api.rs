@@ -1,5 +1,6 @@
 use super::client;
 use crate::environment::RuntimeEnvironment;
+use crate::error::ShopError;
 use crate::listing::{listing_db, Listing, ListingEntity};
 use crate::marketplace::ebay::client::{AuthorizationCodeResponse, ClientCredentialsResponse, RefreshTokenResponse};
 use crate::marketplace::ebay::ebay_action;
@@ -31,6 +32,7 @@ pub fn configurer(config: &mut ServiceConfig) {
             .route("/listing/{item_id}", web::put().to(put_listing))
             .route("/listing/{item_id}", web::get().to(get_listing))
             .route("/location", web::get().to(get_all_locations))
+            .route("/location", web::put().to(sync_locations))
     );
 }
 
@@ -120,7 +122,7 @@ async fn put_listing(
     let listing: Listing = unwrap_result_else_500!(listing.try_to_model());
 
     unwrap_result_else_500!(ebay_action::post(&pgpool, &user_token.value(), &listing).await);
-    HttpResponse::Ok().finish()
+    HttpResponse::NoContent().finish()
 }
 
 async fn get_listing(
@@ -133,7 +135,7 @@ async fn get_listing(
     };
 
     let json: Value = unwrap_result_else_500!(client::get_inventory_item(&user_token.value(), &item_id).await);
-    HttpResponse::Ok().body(json.to_string())
+    HttpResponse::Ok().json(json)
 }
 
 async fn get_all_locations(
@@ -145,5 +147,18 @@ async fn get_all_locations(
     };
 
     let json: Value = unwrap_result_else_500!(client::get_all_inventory_locations(&user_token.value()).await);
-    HttpResponse::Ok().body(json.to_string())
+    HttpResponse::Ok().json(json)
+}
+
+async fn sync_locations(
+    pgpool: web::Data<PgPool>,
+    request: HttpRequest,
+) -> HttpResponse {
+    let user_token: Cookie = match extract_user_token(&request) {
+        Ok(value) => value,
+        Err(response) => return response,
+    };
+
+    unwrap_result_else_500!(ebay_action::sync_all_locations(&pgpool, &user_token.value()).await);
+    HttpResponse::build(StatusCode::NO_CONTENT).finish()
 }
