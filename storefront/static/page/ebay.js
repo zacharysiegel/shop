@@ -15,7 +15,7 @@ component()
 
         const pre = document.createElement("pre");
         pre.textContent = "Pending.";
-        pre.style.margin = "1rem 0"
+        pre.style.margin = ".5rem 0"
 
         fragment.append(h2, refresh_button, pre);
 
@@ -29,12 +29,12 @@ component()
             })
                 .then(body => {
                     const json = JSON.parse(body);
-                    let str = "";
+                    let str = `n: ${json["total"]}`;
                     // Specific to eBay's inventory location JSON schema
                     for (let location of json["locations"]) {
-                        str += JSON.stringify(location) + "\n";
+                        str += "\n" + JSON.stringify(location);
                     }
-                    pre.textContent = str.slice(0, -1);
+                    pre.textContent = str;
                 })
                 .catch(() => null);
         }
