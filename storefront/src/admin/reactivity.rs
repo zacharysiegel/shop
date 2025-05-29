@@ -40,7 +40,7 @@ pub fn update_form_from_json_string(path: &str, json_parameters: &str) -> String
         const form = forms[forms.length - 1]
         form.action = "{}{}";
 
-        const parameters = JSON.parse('{}');
+        const parameters = JSON.parse(`{}`); // If this string contains backticks, the script will probably fail
         for (let [key, value] of Object.entries(parameters)) {{
             const input = form[key];
             if (input === undefined) continue;
