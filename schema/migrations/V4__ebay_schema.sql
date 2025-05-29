@@ -1,12 +1,12 @@
 create schema if not exists ebay;
 
-create table shop.ebay.category
+create table if not exists shop.ebay.category
 (
     id uuid not null unique primary key,
     ebay_category_id text not null unique,
     ebay_category_tree_id text not null,
     ebay_category_tree_version text not null,
-    ebay_category_name text
+    ebay_category_name text not null
 );
 
 insert into shop.ebay.category
@@ -16,7 +16,7 @@ values ('00000000-0000-0000-0000-000000000000', '1', '0', '131', 'Collectibles')
 ;
 
 alter table shop.public.category
-    add column ebay_category_id uuid
+    add column if not exists ebay_category_id uuid
         not null default '00000000-0000-0000-0000-000000000000'
         references shop.ebay.category
 ;
