@@ -1,6 +1,5 @@
 use super::client;
 use crate::environment::RuntimeEnvironment;
-use crate::error::ShopError;
 use crate::listing::{listing_db, Listing, ListingEntity};
 use crate::marketplace::ebay::client::{AuthorizationCodeResponse, ClientCredentialsResponse, RefreshTokenResponse};
 use crate::marketplace::ebay::ebay_action;
