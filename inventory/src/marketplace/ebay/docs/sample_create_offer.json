@@ -26,14 +26,14 @@
 //    "productCompliancePolicyIds": [],
 //    "regionalProductCompliancePolicies": {}, // Relevant for GB, DE, FR, IT, ES (not US)
 //    "regionalTakeBackPolicies": {}, // Relevant for GB, DE, FR, IT, ES (not US)
-    "returnPolicyId": "{nominal.id}",
+    "returnPolicyId": "{nominal.id}"
 //    "shippingCostOverrides": [], // https://developer.ebay.com/api-docs/sell/inventory/types/slr:ShippingCostOverride
 //    "takeBackPolicyId": "string" // todo: Not sure if we want to use this. IDK how it's different from return policy.
   },
 //  "listingStartDate": "string", // Default: immediate;
 //  "lotSize": "integer", // Only used for lot listings
   "marketplaceId": "EBAY_US",
-  "merchantLocationKey": "{inventory_location.id}",
+  "merchantLocationKey": "{item.inventory_location_id}",
   "pricingSummary": { // https://developer.ebay.com/api-docs/sell/inventory/types/slr:PricingSummary
 //    "auctionReservePrice": {},
 //    "auctionStartPrice": {},
@@ -43,7 +43,7 @@
     "price": {
       "currency": "USD",
       "value": "{item.price_cents / 100 + . + item.price_cents % 100}"
-    },
+    }
 //    "pricingVisibility": "MinimumAdvertisedPriceHandlingEnum : [NONE,PRE_CHECKOUT,DURING_CHECKOUT]" // https://developer.ebay.com/api-docs/sell/inventory/types/slr:MinimumAdvertisedPriceHandlingEnum
   },
 //  "quantityLimitPerBuyer": "integer",

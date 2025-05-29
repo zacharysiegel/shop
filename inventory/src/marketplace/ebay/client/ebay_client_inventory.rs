@@ -1,3 +1,4 @@
+use super::super::ebay_category::ebay_category_model::Category;
 use crate::error::ShopError;
 use crate::http;
 use crate::http::{WithBearer, HTTP_CLIENT};
@@ -11,6 +12,7 @@ use serde_json::{json, Value};
 use std::ops::Deref;
 
 const INVENTORY_API_BASE_PATH: &str = "/sell/inventory/v1";
+const EBAY_MARKETPLACE_ID_US: &str = "EBAY_US";
 
 pub async fn create_or_replace_inventory_item(
     user_access_token: &str,
@@ -126,7 +128,7 @@ fn inventory_location_body(inventory_location: &InventoryLocation) -> Result<Str
     });
     let body: String = serde_json::to_string(&body)
         .map_err(|e|
-            ShopError::from_error("serializing inventory item", Box::new(e))
+            ShopError::from_error("serializing inventory location", Box::new(e))
         )?;
     Ok(body)
 }
@@ -167,4 +169,75 @@ pub async fn update_inventory_location(
 
     http::execute_checked(request).await?;
     Ok(())
+}
+
+pub async fn create_offer(
+    user_access_token: &str,
+    ebay_categories: Vec<&Category>,
+    item: Item,
+    // todo: inventory_location + listing + item?
+) -> Result<String, ShopError> {
+    let category_0: &Category = *ebay_categories.get(0)
+        .ok_or_else(|| ShopError::new("missing category"))?;
+    let price: String = dollar_string(u64::from(item.price_cents));
+    let price_div_2: String = dollar_string(u64::from(item.price_cents / 2));
+    let fulfillment_policy_id: &String = super::super::ebay_action::NOMINAL_FULFILLMENT_POLICY_ID
+        .get()
+        .ok_or_else(|| ShopError::default())?;
+    let payment_policy_id: &String = super::super::ebay_action::NOMINAL_PAYMENT_POLICY_ID
+        .get()
+        .ok_or_else(|| ShopError::default())?;
+    let return_policy_id: &String = super::super::ebay_action::NOMINAL_RETURN_POLICY_ID
+        .get()
+        .ok_or_else(|| ShopError::default())?;
+    let body: Value = json!({
+        "categoryId": category_0.ebay_category_id,
+        "format": "FIXED_PRICE",
+        "hideBuyerDetails": false,
+        "includeCatalogProductDetails": true,
+        "listingDuration": "GTC",
+        "listingPolicies": {
+            "bestOfferTerms": {
+                "autoDeclinePrice": {
+                    "currency": "USD",
+                    "value": price_div_2
+                },
+                "bestOfferEnabled": true
+            },
+            "fulfillmentPolicyId": fulfillment_policy_id,
+            "paymentPolicyId": payment_policy_id,
+            "returnPolicyId": return_policy_id,
+        },
+        "marketplaceId": EBAY_MARKETPLACE_ID_US,
+        "merchantLocationKey": item.inventory_location_id,
+        "pricingSummary": {
+            "price": {
+                "currency": "USD",
+                "value": price,
+            }
+        },
+        "tax": {
+            "applyTax": false
+        }
+    });
+    let body = serde_json::to_string(&body)
+        .map_err(|e| ShopError::from_error("serializing offer", Box::new(e)))?;
+
+    let request: Request = HTTP_CLIENT
+        .post(format!("{}{}/offer", EBAY_BASE_URL.deref(), INVENTORY_API_BASE_PATH))
+        .header(CONTENT_TYPE, "application/json")
+        .header(CONTENT_LANGUAGE, super::ebay_client_shared::EBAY_CONTENT_LANGUAGE)
+        .with_bearer(user_access_token)
+        .body(body)
+        .build()
+        .map_err(|e| ShopError::from_error("malformed request", Box::new(e)))?;
+
+    let response = http::execute_checked(request).await?;
+    let offer_id = response.text().await
+        .map_err(|e| ShopError::from_error("reading offer response", Box::new(e)))?;
+    Ok(offer_id) // todo: check actual response value
+}
+
+fn dollar_string(cents: u64) -> String {
+    format!("{}.{}", cents / 100, cents % 100)
 }

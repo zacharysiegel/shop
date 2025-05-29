@@ -10,6 +10,10 @@ use uuid::Uuid;
 use crate::inventory_location::{InventoryLocation, InventoryLocationEntity};
 use super::client;
 
+pub static NOMINAL_FULFILLMENT_POLICY_ID: OnceLock<String> = OnceLock::new();
+pub static NOMINAL_PAYMENT_POLICY_ID: OnceLock<String> = OnceLock::new();
+pub static NOMINAL_RETURN_POLICY_ID: OnceLock<String> = OnceLock::new();
+
 static MARKETPLACE_ID: OnceLock<Uuid> = OnceLock::new();
 
 const MARKETPLACE_INTERNAL_NAME: &str = "ebay";
@@ -21,7 +25,11 @@ pub async fn init(pgpool: &PgPool) {
         // Panicking on application initialization is fine
         .expect(&format!("Error querying database for marketplace initialization; [{}]", MARKETPLACE_INTERNAL_NAME))
         .expect(&format!("No marketplace matching the given name; [{}]", MARKETPLACE_INTERNAL_NAME));
-    _ = MARKETPLACE_ID.set(entity.id);
+    MARKETPLACE_ID.set(entity.id).ok();
+    // todo: use the Account v1 API to fetch live object IDs. (these are sandbox values)
+    NOMINAL_FULFILLMENT_POLICY_ID.set("6209442000".to_string()).ok();
+    NOMINAL_PAYMENT_POLICY_ID.set("6209443000".to_string()).ok();
+    NOMINAL_RETURN_POLICY_ID.set("6209449000".to_string()).ok();
 }
 
 /// https://developer.ebay.com/api-docs/sell/inventory/resources/inventory_item/methods/createOrReplaceInventoryItem
@@ -51,7 +59,8 @@ fn validate_listing(listing: &Listing) -> Result<(), ShopError> {
         return Err(ShopError::new(&format!(
             "Invalid listing; Listing marketplace ID does not match \"{}\"; [{}]",
             MARKETPLACE_INTERNAL_NAME,
-            MARKETPLACE_ID.get().unwrap(),
+            MARKETPLACE_ID.get()
+                .ok_or_else(|| ShopError::default())?,
         )))
     }
     Ok(())
