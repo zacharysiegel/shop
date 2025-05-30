@@ -42,11 +42,18 @@ pub async fn post(pgpool: &PgPool, user_access_token: &str, listing: &Listing) -
     log::info!("Posting listing to {}; [listing_id: {}]; [marketplace_id: {}]", MARKETPLACE_INTERNAL_NAME, listing.id, MARKETPLACE_ID.get().unwrap());
 
     client::create_or_replace_inventory_item(user_access_token, &item, &product).await?;
-    
-    // todo: return early if offer already exists
+
+    if (offer_exists(user_access_token, &item.id).await?) {
+        log::info!("Offer already exists; Cancelling create/publish; [{}]", item.id);
+        return Ok(());
+    }
+
+    // Offers are immediately published here, so we don't bother to check if already published
     let offer_id: String = create_offer(pgpool, user_access_token, &item).await?;
-    // todo: publish offer
     log::info!("Created ebay offer [{}]", offer_id);
+
+    client::publish_offer(user_access_token, &offer_id).await?;
+    log::info!("Published ebay offer [{}]", offer_id);
 
     Ok(())
 }
@@ -63,6 +70,18 @@ fn validate_listing(listing: &Listing) -> Result<(), ShopError> {
         )))
     }
     Ok(())
+}
+
+async fn offer_exists(
+    user_access_token: &str,
+    item_id: &Uuid,
+) -> Result<bool, ShopError> {
+    let offer: Value = client::get_offers_fixed_price(user_access_token, &item_id).await?;
+    let total: i64 = offer.get("total")
+        .ok_or_else(|| ShopError::new("getting total field in get_offers response"))?
+        .as_i64()
+        .ok_or_else(|| ShopError::new("converting total field to i64"))?;
+    Ok(total > 0)
 }
 
 async fn create_offer(

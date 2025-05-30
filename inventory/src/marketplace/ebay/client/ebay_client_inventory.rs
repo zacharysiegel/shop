@@ -10,6 +10,7 @@ use reqwest::header::{CONTENT_LANGUAGE, CONTENT_TYPE};
 use reqwest::{Request, Response};
 use serde_json::{json, Value};
 use std::ops::Deref;
+use uuid::Uuid;
 
 const INVENTORY_API_BASE_PATH: &str = "/sell/inventory/v1";
 const EBAY_MARKETPLACE_ID_US: &str = "EBAY_US";
@@ -171,6 +172,54 @@ pub async fn update_inventory_location(
     Ok(())
 }
 
+#[allow(unused)]
+pub async fn get_offer(
+    user_access_token: &str,
+    offer_id: &str,
+) -> Result<Option<Value>, ShopError> {
+    let request: Request = HTTP_CLIENT
+        .get(format!("{}{}/offer/{}", *EBAY_BASE_URL, INVENTORY_API_BASE_PATH, offer_id))
+        .with_bearer(user_access_token)
+        .build()
+        .map_err(|e| ShopError::from_error("malformed request", Box::new(e)))?;
+    let response: Option<Response> = http::execute_checked_optional(request)
+        .await?;
+
+    match response {
+        Some(response) => {
+            let value: Value = response.json::<Value>()
+                .await
+                .map_err(|e| ShopError::from_error("deserializing offer response", Box::new(e)))?;
+            Ok(Some(value))
+        }
+        None => Ok(None),
+    }
+}
+
+pub async fn get_offers_fixed_price(
+    user_access_token: &str,
+    item_id: &Uuid,
+) -> Result<Value, ShopError> {
+    let request: Request = HTTP_CLIENT
+        .get(format!(
+            "{}{}/offer?marketplace_id={}&sku={}&format=FIXED_PRICE",
+            *EBAY_BASE_URL,
+            INVENTORY_API_BASE_PATH,
+            EBAY_MARKETPLACE_ID_US,
+            item_id.to_string(),
+        ))
+        .with_bearer(user_access_token)
+        .build()
+        .map_err(|e| ShopError::from_error("malformed request", Box::new(e)))?;
+
+    let response: Response = http::execute_checked(request).await?;
+    let body = response.json::<Value>()
+        .await
+        .map_err(|e| ShopError::from_error("deserializing get_offers body", Box::new(e)))?;
+
+    Ok(body)
+}
+
 pub async fn create_offer(
     user_access_token: &str,
     item: &Item,
@@ -245,4 +294,17 @@ pub async fn create_offer(
 
 fn dollar_string(cents: u64) -> String {
     format!("{}.{}", cents / 100, cents % 100)
+}
+
+pub async fn publish_offer(
+    user_access_token: &str,
+    offer_id: &str,
+) -> Result<(), ShopError> {
+    let request = HTTP_CLIENT
+        .post(format!("{}{}/offer/{}/publish", *EBAY_BASE_URL, INVENTORY_API_BASE_PATH, offer_id))
+        .with_bearer(user_access_token)
+        .build()
+        .map_err(|e| ShopError::from_error("malformed request", Box::new(e)))?;
+    http::execute_checked(request).await?;
+    Ok(())
 }
