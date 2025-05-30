@@ -12,7 +12,10 @@ create table if not exists shop.ebay.category
 insert into shop.ebay.category
 (id, ebay_category_id, ebay_category_tree_id, ebay_category_tree_version, ebay_category_name)
 values ('00000000-0000-0000-0000-000000000000', '1', '0', '131', 'Collectibles'),
-       (gen_random_uuid(), '8675', '0', '131', 'Star Wars Collectibles')
+       -- "Star Wars Collectibles" sub-categories
+       (gen_random_uuid(), '154', '0', '131', 'Other Star Wars Collectibles'),
+       (gen_random_uuid(), '111997', '0', '131', 'Collectible Action Figures'),
+       (gen_random_uuid(), '99975', '0', '131', 'Vehicle & Space Ship Replicas')
 ;
 
 alter table shop.public.category

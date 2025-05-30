@@ -48,7 +48,7 @@ impl From<&ItemCondition> for Condition {
         match value {
             ItemCondition::Inapplicable => Condition::New,
             ItemCondition::BrandNew => Condition::New,
-            ItemCondition::LikeNew => Condition::LikeNew,
+            ItemCondition::LikeNew => Condition::New,
             ItemCondition::VeryGood => Condition::UsedVeryGood,
             ItemCondition::Good => Condition::UsedGood,
             ItemCondition::Acceptable => Condition::UsedAcceptable,
