@@ -19,7 +19,7 @@ pub static EBAY_CLIENT_SECRET: LazyLock<String> = LazyLock::new(||
 
 pub const EBAY_CLIENT_ID: &str = "ZacharyS-shop-SBX-9a6e149a0-59597965";
 
-pub const EBAY_MARKETPLACE_US: &str = "EBAY_US";
+pub const EBAY_MARKETPLACE_ID_US: &str = "EBAY_US";
 
 // https://developer.ebay.com/api-docs/sell/account/types/ba:MarketplaceIdEnum
 pub const EBAY_CATEGORY_STANDARD: &str = "ALL_EXCLUDING_MOTORS_VEHICLES";

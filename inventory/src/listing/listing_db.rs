@@ -58,20 +58,4 @@ pub async fn update_listing(
         .await
 }
 
-pub async fn publish_listing(
-    pgpool: &PgPool,
-    listing_id: &Uuid,
-) -> Result<PgQueryResult, Error> {
-    query!("
-        update shop.public.listing
-        set status = $2
-        where id = $1
-    ",
-        listing_id,
-        i32::from(ListingStatus::Published as u8),
-    )
-        .execute(pgpool)
-        .await
-}
-
 // todo: Paginated get_all_marketplace_listings(_page) query

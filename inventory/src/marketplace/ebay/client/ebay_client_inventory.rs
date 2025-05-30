@@ -11,9 +11,9 @@ use reqwest::{Request, Response};
 use serde_json::{json, Value};
 use std::ops::Deref;
 use uuid::Uuid;
+use super::ebay_client_shared;
 
 const INVENTORY_API_BASE_PATH: &str = "/sell/inventory/v1";
-const EBAY_MARKETPLACE_ID_US: &str = "EBAY_US";
 
 pub async fn create_or_replace_inventory_item(
     user_access_token: &str,
@@ -48,7 +48,7 @@ pub async fn create_or_replace_inventory_item(
 
     let request: Request = HTTP_CLIENT
         .put(format!("{}{}/inventory_item/{}", *EBAY_BASE_URL, INVENTORY_API_BASE_PATH, item.id))
-        .header(CONTENT_LANGUAGE, super::ebay_client_shared::EBAY_CONTENT_LANGUAGE)
+        .header(CONTENT_LANGUAGE, ebay_client_shared::EBAY_CONTENT_LANGUAGE)
         .header(CONTENT_TYPE, "application/json")
         .with_bearer(user_access_token)
         .body(body)
@@ -206,7 +206,7 @@ pub async fn get_offers_fixed_price(
             "{}{}/offer?marketplace_id={}&sku={}&format=FIXED_PRICE",
             *EBAY_BASE_URL,
             INVENTORY_API_BASE_PATH,
-            EBAY_MARKETPLACE_ID_US,
+            ebay_client_shared::EBAY_MARKETPLACE_ID_US,
             item_id.to_string(),
         ))
         .with_bearer(user_access_token)
@@ -260,7 +260,7 @@ pub async fn create_offer(
             "paymentPolicyId": payment_policy_id,
             "returnPolicyId": return_policy_id,
         },
-        "marketplaceId": EBAY_MARKETPLACE_ID_US,
+        "marketplaceId": ebay_client_shared::EBAY_MARKETPLACE_ID_US,
         "merchantLocationKey": item.inventory_location_id,
         "pricingSummary": {
             "price": {
@@ -279,7 +279,7 @@ pub async fn create_offer(
     let request: Request = HTTP_CLIENT
         .post(format!("{}{}/offer", EBAY_BASE_URL.deref(), INVENTORY_API_BASE_PATH))
         .header(CONTENT_TYPE, "application/json")
-        .header(CONTENT_LANGUAGE, super::ebay_client_shared::EBAY_CONTENT_LANGUAGE)
+        .header(CONTENT_LANGUAGE, ebay_client_shared::EBAY_CONTENT_LANGUAGE)
         .with_bearer(user_access_token)
         .body(body)
         .build()
