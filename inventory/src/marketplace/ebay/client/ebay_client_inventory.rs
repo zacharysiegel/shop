@@ -199,7 +199,7 @@ pub async fn get_offer(
 pub async fn get_offers_fixed_price(
     user_access_token: &str,
     item_id: &Uuid,
-) -> Result<Value, ShopError> {
+) -> Result<Option<Value>, ShopError> {
     let request: Request = HTTP_CLIENT
         .get(format!(
             "{}{}/offer?marketplace_id={}&sku={}&format=FIXED_PRICE",
@@ -212,12 +212,15 @@ pub async fn get_offers_fixed_price(
         .build()
         .map_err(|e| ShopError::from_error("malformed request", Box::new(e)))?;
 
-    let response: Response = http::execute_checked(request).await?;
+    let response: Option<Response> = http::execute_checked_optional(request).await?;
+    let Some(response) = response else {
+        return Ok(None);
+    };
+
     let body = response.json::<Value>()
         .await
         .map_err(|e| ShopError::from_error("deserializing get_offers body", Box::new(e)))?;
-
-    Ok(body)
+    Ok(Some(body))
 }
 
 pub async fn create_offer(

@@ -43,7 +43,7 @@ pub async fn post(pgpool: &PgPool, user_access_token: &str, listing: &Listing) -
 
     client::create_or_replace_inventory_item(user_access_token, &item, &product).await?;
 
-    if (offer_exists(user_access_token, &item.id).await?) {
+    if offer_exists(user_access_token, &item.id).await? {
         log::info!("Offer already exists; Cancelling create/publish; [{}]", item.id);
         return Ok(());
     }
@@ -76,7 +76,11 @@ async fn offer_exists(
     user_access_token: &str,
     item_id: &Uuid,
 ) -> Result<bool, ShopError> {
-    let offer: Value = client::get_offers_fixed_price(user_access_token, &item_id).await?;
+    let offer: Option<Value> = client::get_offers_fixed_price(user_access_token, &item_id).await?;
+    let Some(offer) = offer else {
+        return Ok(false);
+    };
+
     let total: i64 = offer.get("total")
         .ok_or_else(|| ShopError::new("getting total field in get_offers response"))?
         .as_i64()
@@ -113,7 +117,7 @@ pub async fn sync_all_locations(pgpool: &PgPool, user_token: &str) -> Result<(),
 
     for inventory_location in &inventory_location_vec {
         let ebay_location: Option<Value> = client::get_inventory_location(user_token, &inventory_location.id.to_string()).await?;
-        if (ebay_location.is_none()) {
+        if ebay_location.is_none() {
             client::create_inventory_location(user_token, &inventory_location).await?;
         } else {
             // todo: This part of eBay's service is broken. Check back in later. For now we can only create.
