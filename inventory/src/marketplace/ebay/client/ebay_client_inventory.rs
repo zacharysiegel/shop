@@ -36,6 +36,7 @@ pub async fn create_or_replace_inventory_item(
         "condition": condition,
         "product": {
             "title": product.display_name,
+            "description": product.display_name,
             "upc": [ product.upc ],
         },
         // todo: product images (required for non-catalog products)
