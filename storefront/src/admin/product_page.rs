@@ -294,7 +294,9 @@ async fn activate_categories_script(element_id: &str, product: &ProductSerial) -
     let inject: String = format!(
         r#"{{
         const categories = JSON.parse('{}');
-        activate_categories(element, "{}", "{}", categories); // Defined in product.js
+        import("/page/product.js").then(module => {{
+            module.activate_categories(element, "{}", "{}", categories); // Defined in product.js
+        }});
         }}"#,
         serde_json::to_string(&product_categories).unwrap(),
         REGISTRY.inventory_external_path,

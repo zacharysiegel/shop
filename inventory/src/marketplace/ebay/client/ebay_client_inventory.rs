@@ -173,9 +173,8 @@ pub async fn update_inventory_location(
 
 pub async fn create_offer(
     user_access_token: &str,
-    ebay_categories: Vec<&Category>,
-    item: Item,
-    // todo: inventory_location + listing + item?
+    item: &Item,
+    ebay_categories: &Vec<&Category>,
 ) -> Result<String, ShopError> {
     let category_0: &Category = *ebay_categories.get(0)
         .ok_or_else(|| ShopError::new("missing category"))?;
@@ -216,6 +215,7 @@ pub async fn create_offer(
                 "value": price,
             }
         },
+        "sku": item.id,
         "tax": {
             "applyTax": false
         }
@@ -233,9 +233,14 @@ pub async fn create_offer(
         .map_err(|e| ShopError::from_error("malformed request", Box::new(e)))?;
 
     let response = http::execute_checked(request).await?;
-    let offer_id = response.text().await
-        .map_err(|e| ShopError::from_error("reading offer response", Box::new(e)))?;
-    Ok(offer_id) // todo: check actual response value
+    let offer_id: String = response.json::<Value>().await
+        .map_err(|e| ShopError::from_error("reading offer response", Box::new(e)))?
+        .get("offerId")
+        .ok_or_else(|| ShopError::new("missing offerId field"))?
+        .as_str()
+        .ok_or_else(|| ShopError::new("offerId field is not string"))?
+        .to_string();
+    Ok(offer_id)
 }
 
 fn dollar_string(cents: u64) -> String {

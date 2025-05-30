@@ -11,7 +11,7 @@
  * @param {Array<Category>} categories
  */
 // noinspection JSUnusedGlobalSymbols
-function activate_categories(element, base_url, product_id, categories) {
+export function activate_categories(element, base_url, product_id, categories) {
     const section = element.getElementsByTagName("section")[0];
     section.replaceChildren();
 
@@ -32,7 +32,7 @@ function activate_categories(element, base_url, product_id, categories) {
  * @param {Category} category
  * @return HTMLDivElement
  */
-function create_category_entry(base_url, product_id, category) {
+export function create_category_entry(base_url, product_id, category) {
     const container = document.createElement("div");
     container.style.display = "flex";
     container.style.flexDirection = "row";

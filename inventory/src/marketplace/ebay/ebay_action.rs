@@ -1,14 +1,16 @@
+use super::{client, ebay_category};
+use crate::category::Category;
 use crate::error::ShopError;
+use crate::inventory_location::InventoryLocation;
 use crate::item::Item;
 use crate::listing::{listing_action, Listing, ListingStatus};
 use crate::marketplace::marketplace_db;
 use crate::product::Product;
+use crate::ShopEntity;
+use serde_json::Value;
 use sqlx::PgPool;
 use std::sync::OnceLock;
-use serde_json::Value;
 use uuid::Uuid;
-use crate::inventory_location::{InventoryLocation, InventoryLocationEntity};
-use super::client;
 
 pub static NOMINAL_FULFILLMENT_POLICY_ID: OnceLock<String> = OnceLock::new();
 pub static NOMINAL_PAYMENT_POLICY_ID: OnceLock<String> = OnceLock::new();
@@ -39,16 +41,13 @@ pub async fn post(pgpool: &PgPool, user_access_token: &str, listing: &Listing) -
     let (item, product): (Item, Product) = listing_action::get_item_and_product_for_listing(pgpool, listing).await?;
     log::info!("Posting listing to {}; [listing_id: {}]; [marketplace_id: {}]", MARKETPLACE_INTERNAL_NAME, listing.id, MARKETPLACE_ID.get().unwrap());
 
-    client::create_or_replace_inventory_item(user_access_token, &item, &product).await
-}
-
-pub async fn publish(pgpool: &PgPool, listing: &Listing) -> Result<(), ShopError> {
-    validate_listing(listing)?;
-
-    let (item, product): (Item, Product) = listing_action::get_item_and_product_for_listing(pgpool, listing).await?;
-    log::info!("Publishing listing to {}; [listing_id: {}]; [marketplace_id: {}]", MARKETPLACE_INTERNAL_NAME, listing.id, MARKETPLACE_ID.get().unwrap());
-
+    client::create_or_replace_inventory_item(user_access_token, &item, &product).await?;
+    
+    // todo: return early if offer already exists
+    let offer_id: String = create_offer(pgpool, user_access_token, &item).await?;
     // todo: publish offer
+    log::info!("Created ebay offer [{}]", offer_id);
+
     Ok(())
 }
 
@@ -64,6 +63,30 @@ fn validate_listing(listing: &Listing) -> Result<(), ShopError> {
         )))
     }
     Ok(())
+}
+
+async fn create_offer(
+    pgpool: &PgPool,
+    user_token: &str,
+    item: &Item,
+) -> Result<String, ShopError> {
+    let categories: Vec<Category> = crate::product::product_db::get_product_categories(pgpool, &item.product_id)
+        .await?
+        .iter()
+        .map(|entity| entity.try_to_model())
+        .collect::<Result<Vec<Category>, ShopError>>()?;
+
+    let mut ebay_categories: Vec<ebay_category::ebay_category_model::Category> = Vec::new();
+    for category in &categories {
+        let ebay_category = ebay_category::ebay_category_db::get_ebay_category(pgpool, &category.ebay_category_id)
+            .await?
+            .ok_or_else(|| ShopError::new("ebay category not found"))?
+            .try_to_model()?;
+        ebay_categories.push(ebay_category);
+    }
+
+    client::create_offer(user_token, item, &ebay_categories.iter().collect())
+        .await
 }
 
 pub async fn sync_all_locations(pgpool: &PgPool, user_token: &str) -> Result<(), ShopError> {
