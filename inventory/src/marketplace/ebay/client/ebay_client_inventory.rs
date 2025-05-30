@@ -300,6 +300,7 @@ fn dollar_string(cents: u64) -> String {
     format!("{}.{}", cents / 100, cents % 100)
 }
 
+// todo: "The eBay listing associated with the inventory item, or the unpublished offer has invalid item condition information. The provided condition id is invalid for the selected primary category id."
 pub async fn publish_offer(
     user_access_token: &str,
     offer_id: &str,
