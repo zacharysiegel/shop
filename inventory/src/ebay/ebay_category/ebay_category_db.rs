@@ -1,4 +1,4 @@
-use crate::marketplace::ebay::ebay_category::ebay_category_model::CategoryEntity;
+use crate::ebay::ebay_category::ebay_category_model::CategoryEntity;
 use sqlx::{query_as, Error, PgPool};
 use uuid::Uuid;
 

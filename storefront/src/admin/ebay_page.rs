@@ -49,7 +49,7 @@ async fn content() -> Markup {
 }
 
 fn auth_local() -> Markup {
-    let oauth_url: &&str = inventory::marketplace::ebay::ebay_api::EBAY_OAUTH_AUTHORIZATION_URL.deref();
+    let oauth_url: &&str = inventory::ebay::ebay_api::EBAY_OAUTH_AUTHORIZATION_URL.deref();
     html! {
         (form::form(Some("Authenticate"), "/ebay/auth/user/token", Method::PUT, html! {
             h3 { "Fetch authorization code"}

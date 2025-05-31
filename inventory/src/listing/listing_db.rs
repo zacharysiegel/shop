@@ -1,4 +1,4 @@
-use crate::listing::{ListingEntity, ListingStatus};
+use crate::listing::ListingEntity;
 use sqlx::postgres::PgQueryResult;
 use sqlx::{query, query_as, Error, PgPool};
 use uuid::Uuid;

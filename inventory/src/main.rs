@@ -1,4 +1,4 @@
-use inventory::{environment, marketplace, server};
+use inventory::{ebay, environment, server};
 use sqlx::{Pool, Postgres};
 
 #[actix_web::main]
@@ -11,7 +11,7 @@ async fn main() -> Result<(), std::io::Error> {
 
     let pgpool: Pool<Postgres> = inventory::db::sqlx_connect().await?;
 
-    marketplace::ebay::ebay_action::init(&pgpool).await;
+    ebay::ebay_action::init(&pgpool).await;
 
     server::open_server(pgpool).await
 }

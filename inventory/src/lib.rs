@@ -25,5 +25,6 @@ pub mod pagination;
 pub mod environment;
 pub mod http;
 pub mod decrypt;
+pub mod ebay;
 
 pub use object::*;

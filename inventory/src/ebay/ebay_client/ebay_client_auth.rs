@@ -1,6 +1,6 @@
 use crate::error::ShopError;
 use crate::http;
-use crate::marketplace::ebay::ebay_client::ebay_client_shared::{ebay_basic_auth, EBAY_BASE_URL};
+use crate::ebay::ebay_client::ebay_client_shared::{ebay_basic_auth, EBAY_BASE_URL};
 use reqwest::header::{AUTHORIZATION, CONTENT_TYPE};
 use reqwest::{Request, Response};
 use serde::{Deserialize, Serialize};

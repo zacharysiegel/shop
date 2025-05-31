@@ -1,8 +1,8 @@
 use super::ebay_client;
 use crate::environment::RuntimeEnvironment;
 use crate::listing::{listing_db, Listing, ListingEntity};
-use crate::marketplace::ebay::ebay_client::{AuthorizationCodeResponse, ClientCredentialsResponse, RefreshTokenResponse};
-use crate::marketplace::ebay::ebay_action;
+use crate::ebay::ebay_client::{AuthorizationCodeResponse, ClientCredentialsResponse, RefreshTokenResponse};
+use crate::ebay::ebay_action;
 use crate::{http, unwrap_option_else_400, unwrap_option_else_404, unwrap_result_else_400, unwrap_result_else_500, ShopEntity};
 use actix_web::cookie::Cookie;
 use actix_web::http::StatusCode;
