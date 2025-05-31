@@ -1,7 +1,7 @@
-use super::client;
+use super::ebay_client;
 use crate::environment::RuntimeEnvironment;
 use crate::listing::{listing_db, Listing, ListingEntity};
-use crate::marketplace::ebay::client::{AuthorizationCodeResponse, ClientCredentialsResponse, RefreshTokenResponse};
+use crate::marketplace::ebay::ebay_client::{AuthorizationCodeResponse, ClientCredentialsResponse, RefreshTokenResponse};
 use crate::marketplace::ebay::ebay_action;
 use crate::{http, unwrap_option_else_400, unwrap_option_else_404, unwrap_result_else_400, unwrap_result_else_500, ShopEntity};
 use actix_web::cookie::Cookie;
@@ -46,7 +46,7 @@ fn extract_user_token(request: &HttpRequest) -> Result<Cookie, HttpResponse> {
 
 async fn get_application_token() -> impl Responder {
     let token_response: ClientCredentialsResponse = unwrap_result_else_500!(
-        client::get_application_token().await
+        ebay_client::get_application_token().await
     );
 
     /* Don't set a cookie here. The client does not need it.
@@ -66,7 +66,7 @@ async fn get_user_token(
         return HttpResponse::BadRequest().body(message);
     };
 
-    let user_token_response: AuthorizationCodeResponse = match client::get_user_token(authorization_code).await {
+    let user_token_response: AuthorizationCodeResponse = match ebay_client::get_user_token(authorization_code).await {
         Ok(value) => value,
         Err(error) => return HttpResponse::InternalServerError().body(error.to_string()),
     };
@@ -87,7 +87,7 @@ async fn refresh_user_token(
             .body("Invalid eBay refresh token"),
     };
 
-    let refresh_token_response: RefreshTokenResponse = match client::refresh_user_token(refresh_token.value()).await {
+    let refresh_token_response: RefreshTokenResponse = match ebay_client::refresh_user_token(refresh_token.value()).await {
         Ok(value) => value,
         Err(error) => return HttpResponse::InternalServerError().body(error.to_string()),
     };
@@ -133,7 +133,7 @@ async fn get_listing(
         Err(response) => return response,
     };
 
-    let json: Value = unwrap_result_else_500!(client::get_inventory_item(&user_token.value(), &item_id).await);
+    let json: Value = unwrap_result_else_500!(ebay_client::get_inventory_item(&user_token.value(), &item_id).await);
     HttpResponse::Ok().json(json)
 }
 
@@ -145,7 +145,7 @@ async fn get_all_locations(
         Err(response) => return response,
     };
 
-    let json: Value = unwrap_result_else_500!(client::get_all_inventory_locations(&user_token.value()).await);
+    let json: Value = unwrap_result_else_500!(ebay_client::get_all_inventory_locations(&user_token.value()).await);
     HttpResponse::Ok().json(json)
 }
 

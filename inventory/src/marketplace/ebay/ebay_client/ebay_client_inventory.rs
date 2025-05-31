@@ -4,7 +4,7 @@ use crate::http;
 use crate::http::{WithBearer, HTTP_CLIENT};
 use crate::inventory_location::InventoryLocation;
 use crate::item::Item;
-use crate::marketplace::ebay::client::ebay_client_shared::EBAY_BASE_URL;
+use crate::marketplace::ebay::ebay_client::ebay_client_shared::EBAY_BASE_URL;
 use crate::product::Product;
 use reqwest::header::{CONTENT_LANGUAGE, CONTENT_TYPE};
 use reqwest::{Request, Response};
