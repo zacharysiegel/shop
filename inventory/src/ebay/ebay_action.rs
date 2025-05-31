@@ -6,7 +6,7 @@ use crate::item::Item;
 use crate::listing::{Listing, ListingStatus};
 use crate::marketplace::marketplace_db;
 use crate::product::Product;
-use crate::{listing, ShopEntity, ShopModel};
+use crate::{listing, ShopEntity};
 use serde_json::Value;
 use sqlx::PgPool;
 use std::sync::OnceLock;

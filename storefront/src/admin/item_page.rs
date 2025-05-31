@@ -174,10 +174,6 @@ async fn create_listing_form() -> Markup {
                         }
                     }
                 }
-                label {
-                    "URI (optional)"
-                    input type="text" name="uri";
-                }
 
                 // Need to use number/datetime-local instead of hidden type for form_data mutators; see submit_form.js;
                 input style="display: none;" type="datetime-local" name="created" value=(form::get_current_datetime_string());

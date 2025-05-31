@@ -19,17 +19,16 @@ pub const PAGE: Page = Page {
     relative_path: "/admin/product/{product_id}/item/{item_id}/listing",
     configurer,
 };
-pub const LISTING_FIELDS: [&str; 7] = [
+pub const LISTING_FIELDS: [&str; 6] = [
     "id",
     "item_id",
     "marketplace_id",
-    "uri",
     "status",
     "created",
     "updated",
 ];
 
-const HEADINGS: [&str; 5] = ["id", "marketplace", "uri", "status", "actions"];
+const HEADINGS: [&str; 4] = ["id", "marketplace", "status", "actions"];
 const LISTING_DETAILS_CONTAINER_ID: &str = "listing_details_container";
 const LISTING_DETAIL_ID_PREFIX: &str = "listing_detail_";
 const LISTING_UPDATE_CONTAINER_ID: &str = "listing_update_container";
@@ -113,7 +112,6 @@ async fn table(elements: &Vec<ListingSerial>) -> Markup {
                     tr {
                         td { (listing.id) }
                         td { (marketplace_markup(&marketplace_vec, listing)) }
-                        td { (format!("{:?}", listing.uri)) }
                         td { (match ListingStatus::try_from_repr(listing.status) {
                             Ok(variant) => format!("{}", variant),
                             Err(error) => Markup::into_string(error_markup(error)),
@@ -245,10 +243,6 @@ fn listing_update() -> Markup {
                     label {
                         "ID"
                         input type="text" name="id" readonly[true];
-                    }
-                    label {
-                        "URI"
-                        input type="text" name="uri";
                     }
 
                     // Need to use number/datetime-local instead of hidden type for form_data mutators; see submit_form.js;

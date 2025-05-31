@@ -7,14 +7,13 @@ pub async fn create_listing(
     pgpool: &PgPool,
     listing: &ListingEntity,
 ) -> Result<PgQueryResult, Error> {
-    query!("\
-        insert into shop.public.listing (id, item_id, marketplace_id, uri, status, created, updated)  \
-        values ($1, $2, $3, $4, $5, $6, $7) \
+    query!("
+        insert into shop.public.listing (id, item_id, marketplace_id, status, created, updated)
+        values ($1, $2, $3, $4, $5, $6)
     ",
         listing.id,
         listing.item_id,
         listing.marketplace_id,
-        listing.uri,
         listing.status,
         listing.created,
         listing.updated
@@ -27,12 +26,10 @@ pub async fn get_listing(
     pgpool: &PgPool,
     listing_id: &Uuid,
 ) -> Result<Option<ListingEntity>, Error> {
-    query_as!(
-		ListingEntity,
-		"\
-        select * \
-        from shop.public.listing \
-        where id = $1 \
+    query_as!(ListingEntity, "
+        select *
+        from shop.public.listing
+        where id = $1
     ",
 		listing_id
 	)
@@ -46,11 +43,10 @@ pub async fn update_listing(
 ) -> Result<PgQueryResult, Error> {
     query!("
         update shop.public.listing
-        set (uri, status, updated) = ($2, $3, $4)
+        set (status, updated) = ($2, $3)
         where id = $1
     ",
         listing.id,
-        listing.uri,
         listing.status,
         listing.updated,
     )

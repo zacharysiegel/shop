@@ -66,7 +66,7 @@ pub async fn get_purchase_listing(
     purchase_id: &Uuid,
 ) -> Result<Option<ListingEntity>, Error> {
     query_as!(ListingEntity, "\
-        select listing.id, listing.item_id, listing.marketplace_id, listing.uri, listing.status, listing.created, listing.updated \
+        select listing.id, listing.item_id, listing.marketplace_id, listing.status, listing.created, listing.updated \
         from shop.public.listing \
         inner join shop.public.purchase on listing.id = purchase.listing_id \
         where purchase.id = $1
