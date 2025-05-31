@@ -1,8 +1,8 @@
 use crate::error::ShopError;
 use crate::item::{item_db, Item, ItemEntity};
-use crate::listing::Listing;
+use crate::listing::{Listing, ListingStatus};
 use crate::product::{product_db, Product, ProductEntity};
-use crate::ShopEntity;
+use crate::{listing, ShopEntity, ShopModel};
 use sqlx::PgPool;
 
 pub async fn get_item_and_product_for_listing(
@@ -27,4 +27,19 @@ pub async fn get_item_and_product_for_listing(
     };
 
     Ok((item, product))
+}
+
+pub async fn update_listing_status(
+    pgpool: &PgPool,
+    listing: &Listing,
+    new_status: ListingStatus,
+) -> Result<(), ShopError> {
+    let mut updated_listing: Listing = listing.clone();
+    updated_listing.status = new_status;
+
+    listing::listing_db::update_listing(pgpool, &updated_listing.to_entity())
+        .await
+        .map_err(|e| ShopError::from(e))?;
+
+    Ok(())
 }

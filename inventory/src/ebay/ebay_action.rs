@@ -1,12 +1,12 @@
-use super::{ebay_client, ebay_category};
+use super::{ebay_category, ebay_client};
 use crate::category::Category;
 use crate::error::ShopError;
 use crate::inventory_location::InventoryLocation;
 use crate::item::Item;
-use crate::listing::{listing_action, Listing, ListingStatus};
+use crate::listing::{Listing, ListingStatus};
 use crate::marketplace::marketplace_db;
 use crate::product::Product;
-use crate::ShopEntity;
+use crate::{listing, ShopEntity, ShopModel};
 use serde_json::Value;
 use sqlx::PgPool;
 use std::sync::OnceLock;
@@ -38,7 +38,7 @@ pub async fn init(pgpool: &PgPool) {
 pub async fn post(pgpool: &PgPool, user_access_token: &str, listing: &Listing) -> Result<(), ShopError> {
     validate_listing(listing)?;
 
-    let (item, product): (Item, Product) = listing_action::get_item_and_product_for_listing(pgpool, listing).await?;
+    let (item, product): (Item, Product) = listing::listing_action::get_item_and_product_for_listing(pgpool, listing).await?;
     log::info!("Posting listing to {}; [listing_id: {}]; [marketplace_id: {}]", MARKETPLACE_INTERNAL_NAME, listing.id, MARKETPLACE_ID.get().unwrap());
 
     ebay_client::create_or_replace_inventory_item(user_access_token, &item, &product).await?;
@@ -53,6 +53,7 @@ pub async fn post(pgpool: &PgPool, user_access_token: &str, listing: &Listing) -
     log::info!("Created ebay offer [{}]", offer_id);
 
     ebay_client::publish_offer(user_access_token, &offer_id).await?;
+    listing::listing_action::update_listing_status(pgpool, listing, ListingStatus::Published).await?;
     log::info!("Published ebay offer [{}]", offer_id);
 
     Ok(())

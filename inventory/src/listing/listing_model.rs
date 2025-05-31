@@ -22,7 +22,7 @@ impl ShopEntity for ListingEntity {
     type Model = Listing;
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Listing {
     pub id: Uuid,
     pub item_id: Uuid,
