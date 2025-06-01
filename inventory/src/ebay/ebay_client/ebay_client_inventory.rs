@@ -20,12 +20,8 @@ pub async fn create_or_replace_inventory_item(
     item: &Item,
     product: &Product,
 ) -> Result<(), ShopError> {
-    if product.upc.is_none() {
-        return Err(ShopError::new("upc is required for ebay listings"));
-    }
-
     let condition: &str = super::ebay_condition::Condition::from(&item.condition).to_serial();
-    let body: serde_json::Value = json!({
+    let mut body: Value = json!({
         "availability": {
             "shipToLocationAvailability": {
                 "availabilityDistributions": [
@@ -41,10 +37,27 @@ pub async fn create_or_replace_inventory_item(
         "product": {
             "title": product.display_name,
             "description": product.display_name,
-            "upc": [ product.upc ],
+            "upc": [],
         },
         // todo: product images (required for non-catalog products)
     });
+    // The upc array cannot take null values (from Option::None), so we need to dynamically insert
+    if let Some(upc) = &product.upc {
+        let body_map = body.as_object_mut()
+            .ok_or_else(|| ShopError::default())?;
+        let product_map = body_map.get_mut("product")
+            .ok_or_else(|| ShopError::default())?
+            .as_object_mut()
+            .ok_or_else(|| ShopError::default())?;
+        let upc_array = product_map.get_mut("upc")
+            .ok_or_else(|| ShopError::default())?
+            .as_array_mut()
+            .ok_or_else(|| ShopError::default())?;
+        upc_array.push(
+            serde_json::from_str(upc)
+                .map_err(|_| ShopError::default())?
+        );
+    }
     let body: String = serde_json::to_string(&body)
         .map_err(|e|
             ShopError::from_error("serializing inventory item", Box::new(e))
