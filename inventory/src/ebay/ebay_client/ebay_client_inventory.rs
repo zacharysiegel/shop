@@ -1,17 +1,17 @@
 use super::super::ebay_category::ebay_category_model::Category;
+use super::ebay_client_shared;
+use crate::ebay::ebay_client::ebay_client_shared::EBAY_BASE_URL;
 use crate::error::ShopError;
 use crate::http;
 use crate::http::{WithBearer, HTTP_CLIENT};
 use crate::inventory_location::InventoryLocation;
 use crate::item::Item;
-use crate::ebay::ebay_client::ebay_client_shared::EBAY_BASE_URL;
 use crate::product::Product;
 use reqwest::header::{CONTENT_LANGUAGE, CONTENT_TYPE};
 use reqwest::{Request, Response};
 use serde_json::{json, Value};
 use std::ops::Deref;
 use uuid::Uuid;
-use super::ebay_client_shared;
 
 const INVENTORY_API_BASE_PATH: &str = "/sell/inventory/v1";
 
@@ -20,6 +20,10 @@ pub async fn create_or_replace_inventory_item(
     item: &Item,
     product: &Product,
 ) -> Result<(), ShopError> {
+    if product.upc.is_none() {
+        return Err(ShopError::new("upc is required for ebay listings"));
+    }
+
     let condition: &str = super::ebay_condition::Condition::from(&item.condition).to_serial();
     let body: serde_json::Value = json!({
         "availability": {
