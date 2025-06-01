@@ -42,6 +42,7 @@ fn extract_user_token(request: &HttpRequest) -> Result<Cookie, HttpResponse> {
         Some(value) => Ok(value),
         None => Err(HttpResponse::build(StatusCode::UNAUTHORIZED)
             .insert_header(("Location", EBAY_OAUTH_AUTHORIZATION_URL.to_string()))
+            .insert_header(("Content-Type", "text/plain"))
             .body("Invalid eBay access token")),
     }
 }

@@ -4,6 +4,7 @@ use crate::admin::structure::{form, page};
 use actix_web::web;
 use actix_web::web::ServiceConfig;
 use inventory::environment::RuntimeEnvironment;
+use inventory::listing::ListingStatus;
 use maud::{html, Markup};
 use reqwest::Method;
 use std::ops::Deref;
@@ -38,6 +39,7 @@ async fn content() -> Markup {
         @if runtime_environment == RuntimeEnvironment::Local {
             (auth_local())
             (refresh())
+            (publish_all_drafts())
         }
 
         hr;
@@ -75,6 +77,15 @@ fn refresh() -> Markup {
         hr;
         (form::form(Some("Refresh user access token"), "/ebay/auth/user/refresh", Method::PUT, html! {
             button type="submit" { "Refresh" }
+        }))
+    }
+}
+
+fn publish_all_drafts() -> Markup {
+    html! {
+        hr;
+        (form::form(Some("Publish all draft listings"), &format!("/ebay/listing?status={}", ListingStatus::Draft as u8), Method::PUT, html! {
+            button type="submit" { "Publish" }
         }))
     }
 }
