@@ -1,13 +1,14 @@
 use super::ebay_client;
-use crate::environment::RuntimeEnvironment;
-use crate::listing::{listing_db, Listing, ListingEntity};
-use crate::ebay::ebay_client::{AuthorizationCodeResponse, ClientCredentialsResponse, RefreshTokenResponse};
 use crate::ebay::ebay_action;
+use crate::ebay::ebay_client::{AuthorizationCodeResponse, ClientCredentialsResponse, RefreshTokenResponse};
+use crate::environment::RuntimeEnvironment;
+use crate::listing::{listing_db, Listing, ListingEntity, ListingStatus};
 use crate::{http, unwrap_option_else_400, unwrap_option_else_404, unwrap_result_else_400, unwrap_result_else_500, ShopEntity};
 use actix_web::cookie::Cookie;
 use actix_web::http::StatusCode;
 use actix_web::web::ServiceConfig;
 use actix_web::{web, HttpRequest, HttpResponse, Responder};
+use serde::Deserialize;
 use serde_json::{Map, Value};
 use sqlx::PgPool;
 use std::sync::LazyLock;
@@ -28,7 +29,8 @@ pub fn configurer(config: &mut ServiceConfig) {
             .route("/auth/user/token", web::put().to(get_user_token))
             .route("/auth/user/redirect", web::get().to(get_oauth_redirect))
             .route("/auth/user/refresh", web::put().to(refresh_user_token))
-            .route("/listing/{item_id}", web::put().to(put_listing))
+            .route("/listing/{item_id}", web::put().to(publish_listing))
+            .route("/listing", web::put().to(publish_all_listings))
             .route("/listing/{item_id}", web::get().to(get_listing))
             .route("/location", web::get().to(get_all_locations))
             .route("/location", web::put().to(sync_locations))
@@ -80,14 +82,14 @@ async fn get_user_token(
 async fn refresh_user_token(
     request: HttpRequest,
 ) -> impl Responder {
-    let refresh_token: Cookie = match request.cookie(EBAY_USER_REFRESH_TOKEN_COOKIE_NAME) {
+    let user_refresh_token: Cookie = match request.cookie(EBAY_USER_REFRESH_TOKEN_COOKIE_NAME) {
         Some(value) => value,
         None => return HttpResponse::build(StatusCode::UNAUTHORIZED)
             .insert_header(("Location", EBAY_OAUTH_AUTHORIZATION_URL.to_string()))
             .body("Invalid eBay refresh token"),
     };
 
-    let refresh_token_response: RefreshTokenResponse = match ebay_client::refresh_user_token(refresh_token.value()).await {
+    let refresh_token_response: RefreshTokenResponse = match ebay_client::refresh_user_token(user_refresh_token.value()).await {
         Ok(value) => value,
         Err(error) => return HttpResponse::InternalServerError().body(error.to_string()),
     };
@@ -103,12 +105,12 @@ async fn get_oauth_redirect() -> impl Responder {
         .finish()
 }
 
-async fn put_listing(
+async fn publish_listing(
     pgpool: web::Data<PgPool>,
     item_id: web::Path<String>,
     request: HttpRequest,
 ) -> impl Responder {
-    let user_token: Cookie = match extract_user_token(&request) {
+    let user_access_token: Cookie = match extract_user_token(&request) {
         Ok(value) => value,
         Err(response) => return response,
     };
@@ -120,7 +122,31 @@ async fn put_listing(
     let listing: ListingEntity = unwrap_option_else_404!(listing);
     let listing: Listing = unwrap_result_else_500!(listing.try_to_model());
 
-    unwrap_result_else_500!(ebay_action::post(&pgpool, &user_token.value(), &listing).await);
+    unwrap_result_else_500!(ebay_action::publish(&pgpool, &user_access_token.value(), &listing).await);
+    HttpResponse::NoContent().finish()
+}
+
+#[derive(Deserialize)]
+struct PublishAllListingsParameters {
+    status: u8,
+}
+
+async fn publish_all_listings(
+    pgpool: web::Data<PgPool>,
+    request: HttpRequest,
+    parameters: web::Query<PublishAllListingsParameters>,
+) -> HttpResponse {
+    let user_access_token: Cookie = match extract_user_token(&request) {
+        Ok(value) => value,
+        Err(response) => return response,
+    };
+
+    let status: ListingStatus = unwrap_option_else_400!(ListingStatus::from_repr(parameters.status));
+    if (status != ListingStatus::Draft) {
+        return HttpResponse::BadRequest().finish();
+    }
+
+    unwrap_result_else_500!(ebay_action::publish_all_drafts(&pgpool, user_access_token.value()).await);
     HttpResponse::NoContent().finish()
 }
 
@@ -128,24 +154,24 @@ async fn get_listing(
     item_id: web::Path<String>,
     request: HttpRequest,
 ) -> impl Responder {
-    let user_token: Cookie = match extract_user_token(&request) {
+    let user_access_token: Cookie = match extract_user_token(&request) {
         Ok(value) => value,
         Err(response) => return response,
     };
 
-    let json: Value = unwrap_result_else_500!(ebay_client::get_inventory_item(&user_token.value(), &item_id).await);
+    let json: Value = unwrap_result_else_500!(ebay_client::get_inventory_item(&user_access_token.value(), &item_id).await);
     HttpResponse::Ok().json(json)
 }
 
 async fn get_all_locations(
     request: HttpRequest,
 ) -> impl Responder {
-    let user_token: Cookie = match extract_user_token(&request) {
+    let user_access_token: Cookie = match extract_user_token(&request) {
         Ok(value) => value,
         Err(response) => return response,
     };
 
-    let json: Value = unwrap_result_else_500!(ebay_client::get_all_inventory_locations(&user_token.value()).await);
+    let json: Value = unwrap_result_else_500!(ebay_client::get_all_inventory_locations(&user_access_token.value()).await);
     HttpResponse::Ok().json(json)
 }
 
@@ -153,11 +179,11 @@ async fn sync_locations(
     pgpool: web::Data<PgPool>,
     request: HttpRequest,
 ) -> HttpResponse {
-    let user_token: Cookie = match extract_user_token(&request) {
+    let user_access_token: Cookie = match extract_user_token(&request) {
         Ok(value) => value,
         Err(response) => return response,
     };
 
-    unwrap_result_else_500!(ebay_action::sync_all_locations(&pgpool, &user_token.value()).await);
+    unwrap_result_else_500!(ebay_action::sync_all_locations(&pgpool, &user_access_token.value()).await);
     HttpResponse::build(StatusCode::NO_CONTENT).finish()
 }

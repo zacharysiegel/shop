@@ -34,8 +34,11 @@ pub async fn init(pgpool: &PgPool) {
     NOMINAL_RETURN_POLICY_ID.set("6209449000".to_string()).ok();
 }
 
-/// https://developer.ebay.com/api-docs/sell/inventory/resources/inventory_item/methods/createOrReplaceInventoryItem
-pub async fn post(pgpool: &PgPool, user_access_token: &str, listing: &Listing) -> Result<(), ShopError> {
+pub async fn publish(
+    pgpool: &PgPool,
+    user_access_token: &str,
+    listing: &Listing,
+) -> Result<(), ShopError> {
     validate_listing(listing)?;
 
     let (item, product): (Item, Product) = listing::listing_action::get_item_and_product_for_listing(pgpool, listing).await?;
@@ -55,6 +58,26 @@ pub async fn post(pgpool: &PgPool, user_access_token: &str, listing: &Listing) -
     ebay_client::publish_offer(user_access_token, &offer_id).await?;
     listing::listing_action::update_listing_status(pgpool, listing, ListingStatus::Published).await?;
     log::info!("Published ebay offer [{}]", offer_id);
+
+    Ok(())
+}
+
+pub async fn publish_all_drafts(
+    pgpool: &PgPool,
+    user_access_token: &str,
+) -> Result<(), ShopError> {
+    let listings = listing::listing_db::get_all_by_status_and_marketplace(
+        pgpool,
+        ListingStatus::Draft,
+        MARKETPLACE_ID.get()
+            .ok_or_else(|| ShopError::default())?,
+    )
+        .await?;
+
+    for listing in listings {
+        let listing: Listing = listing.try_to_model()?;
+        publish(pgpool, user_access_token, &listing).await?;
+    }
 
     Ok(())
 }

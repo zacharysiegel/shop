@@ -38,8 +38,7 @@ pub async fn update_listing_status(
     updated_listing.status = new_status;
 
     listing::listing_db::update_listing(pgpool, &updated_listing.to_entity())
-        .await
-        .map_err(|e| ShopError::from(e))?;
+        .await?;
 
     Ok(())
 }
