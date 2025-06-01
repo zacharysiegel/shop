@@ -48,6 +48,7 @@ impl From<&ItemCondition> for Condition {
         match value {
             ItemCondition::Inapplicable => Condition::New,
             ItemCondition::BrandNew => Condition::New,
+            // LIKE_NEW is not available for the Star Wars collectible categories
             ItemCondition::LikeNew => Condition::New,
             ItemCondition::VeryGood => Condition::UsedVeryGood,
             ItemCondition::Good => Condition::UsedGood,
