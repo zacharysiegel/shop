@@ -11,12 +11,18 @@ pub struct ShopError {
 }
 
 impl ShopError {
+    const DEFAULT_MESSAGE: &'static str = "unspecified";
+
     pub fn new(message: &str) -> ShopError {
         Self::_new(message, None)
     }
 
     pub fn from_error(message: &str, error: Box<dyn Error>) -> ShopError {
         Self::_new(message, Some(error))
+    }
+
+    pub fn from_error_default(error: Box<dyn Error>) -> ShopError {
+        Self::_new(Self::DEFAULT_MESSAGE, Some(error))
     }
 
     fn _new(message: &str, error: Option<Box<dyn Error>>) -> ShopError {
@@ -45,7 +51,7 @@ impl Error for ShopError {}
 
 impl Default for ShopError {
     fn default() -> Self {
-        Self::new("unspecified")
+        Self::new(Self::DEFAULT_MESSAGE)
     }
 }
 

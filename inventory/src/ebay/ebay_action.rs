@@ -39,7 +39,10 @@ pub async fn publish(
     user_access_token: &str,
     listing: &Listing,
 ) -> Result<(), ShopError> {
-    validate_listing(listing)?;
+    validate_listing_marketplace(listing)?;
+    if listing.status != ListingStatus::Draft {
+        return Err(ShopError::new("listing is not draft"));
+    }
 
     let (item, product): (Item, Product) = listing::listing_action::get_item_and_product_for_listing(pgpool, listing).await?;
     log::info!("Posting listing to {}; [listing_id: {}]; [marketplace_id: {}]", MARKETPLACE_INTERNAL_NAME, listing.id, MARKETPLACE_ID.get().unwrap());
@@ -59,6 +62,24 @@ pub async fn publish(
     listing::listing_action::update_listing_status(pgpool, listing, ListingStatus::Published).await?;
     log::info!("Published ebay offer [{}]", offer_id);
 
+    Ok(())
+}
+
+pub async fn withdraw(
+    user_access_token: &str,
+    listing: &Listing,
+) -> Result<(), ShopError> {
+    validate_listing_marketplace(listing)?;
+    if listing.status != ListingStatus::Published {
+        return Err(ShopError::new("listing is not published"));
+    }
+
+    let offer_id: Option<String> = get_offer_id(user_access_token, &listing.item_id).await?;
+    let Some(offer_id) = offer_id else {
+        return Err(ShopError::new("offer ID lookup failed"))
+    };
+
+    ebay_client::withdraw_offer(user_access_token, &offer_id).await?;
     Ok(())
 }
 
@@ -83,18 +104,16 @@ pub async fn publish_all_with_status(
     Ok(())
 }
 
-fn validate_listing(listing: &Listing) -> Result<(), ShopError> {
-    if listing.status != ListingStatus::Draft {
-        return Err(ShopError::new("Invalid listing; Attempted to publish non-draft listing;"));
-    } else if listing.marketplace_id.ne(MARKETPLACE_ID.get().unwrap()) {
-        return Err(ShopError::new(&format!(
+fn validate_listing_marketplace(listing: &Listing) -> Result<(), ShopError> {
+    if listing.marketplace_id.ne(MARKETPLACE_ID.get().unwrap()) {
+        Err(ShopError::new(&format!(
             "Invalid listing; Listing marketplace ID does not match \"{}\"; [{}]",
             MARKETPLACE_INTERNAL_NAME,
-            MARKETPLACE_ID.get()
-                .ok_or_else(|| ShopError::default())?,
+            MARKETPLACE_ID.get().ok_or_else(|| ShopError::default())?,
         )))
+    } else {
+        Ok(())
     }
-    Ok(())
 }
 
 async fn offer_exists(
@@ -111,6 +130,23 @@ async fn offer_exists(
         .as_i64()
         .ok_or_else(|| ShopError::new("converting total field to i64"))?;
     Ok(total > 0)
+}
+
+/// Get the first offer ID to appear in the list returned by getOffers (for the given SKU)
+async fn get_offer_id(
+    user_access_token: &str,
+    item_id: &Uuid,
+) -> Result<Option<String>, ShopError> {
+    let response: Option<Value> = ebay_client::get_offers_fixed_price(user_access_token, &item_id).await?;
+    let Some(response) = response else {
+        return Ok(None);
+    };
+
+    let first_offer_id: String = response["offers"][0]["offerId"]
+        .as_str()
+        .ok_or_else(|| ShopError::default())?
+        .to_string();
+    Ok(Some(first_offer_id))
 }
 
 async fn create_offer(

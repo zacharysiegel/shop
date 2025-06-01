@@ -43,20 +43,8 @@ pub async fn create_or_replace_inventory_item(
     });
     // The upc array cannot take null values (from Option::None), so we need to dynamically insert
     if let Some(upc) = &product.upc {
-        let body_map = body.as_object_mut()
-            .ok_or_else(|| ShopError::default())?;
-        let product_map = body_map.get_mut("product")
-            .ok_or_else(|| ShopError::default())?
-            .as_object_mut()
-            .ok_or_else(|| ShopError::default())?;
-        let upc_array = product_map.get_mut("upc")
-            .ok_or_else(|| ShopError::default())?
-            .as_array_mut()
-            .ok_or_else(|| ShopError::default())?;
-        upc_array.push(
-            serde_json::from_str(upc)
-                .map_err(|_| ShopError::default())?
-        );
+        body["product"]["upc"][0] = serde_json::from_str(upc)
+            .map_err(|_| ShopError::default())?;
     }
     let body: String = serde_json::to_string(&body)
         .map_err(|e|
@@ -317,16 +305,29 @@ fn dollar_string(cents: u64) -> String {
     format!("{}.{}", cents / 100, cents % 100)
 }
 
-// todo: "The eBay listing associated with the inventory item, or the unpublished offer has invalid item condition information. The provided condition id is invalid for the selected primary category id."
 pub async fn publish_offer(
     user_access_token: &str,
     offer_id: &str,
 ) -> Result<(), ShopError> {
-    let request = HTTP_CLIENT
+    let request: Request = HTTP_CLIENT
         .post(format!("{}{}/offer/{}/publish", *EBAY_BASE_URL, INVENTORY_API_BASE_PATH, offer_id))
+        // todo: refactor to use bearer_auth method
         .with_bearer(user_access_token)
         .build()
         .map_err(|e| ShopError::from_error("malformed request", Box::new(e)))?;
+    http::execute_checked(request).await?;
+    Ok(())
+}
+
+pub async fn withdraw_offer(
+    user_access_token: &str,
+    offer_id: &str,
+) -> Result<(), ShopError> {
+    let request: Request = HTTP_CLIENT
+        .post(format!("{}{}/offer/{}/withdraw", *EBAY_BASE_URL, INVENTORY_API_BASE_PATH, offer_id))
+        .bearer_auth(user_access_token)
+        .build()
+        .map_err(|e| ShopError::from_error_default(Box::new(e)))?;
     http::execute_checked(request).await?;
     Ok(())
 }
