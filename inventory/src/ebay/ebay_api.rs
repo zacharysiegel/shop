@@ -146,7 +146,7 @@ async fn publish_all_listings(
         return HttpResponse::BadRequest().finish();
     }
 
-    unwrap_result_else_500!(ebay_action::publish_all_drafts(&pgpool, user_access_token.value()).await);
+    unwrap_result_else_500!(ebay_action::publish_all_with_status(&pgpool, user_access_token.value(), &status).await);
     HttpResponse::NoContent().finish()
 }
 

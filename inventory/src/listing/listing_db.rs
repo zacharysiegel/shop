@@ -60,7 +60,7 @@ pub async fn update_listing(
 
 pub async fn get_all_by_status_and_marketplace(
     pgpool: &PgPool,
-    status: ListingStatus,
+    status: &ListingStatus,
     marketplace_id: &Uuid,
 ) -> Result<Vec<ListingEntity>, ShopError> {
     query_as!(ListingEntity, "

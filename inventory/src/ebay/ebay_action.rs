@@ -62,13 +62,14 @@ pub async fn publish(
     Ok(())
 }
 
-pub async fn publish_all_drafts(
+pub async fn publish_all_with_status(
     pgpool: &PgPool,
     user_access_token: &str,
+    status: &ListingStatus,
 ) -> Result<(), ShopError> {
     let listings = listing::listing_db::get_all_by_status_and_marketplace(
         pgpool,
-        ListingStatus::Draft,
+        status,
         MARKETPLACE_ID.get()
             .ok_or_else(|| ShopError::default())?,
     )
