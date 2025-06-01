@@ -68,7 +68,7 @@ pub async fn get_all_by_status_and_marketplace(
         from shop.public.listing
         where status = $1 and marketplace_id = $2
     ",
-        i32::from(status as u8),
+        i32::from(status.clone() as u8),
         marketplace_id,
     )
         .fetch_all(pgpool)
