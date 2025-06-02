@@ -26,9 +26,9 @@ macro_rules! create_json_spec {
 	($id:ident<$typ:ty>$(,)?) => {
 		impl $id {
 			/// Produces a JSON-formatted string specifying the contents of the given enum.
-			/// Requires a EnumT::to_serial implementation which returns a String per variant (to use as JSON object key).
-			/// Requires strum::FromRepr and strum::VariantArray derived traits.
-			/// Requires the serde_json crate.
+            /// Requires a EnumT::to_serial implementation which returns a String per variant (to use as JSON object key).
+            /// Requires strum::FromRepr and strum::VariantArray derived traits.
+            /// Requires the serde_json crate.
 			pub fn get_json_spec() -> ::std::string::String {
     		    let variant_pairs: ::std::vec::Vec<(&'static str, $typ)> = Self::VARIANTS
     		        .iter()

@@ -3,7 +3,7 @@ use crate::ebay::ebay_action;
 use crate::ebay::ebay_client::{AuthorizationCodeResponse, ClientCredentialsResponse, RefreshTokenResponse};
 use crate::environment::RuntimeEnvironment;
 use crate::listing::{listing_db, Listing, ListingEntity, ListingStatus};
-use crate::{http, unwrap_option_else_400, unwrap_option_else_404, unwrap_result_else_400, unwrap_result_else_500, ShopEntity};
+use crate::{http, try_return, unwrap_option_else_400, unwrap_option_else_404, unwrap_result_else_400, unwrap_result_else_500, ShopEntity};
 use actix_web::cookie::Cookie;
 use actix_web::http::StatusCode;
 use actix_web::web::ServiceConfig;
@@ -29,9 +29,10 @@ pub fn configurer(config: &mut ServiceConfig) {
             .route("/auth/user/token", web::put().to(get_user_token))
             .route("/auth/user/redirect", web::get().to(get_oauth_redirect))
             .route("/auth/user/refresh", web::put().to(refresh_user_token))
-            .route("/listing/{item_id}", web::put().to(publish_listing))
+            .route("/listing/{listing_id}/publish", web::post().to(publish_listing))
+            .route("/listing/{listing_id}/cancel", web::post().to(cancel_listing))
             .route("/listing", web::put().to(publish_all_listings))
-            .route("/listing/{item_id}", web::get().to(get_listing))
+            .route("/listing/{listing_id}", web::get().to(get_listing))
             .route("/location", web::get().to(get_all_locations))
             .route("/location", web::put().to(sync_locations))
     );
@@ -108,7 +109,7 @@ async fn get_oauth_redirect() -> impl Responder {
 
 async fn publish_listing(
     pgpool: web::Data<PgPool>,
-    item_id: web::Path<String>,
+    listing_id: web::Path<String>,
     request: HttpRequest,
 ) -> impl Responder {
     let user_access_token: Cookie = match extract_user_token(&request) {
@@ -116,7 +117,7 @@ async fn publish_listing(
         Err(response) => return response,
     };
 
-    let listing_id: Uuid = unwrap_result_else_400!(Uuid::try_parse(&item_id));
+    let listing_id: Uuid = unwrap_result_else_400!(Uuid::try_parse(&listing_id));
     let listing: Option<ListingEntity> = unwrap_result_else_500!(
         listing_db::get_listing(&pgpool, &listing_id).await
     );
@@ -143,7 +144,7 @@ async fn publish_all_listings(
     };
 
     let status: ListingStatus = unwrap_option_else_400!(ListingStatus::from_repr(parameters.status));
-    if (status != ListingStatus::Draft) {
+    if status != ListingStatus::Draft {
         return HttpResponse::BadRequest().finish();
     }
 
@@ -151,6 +152,24 @@ async fn publish_all_listings(
     HttpResponse::NoContent().finish()
 }
 
+async fn cancel_listing(
+    pgpool: web::Data<PgPool>,
+    request: HttpRequest,
+    listing_id: web::Path<String>,
+) -> HttpResponse {
+    let user_access_token: Cookie = try_return!(extract_user_token(&request));
+    let listing_id: Uuid = unwrap_result_else_400!(Uuid::try_parse(&listing_id.into_inner()));
+
+    let listing: ListingEntity = unwrap_option_else_400!(
+        unwrap_result_else_500!(listing_db::get_listing(&pgpool, &listing_id).await)
+    );
+    let listing: Listing = unwrap_result_else_500!(listing.try_to_model());
+
+    unwrap_result_else_500!(ebay_action::withdraw(&pgpool, &user_access_token.value(), &listing).await);
+    HttpResponse::NoContent().finish()
+}
+
+// todo: fix this to accept listing_id
 async fn get_listing(
     item_id: web::Path<String>,
     request: HttpRequest,

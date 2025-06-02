@@ -66,6 +66,7 @@ pub async fn publish(
 }
 
 pub async fn withdraw(
+    pgpool: &PgPool,
     user_access_token: &str,
     listing: &Listing,
 ) -> Result<(), ShopError> {
@@ -80,6 +81,7 @@ pub async fn withdraw(
     };
 
     ebay_client::withdraw_offer(user_access_token, &offer_id).await?;
+    listing::listing_action::update_listing_status(pgpool, listing, ListingStatus::Cancelled).await?;
     Ok(())
 }
 

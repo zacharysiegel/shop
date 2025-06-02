@@ -119,9 +119,14 @@ async fn table(elements: &Vec<ListingSerial>) -> Markup {
                         td {
                             button onclick=(activate_listing_details_script(&listing)) { "Details" }
                             button onclick=(activate_listing_update_form_script(&listing)) { "Update" }
-                            @if listing.status == ListingStatus::Draft as u8 {
+                            @if listing.status == ListingStatus::Draft as u8 || listing.status == ListingStatus::Cancelled as u8 {
                                 x-publish-listing
-                                action=(format!("{}/ebay/listing/{}", REGISTRY.inventory_external_path, listing.id))
+                                action=(format!("{}/ebay/listing/{}/publish", REGISTRY.inventory_external_path, listing.id))
+                                {}
+                            }
+                            @if listing.status == ListingStatus::Published as u8 {
+                                x-cancel-listing
+                                action=(format!("{}/ebay/listing/{}/cancel", REGISTRY.inventory_external_path, listing.id))
                                 {}
                             }
                         }
