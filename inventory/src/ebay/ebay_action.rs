@@ -49,6 +49,7 @@ pub async fn publish(
 
     ebay_client::create_or_replace_inventory_item(user_access_token, &item, &product).await?;
 
+    // todo: this should be checking that the offer is published. currently, cancelled offers trigger this
     if offer_exists(user_access_token, &item.id).await? {
         log::info!("Offer already exists; Cancelling create/publish; [{}]", item.id);
         return Ok(());
