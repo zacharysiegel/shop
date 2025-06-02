@@ -40,7 +40,7 @@ pub async fn publish(
     listing: &Listing,
 ) -> Result<(), ShopError> {
     validate_listing_marketplace(listing)?;
-    if listing.status != ListingStatus::Draft {
+    if !(listing.status == ListingStatus::Draft || listing.status == ListingStatus::Cancelled) {
         return Err(ShopError::new("listing is not draft"));
     }
 

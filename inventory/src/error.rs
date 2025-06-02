@@ -39,6 +39,9 @@ impl ShopError {
 impl Display for ShopError {
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
         write!(f, "ShopError [{}]", self.message)?;
+        if let Some(sub_error) = &self.sub_error {
+            write!(f, "\n[{}]", sub_error)?;
+        }
         match self.backtrace.status() {
             BacktraceStatus::Unsupported | BacktraceStatus::Disabled => Ok(()),
             BacktraceStatus::Captured => write!(f, "\n{}", self.backtrace),

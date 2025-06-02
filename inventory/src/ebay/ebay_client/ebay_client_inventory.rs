@@ -10,7 +10,7 @@ use crate::product::Product;
 use reqwest::header::{CONTENT_LANGUAGE, CONTENT_TYPE};
 use reqwest::{Request, Response};
 use serde_json::{json, Value};
-use std::ops::Deref;
+use std::ops::{Deref, IndexMut};
 use uuid::Uuid;
 
 const INVENTORY_API_BASE_PATH: &str = "/sell/inventory/v1";
@@ -43,8 +43,10 @@ pub async fn create_or_replace_inventory_item(
     });
     // The upc array cannot take null values (from Option::None), so we need to dynamically insert
     if let Some(upc) = &product.upc {
-        body["product"]["upc"][0] = serde_json::from_str(upc)
-            .map_err(|_| ShopError::default())?;
+        let upc_array = body.index_mut("product").index_mut("upc")
+            .as_array_mut()
+            .ok_or_else(|| ShopError::default())?;
+        upc_array.push(json!(upc))
     }
     let body: String = serde_json::to_string(&body)
         .map_err(|e|
