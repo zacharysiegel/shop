@@ -145,22 +145,6 @@ async fn get_offer(
     Ok(Some(first_offer.clone()))
 }
 
-async fn offer_exists(
-    user_access_token: &str,
-    item_id: &Uuid,
-) -> Result<bool, ShopError> {
-    let response: Option<Value> = ebay_client::get_offers_fixed_price(user_access_token, &item_id).await?;
-    let Some(response) = response else {
-        return Ok(false);
-    };
-
-    let total: i64 = response.get("total")
-        .ok_or_else(|| ShopError::new("getting total field in get_offers response"))?
-        .as_i64()
-        .ok_or_else(|| ShopError::new("converting total field to i64"))?;
-    Ok(total > 0)
-}
-
 async fn offer_published(
     offer: &Value,
 ) -> Result<bool, ShopError> {
