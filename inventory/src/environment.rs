@@ -53,7 +53,7 @@ pub fn init_logger() -> Result<(), SetLoggerError> {
     env_logger::builder()
         .filter_level(LevelFilter::Info)
         .filter_module("actix_server", LevelFilter::Debug)
-        .filter_module("actix_web::middleware::logger", LevelFilter::Info)
+        .filter_module("actix_web::middleware::logger", LevelFilter::Warn)
         .format_source_path(true)
         .try_init()
 }
