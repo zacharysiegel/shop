@@ -49,15 +49,28 @@ pub async fn publish(
 
     ebay_client::create_or_replace_inventory_item(user_access_token, &item, &product).await?;
 
-    // todo: this should be checking that the offer is published. currently, cancelled offers trigger this
-    if offer_exists(user_access_token, &item.id).await? {
-        log::info!("Offer already exists; Cancelling create/publish; [{}]", item.id);
+    let mut offer: Option<Value> = get_offer(user_access_token, &item.id).await?;
+    let offer_id: String;
+    if let Some(offer) = &offer {
+        log::info!("Offer already exists; Skipping creation; Attempting to publish; [{}]", item.id);
+        offer_id = offer["offerId"]
+            .as_str()
+            .ok_or_else(|| ShopError::default())?
+            .to_string();
+    } else {
+        // Offers are immediately published here, so we don't bother to check if already published
+        offer_id = create_offer(pgpool, user_access_token, &item).await?
+            .to_string();
+        log::info!("Created ebay offer [{}]", offer_id);
+
+        offer = get_offer(user_access_token, &item.id).await?;
+    }
+    let offer: Value = offer.ok_or_else(|| ShopError::default())?;
+
+    if offer_published(&offer).await? {
+        log::info!("Offer already published; Cancelling publish; [{}]", item.id);
         return Ok(());
     }
-
-    // Offers are immediately published here, so we don't bother to check if already published
-    let offer_id: String = create_offer(pgpool, user_access_token, &item).await?;
-    log::info!("Created ebay offer [{}]", offer_id);
 
     ebay_client::publish_offer(user_access_token, &offer_id).await?;
     listing::listing_action::update_listing_status(pgpool, listing, ListingStatus::Published).await?;
@@ -119,20 +132,42 @@ fn validate_listing_marketplace(listing: &Listing) -> Result<(), ShopError> {
     }
 }
 
+async fn get_offer(
+    user_access_token: &str,
+    item_id: &Uuid,
+) -> Result<Option<Value>, ShopError> {
+    let offers_response: Option<Value> = ebay_client::get_offers_fixed_price(user_access_token, item_id).await?;
+    let Some(offers_response) = offers_response else {
+        return Ok(None);
+    };
+
+    let first_offer = &offers_response["offers"][0];
+    Ok(Some(first_offer.clone()))
+}
+
 async fn offer_exists(
     user_access_token: &str,
     item_id: &Uuid,
 ) -> Result<bool, ShopError> {
-    let offer: Option<Value> = ebay_client::get_offers_fixed_price(user_access_token, &item_id).await?;
-    let Some(offer) = offer else {
+    let response: Option<Value> = ebay_client::get_offers_fixed_price(user_access_token, &item_id).await?;
+    let Some(response) = response else {
         return Ok(false);
     };
 
-    let total: i64 = offer.get("total")
+    let total: i64 = response.get("total")
         .ok_or_else(|| ShopError::new("getting total field in get_offers response"))?
         .as_i64()
         .ok_or_else(|| ShopError::new("converting total field to i64"))?;
     Ok(total > 0)
+}
+
+async fn offer_published(
+    offer: &Value,
+) -> Result<bool, ShopError> {
+    let first_offer_status = offer["status"]
+        .as_str()
+        .ok_or_else(|| ShopError::default())?;
+    Ok(first_offer_status == "PUBLISHED")
 }
 
 /// Get the first offer ID to appear in the list returned by getOffers (for the given SKU)
