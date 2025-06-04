@@ -1,5 +1,5 @@
 /**
- * @module sliver
+ * @module sigma
  * @description A truly minimal, opinionated UI component framework for operating directly with the browser.
  *
  * @author Zachary Siegel

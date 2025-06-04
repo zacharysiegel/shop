@@ -1,4 +1,4 @@
-import {component} from "../sliver.js";
+import {component} from "../sigma.js";
 
 component()
     .properties({action: undefined})

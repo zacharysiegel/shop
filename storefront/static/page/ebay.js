@@ -1,4 +1,4 @@
-import {component} from "../sliver.js";
+import {component} from "../sigma.js";
 import {api_url, fetch_checked} from "../http.js";
 
 component()

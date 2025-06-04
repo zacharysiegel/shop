@@ -1,4 +1,4 @@
-import {component} from "./sliver.js";
+import {component} from "./sigma.js";
 
 document.addEventListener("submit", submit_form);
 
