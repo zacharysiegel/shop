@@ -77,7 +77,7 @@ async fn get_user_token(
 
     HttpResponse::Ok()
         .append_header(http::header_set_cookie_secure(EBAY_USER_ACCESS_TOKEN_COOKIE_NAME, &user_token_response.access_token, user_token_response.expires_in))
-        .append_header(http::header_set_cookie_secure(EBAY_USER_REFRESH_TOKEN_COOKIE_NAME, &user_token_response.refresh_token, user_token_response.expires_in))
+        .append_header(http::header_set_cookie_secure(EBAY_USER_REFRESH_TOKEN_COOKIE_NAME, &user_token_response.refresh_token, user_token_response.refresh_token_expires_in))
         .json(user_token_response)
 }
 
