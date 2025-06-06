@@ -8,10 +8,11 @@ if ! which yq 1>/dev/null 2>&1; then
 	echo 'The `yq` program is required'
 	exit 1
 fi
-properties="$(< ./secret/index.yaml yq '.[]')"
 
 repo_path=$(git rev-parse --show-toplevel)
 cd "${repo_path}/identity" || exit
+
+properties="$(< ./secret/index.yaml yq '.[]')"
 
 if test -e .env; then
 	echo "Environment file .env already exists; Copying to .env.bak;"
