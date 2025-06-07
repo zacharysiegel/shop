@@ -1,4 +1,4 @@
-import {component} from "../sigma.js";
+import {component} from "../util/sigma.js";
 
 component()
     .properties({action: undefined})

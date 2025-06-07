@@ -1,1 +1,1 @@
-import "./submit_form.js"
+import "./util/submit_form.js"
