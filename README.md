@@ -19,6 +19,11 @@ Install podman-compose
 
     brew install podman-compose
 
+### Rust setup
+
+Follow the official [Rust installation guide](https://www.rust-lang.org/tools/install).
+Ensure the `cargo` program is accessible in your shell.
+
 ### Application setup
 
 Start the application database and the NGINX reverse proxy server.
