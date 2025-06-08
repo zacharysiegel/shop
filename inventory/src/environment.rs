@@ -14,6 +14,9 @@ static CARGO_MANIFEST_DIR: LazyLock<String> = LazyLock::new(||
     env::var("CARGO_MANIFEST_DIR").unwrap_or("/dev/null".to_string())
 );
 
+const VOLATILE_DIRECTORY_NAME: &str = "volatile";
+const IMAGES_DIRECTORY_NAME: &str = "images";
+
 #[derive(Debug, PartialEq, Clone)]
 pub enum RuntimeEnvironment {
     Local = 0,
@@ -51,6 +54,7 @@ impl TryFrom<String> for RuntimeEnvironment {
 pub fn load_env() -> Result<(), std::io::Error> {
     dotenvy::dotenv()
         .map_err(|e| std::io::Error::new(std::io::ErrorKind::Other, e))?;
+    images_directory_path();
     Ok(())
 }
 
@@ -72,22 +76,25 @@ pub fn capture_backtrace() -> Backtrace {
 }
 
 pub fn images_directory_path() -> Result<PathBuf, ShopError> {
-    let path: PathBuf = if (RuntimeEnvironment::default() == RuntimeEnvironment::Local) {
+    let path: PathBuf = if RuntimeEnvironment::default() == RuntimeEnvironment::Local {
+        /* For local development, it is expected that the server is running on the host system.
+            This configuration may not work if running locally inside a container. */
         let manifest_path: &Path = Path::new(&*CARGO_MANIFEST_DIR);
         let workspace_path: &Path = manifest_path.parent()
             .ok_or_else(|| ShopError::default())?;
-        let images_path: PathBuf = workspace_path.join("images");
+        let images_path: PathBuf = workspace_path.join(VOLATILE_DIRECTORY_NAME).join(IMAGES_DIRECTORY_NAME);
 
         let images_directory_exists: bool = fs::exists(&images_path)
             .map_err(|e| ShopError::from_error_default(Box::new(e)))?;
-        if (!images_directory_exists) {
-            fs::create_dir(&images_path)
+        if !images_directory_exists {
+            fs::create_dir_all(&images_path)
                 .map_err(|e| ShopError::from_error_default(Box::new(e)))?;
         }
 
         images_path
     } else {
-        Path::new("/images").to_path_buf()
+        // Container volume
+        Path::new("/").join(IMAGES_DIRECTORY_NAME).to_path_buf()
     };
     Ok(path)
 }

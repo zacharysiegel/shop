@@ -5,4 +5,4 @@
 
 # This file may contain secrets. A template file is committed instead.
 /.env
-/images
+/volatile
