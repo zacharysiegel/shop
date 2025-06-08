@@ -3,6 +3,7 @@ use std::error::Error;
 use std::fmt;
 use std::fmt::{Display, Formatter};
 
+/// Should be initialized lazily (e.g. [Option::ok_or_else]) for captured backtraces to make sense.
 #[derive(Debug)]
 pub struct ShopError {
     pub message: String,

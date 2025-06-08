@@ -1,12 +1,17 @@
 use crate::error::ShopError;
 use log::{LevelFilter, SetLoggerError};
 use std::backtrace::Backtrace;
-use std::env;
 use std::ops::Deref;
+use std::path::{Path, PathBuf};
+use std::string::ToString;
 use std::sync::LazyLock;
+use std::{env, fs};
 
 static RUNTIME_ENVIRONMENT_DEFAULT: LazyLock<RuntimeEnvironment> = LazyLock::new(||
     RuntimeEnvironment::from_env().unwrap_or(RuntimeEnvironment::Local)
+);
+static CARGO_MANIFEST_DIR: LazyLock<String> = LazyLock::new(||
+    env::var("CARGO_MANIFEST_DIR").unwrap_or("/dev/null".to_string())
 );
 
 #[derive(Debug, PartialEq, Clone)]
@@ -64,4 +69,25 @@ pub fn capture_backtrace() -> Backtrace {
         RuntimeEnvironment::Local | RuntimeEnvironment::Stage => Backtrace::force_capture(),
         RuntimeEnvironment::Production => Backtrace::capture(),
     }
+}
+
+pub fn images_directory_path() -> Result<PathBuf, ShopError> {
+    let path: PathBuf = if (RuntimeEnvironment::default() == RuntimeEnvironment::Local) {
+        let manifest_path: &Path = Path::new(&*CARGO_MANIFEST_DIR);
+        let workspace_path: &Path = manifest_path.parent()
+            .ok_or_else(|| ShopError::default())?;
+        let images_path: PathBuf = workspace_path.join("images");
+
+        let images_directory_exists: bool = fs::exists(&images_path)
+            .map_err(|e| ShopError::from_error_default(Box::new(e)))?;
+        if (!images_directory_exists) {
+            fs::create_dir(&images_path)
+                .map_err(|e| ShopError::from_error_default(Box::new(e)))?;
+        }
+
+        images_path
+    } else {
+        Path::new("/images").to_path_buf()
+    };
+    Ok(path)
 }
