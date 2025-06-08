@@ -54,7 +54,6 @@ impl TryFrom<String> for RuntimeEnvironment {
 pub fn load_env() -> Result<(), std::io::Error> {
     dotenvy::dotenv()
         .map_err(|e| std::io::Error::new(std::io::ErrorKind::Other, e))?;
-    images_directory_path();
     Ok(())
 }
 
