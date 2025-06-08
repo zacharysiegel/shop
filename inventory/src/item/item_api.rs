@@ -1,6 +1,6 @@
 use super::*;
 use crate::item_audit::{item_audit_db, ItemAudit, ItemAuditSerial};
-use crate::item_image::ItemImageSerial;
+use crate::item_image::{item_image_db, ItemImageSerial};
 use crate::label::LabelSerial;
 use crate::object::JsonHttpResponse;
 use crate::{unwrap_result_else_400, unwrap_result_else_500, ShopEntity, ShopModel, ShopSerial};
@@ -80,7 +80,7 @@ async fn get_all_item_images(
         return HttpResponse::BadRequest().finish();
     };
 
-    let result = crate::item_image::item_image_db::get_all_item_images(&pgpool, item_id).await;
+    let result = item_image_db::get_all_item_images(&pgpool, item_id).await;
     let Ok(item_images) = result else {
         return HttpResponse::InternalServerError().finish();
     };
