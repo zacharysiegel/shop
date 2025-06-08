@@ -51,7 +51,7 @@ Even during local development, you should access web pages through the proxy. Ot
 
 ### Authelia
 
-Authentication is proxied through the Authelia server. It uses a session cookie to persist a user's authorization across HTTP connections.
+Authentication is proxied through the [Authelia](https://www.authelia.com/overview/prologue/introduction/) server. It uses a session cookie to persist a user's authorization across HTTP connections.
 Since the cookie can only apply to a single domain, during local development, if you touch Authelia, only `127.0.0.1` will work (`localhost` will not).
 
 ### Environment variables
