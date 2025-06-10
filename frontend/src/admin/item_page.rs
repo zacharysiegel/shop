@@ -57,7 +57,9 @@ async fn render(
             BreadcrumbItem::from(product_page::PAGE),
             BreadcrumbItem::new("Item", &PAGE.relative_path.replace("{product_id}", &product_id)),
         ),
-        Markup::default(),
+        html! {
+            script type="module" src="/static/page/item.js" {}
+        },
         split::split(
             left(&product_id).await,
             right().await,
@@ -124,6 +126,7 @@ async fn table(elements: &Vec<ItemSerial>) -> Markup {
                                 )
                                 { button { "View listings" } }
                             button onclick=(activate_item_details_script(element)) { "Details" }
+                            x-item-images-button text="Images" item_id=(element.id) {}
                             button onclick=(activate_create_listing_script(element)) { "Create listing" }
                         }
                     }

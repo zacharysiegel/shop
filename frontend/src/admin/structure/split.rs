@@ -8,7 +8,7 @@ pub fn split(
         div style=(concat!(
             "display: flex; flex-direction: row;",
         )) {
-            div style=(concat!(
+            div .left style=(concat!(
                 "flex-basis: 75%;",
                 "flex-grow: 1;",
                 "flex-shrink: 2;",
@@ -18,7 +18,7 @@ pub fn split(
                 (left)
             }
 
-            div style=(concat!(
+            div .right style=(concat!(
                 "flex-basis: 25%;",
                 "flex-grow: 0;",
                 "flex-shrink: 1;",
