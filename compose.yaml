@@ -23,7 +23,8 @@ services:
       - ./proxy/nginx.conf:/etc/nginx/nginx.conf:ro
       - ./proxy/authelia:/etc/nginx/authelia:ro
       - ./proxy/cert:/cert:ro
-      - ./frontend/static:/static:ro
+      - ./frontend/static:/frontend/static:ro
+      - ./volatile:/volatile:ro
     restart: unless-stopped
     networks:
       - shop
