@@ -54,7 +54,7 @@ async fn render(pagination_options: Option<KeysetPaginationOptionsForString>) ->
     page::page(
         &vec!(BreadcrumbItem::from(PAGE)),
         html! {
-            script type="module" src="/page/product.js" {}
+            script type="module" src="/static/page/product.js" {}
         },
         split::split(left(pagination_options).await, right().await),
     )
@@ -294,7 +294,7 @@ async fn activate_categories_script(element_id: &str, product: &ProductSerial) -
     let inject: String = format!(
         r#"{{
         const categories = JSON.parse('{}');
-        import("/page/product.js").then(module => {{
+        import("/static/page/product.js").then(module => {{
             module.activate_categories(element, "{}", "{}", categories); // Defined in product.js
         }});
         }}"#,

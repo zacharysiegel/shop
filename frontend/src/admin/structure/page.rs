@@ -29,11 +29,11 @@ pub fn page(
 			head {
 				meta charset="utf-8";
 				title {"Shop | Administration"}
-				link rel="icon" href="/favicon.svg";
-				link rel="stylesheet" type="text/css" href="/reset.css";
-				link rel="stylesheet" type="text/css" href="/base.css";
-				link rel="stylesheet" type="text/css" href="/tree.css";
-				script type="module" src="/index.js" {};
+				link rel="icon" href="/static/favicon.svg";
+				link rel="stylesheet" type="text/css" href="/static/reset.css";
+				link rel="stylesheet" type="text/css" href="/static/base.css";
+				link rel="stylesheet" type="text/css" href="/static/tree.css";
+				script type="module" src="/static/index.js" {};
 				(head_content)
 			}
 			body style=(concat!(

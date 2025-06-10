@@ -54,7 +54,7 @@ async fn render(
             BreadcrumbItem::new(PAGE.name, &this_path),
         ),
         html! {
-            script type="module" src="/page/listing.js" {}
+            script type="module" src="/static/page/listing.js" {}
         },
         split::split(
             left(&product_id, &item_id).await,

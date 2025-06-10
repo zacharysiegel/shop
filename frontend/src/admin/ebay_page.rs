@@ -23,7 +23,7 @@ async fn render() -> Markup {
     page::page(
         &vec!(BreadcrumbItem::from(PAGE)),
         html! {
-            script type="module" src="/page/ebay.js" {}
+            script type="module" src="/static/page/ebay.js" {}
         },
         content().await,
     )
