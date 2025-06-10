@@ -3,7 +3,7 @@
 ## Images
 
 1. Serve static images from NGINX
-    * Perhaps this easily leads to serving the other static files as well
+    * [done] Perhaps this easily leads to serving the other static files as well
     * Serve from the `[repo]/volatile/images` directory locally, else `/images`
 2. Implement image uploads through `frontend`/`inventory`.
     * Simple file upload UI
