@@ -900,6 +900,27 @@ dependencies = [
 ]
 
 [[package]]
+name = "frontend"
+version = "0.1.0"
+dependencies = [
+ "actix-web",
+ "actix-web-static-files",
+ "chrono",
+ "dotenvy",
+ "env_logger",
+ "inventory",
+ "log",
+ "maud",
+ "reqwest",
+ "serde",
+ "serde_json",
+ "serde_urlencoded",
+ "static-files",
+ "strum",
+ "uuid",
+]
+
+[[package]]
 name = "futures-channel"
 version = "0.3.31"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2799,27 +2820,6 @@ dependencies = [
  "change-detection",
  "mime_guess",
  "path-slash",
-]
-
-[[package]]
-name = "storefront"
-version = "0.1.0"
-dependencies = [
- "actix-web",
- "actix-web-static-files",
- "chrono",
- "dotenvy",
- "env_logger",
- "inventory",
- "log",
- "maud",
- "reqwest",
- "serde",
- "serde_json",
- "serde_urlencoded",
- "static-files",
- "strum",
- "uuid",
 ]
 
 [[package]]

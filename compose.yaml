@@ -55,7 +55,7 @@ services:
       - validate
 
 # todo: inventory container
-# todo: storefront container
+# todo: frontend container
 # These containers should be qualified with [prod/qa] profiles.
 # We would prefer to not run these services as containers during local development.
 # Currently nginx proxies these routes to the host machine's network.

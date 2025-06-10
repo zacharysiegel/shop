@@ -41,7 +41,7 @@ Start the inventory management server.
 
 Start the web server.
 
-    cargo run -p storefront
+    cargo run -p frontend
 
 ### Proxy
 

@@ -8,5 +8,5 @@ async fn main() -> Result<(), impl std::error::Error> {
 
     log::info!("Runtime environment: {:?}", RuntimeEnvironment::default());
 
-    storefront::server::open_server().await
+    frontend::server::open_server().await
 }
