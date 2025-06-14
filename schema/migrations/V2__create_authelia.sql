@@ -1,7 +1,7 @@
 -- Refinery runs SQL scripts within transaction blocks. This prevents the use of CREATE DATABASE here so the following
 -- must be executed manually. See init.sql.
 
-drop role authelia;
+drop role if exists authelia;
 create role authelia
     nosuperuser
     nocreatedb
