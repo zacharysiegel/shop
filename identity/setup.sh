@@ -9,6 +9,11 @@ if ! which yq 1>/dev/null 2>&1; then
 	exit 1
 fi
 
+if ! which cargo 1>/dev/null 2>&1; then
+	echo 'The `cargo` program is required'
+	exit 1
+fi
+
 repo_path=$(git rev-parse --show-toplevel)
 cd "${repo_path}/identity" || exit
 
