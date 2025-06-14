@@ -70,3 +70,10 @@ To add a new secret, use the `crypt` CLI:
 	cargo run -p crypt -- encrypt "$plaintext" --key "$master_key"
 
 The command produces literal Rust code which should be copied and pasted into `crypt/src/data.rs`.
+
+### Venus
+
+_"Venus" is the name of the machine (or cluster of machines) which hosts the production environment_
+
+todo: talk about cloudflare tunnel and ssh connection via `cloudflared`
+
