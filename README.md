@@ -31,7 +31,8 @@ Start the application database and the NGINX reverse proxy server.
     # At the repository root
     podman compose up --detach
 
-Run the migrations via the `schema` application.
+
+Execute `./schema/migrations/manual.sql` manually, then run the automatic migrations via the `schema` application.
 
     cargo run -p schema
 
