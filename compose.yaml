@@ -52,7 +52,7 @@ services:
       - ./identity/config:/config
       - ./identity/secret:/secret
       - ./identity/data:/data
-    restart: no
+    restart: 'no'
     profiles:
       - validate
 
