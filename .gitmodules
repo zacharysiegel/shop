@@ -1,0 +1,12 @@
+[submodule "lib/class-list"]
+	path = lib/class-list
+	url = git@github.com:npm-dom/class-list.git
+	branch = master
+[submodule "lib/browser-split"]
+	path = lib/browser-split
+	url = git@github.com:juliangruber/browser-split.git
+	branch = master
+[submodule "lib/hyperscript"]
+	path = lib/hyperscript
+	url = git@github.com:hyperhype/hyperscript.git
+	branch = master
