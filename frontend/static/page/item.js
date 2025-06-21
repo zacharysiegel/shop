@@ -1,11 +1,14 @@
 import {component} from "../util/sigma.js";
+import {h} from "../util/hyperscript.js";
 
 const item_images_component = component()
     .factory(({fragment}) => {
-        const inner = document.createElement("div");
-        inner.textContent = "_test_";
-
-        fragment.appendChild(inner);
+        const container = h("div", [
+            h("hr"),
+            h("h2", "Item images"),
+            h("ol"),
+        ]);
+        fragment.appendChild(container);
     })
     .build();
 
