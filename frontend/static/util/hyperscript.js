@@ -13,6 +13,9 @@ function context() {
 
     var cleanupFuncs = [];
 
+    /**
+     * @returns {HTMLElementTagNameMap[keyof HTMLElementTagNameMap]}
+     */
     function h() {
         var args = [].slice.call(arguments), e = null;
 
