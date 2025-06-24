@@ -23,7 +23,10 @@ const item_image_element = component()
             /** @type ItemImage */
             item_image,
         } = properties;
-        const element = h("li", item_image.item_id);
+        const element = h("li",
+            h("a", {href: item_image.uri}, `${item_image.id}`),
+            h("span", item_image.alt_text ? ` [${item_image.alt_text}]` : ""),
+        );
         fragment.appendChild(element);
     })
     .properties({
