@@ -18,6 +18,9 @@ let current_item_images_id = null;
  */
 
 const item_image_element = component()
+    .properties({
+        item_image: null,
+    })
     .factory(({fragment, properties}) => {
         const {
             /** @type ItemImage */
@@ -29,12 +32,44 @@ const item_image_element = component()
         );
         fragment.appendChild(element);
     })
+    .build();
+
+const item_image_upload_form = component()
     .properties({
-        item_image: null,
+        item_id: null,
+    })
+    .factory(({fragment, properties}) => {
+        /** @type HTMLInputElement */
+        const file_input = h("input", {type: "file", name: "file"});
+        const error_placeholder = h("div");
+        const form = h("div",
+            h("h3", {style: {"margin-top": ".5rem"}}, "Upload"),
+            file_input,
+            h("button", {onclick: submit}, "Submit"),
+            error_placeholder,
+        );
+        fragment.append(form);
+
+        function submit() {
+            const request = new Request(`${api_url}/item/${properties.item_id}/image`, {
+                method: "POST",
+                body: file_input.files.item(0),
+            });
+            fetch_checked(request, {
+                error_target: error_placeholder,
+                json: true,
+            })
+                .then(json => {
+                    console.log(json);
+                });
+        }
     })
     .build();
 
 const item_images_component = component()
+    .properties({
+        item_id: null,
+    })
     .factory(({fragment, properties, add_callback}) => {
         const ol = h("ol");
         const content = h("div", ol);
@@ -43,6 +78,10 @@ const item_images_component = component()
             h("h2", "Item images"),
             content,
         ]);
+        const upload_form = item_image_upload_form({
+            item_id: properties.item_id,
+        });
+        upload_form.append_self(section);
         fragment.appendChild(section);
 
         add_callback("fetch", () => {
@@ -67,12 +106,13 @@ const item_images_component = component()
                 .catch(() => null);
         });
     })
-    .properties({
-        item_id: null,
-    })
     .build();
 
 component()
+    .properties({
+        text: null,
+        item_id: null,
+    })
     .factory(({fragment, properties}) => {
         const button = document.createElement("button");
         button.textContent = properties.text;
@@ -99,9 +139,5 @@ component()
         };
 
         fragment.appendChild(button);
-    })
-    .properties({
-        text: null,
-        item_id: null,
     })
     .define("x-item-images-button");
