@@ -55,6 +55,10 @@ const item_images_component = component()
             })
                 .then(json => {
                     ol.replaceChildren();
+                    if (json.length === 0) {
+                        content.append("None");
+                        return;
+                    }
                     for (let item_image of json) {
                         const element = item_image_element({item_image});
                         element.append_self(ol);
