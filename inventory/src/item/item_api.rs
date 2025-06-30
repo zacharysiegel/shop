@@ -1,19 +1,15 @@
 use super::*;
-use crate::error::ShopError;
 use crate::item_audit::{item_audit_db, ItemAudit, ItemAuditSerial};
-use crate::item_image::{item_image_action, item_image_db, ItemImage, ItemImageEntity, ItemImageSerial};
+use crate::item_image::{item_image_db, ItemImage, ItemImageSerial};
 use crate::label::LabelSerial;
 use crate::object::JsonHttpResponse;
-use crate::{environment, object, unwrap_result_else_400, unwrap_result_else_500, ShopEntity, ShopModel, ShopSerial};
-use actix_web::dev::Payload;
+use crate::{unwrap_result_else_400, unwrap_result_else_500, ShopEntity, ShopModel, ShopSerial};
 use actix_web::http::StatusCode;
 use actix_web::{web, HttpResponse, HttpResponseBuilder, Responder};
-use futures::{StreamExt, TryStreamExt};
+pub use futures::StreamExt;
 use serde::Deserialize;
 use sqlx::postgres::PgQueryResult;
 use sqlx::PgPool;
-use std::path::PathBuf;
-use std::pin::Pin;
 use uuid::Uuid;
 
 pub fn configurer(config: &mut web::ServiceConfig) {
@@ -87,7 +83,7 @@ async fn get_all_item_images(
         return HttpResponse::BadRequest().finish();
     };
 
-    let result = item_image_db::get_all_item_images(&pgpool, item_id).await;
+    let result = item_image_db::get_all_item_images(&pgpool, &item_id).await;
     let Ok(item_images) = result else {
         return HttpResponse::InternalServerError().finish();
     };
@@ -114,8 +110,9 @@ async fn create_item_image(
     let item_image: ItemImage = ItemImage::new(item_id, parameters.alt_text.clone());
 
     unwrap_result_else_500!(item_image.store_image_file(&mut payload).await);
-    
-    HttpResponse::Ok().body("todo")
+    unwrap_result_else_500!(item_image_db::create_item_image(&pgpool, &item_image).await);
+
+    item_image.to_serial().to_http_response()
 }
 
 async fn get_all_item_labels(
