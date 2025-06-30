@@ -10,7 +10,7 @@ pub async fn get_item_image(
     query_as!(
 		ItemImageEntity,
 		"\
-        select id, item_id, uri, alt_text, priority \
+        select id, item_id, alt_text, priority \
         from shop.public.item_image \
         where id = $1 \
     ",
@@ -26,12 +26,11 @@ pub async fn create_item_image(
 ) -> Result<PgQueryResult, sqlx::Error> {
     query!(
 		"\
-        insert into shop.public.item_image (id, item_id, uri, alt_text, priority) \
-        values ($1, $2, $3, $4, $5) \
+        insert into shop.public.item_image (id, item_id, alt_text, priority) \
+        values ($1, $2, $3, $4) \
     ",
 		item_image.id,
 		item_image.item_id,
-		item_image.uri,
 		item_image.alt_text,
 		item_image.priority,
 	)
@@ -46,7 +45,7 @@ pub async fn get_all_item_images(
     query_as!(
 		ItemImageEntity,
 		"\
-        select id, item_id, uri, alt_text, priority \
+        select id, item_id, alt_text, priority \
         from shop.public.item_image \
         where item_id = $1 \
     ",

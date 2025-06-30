@@ -14,7 +14,6 @@ pub async fn open_server(pgpool: Pool<Postgres>) -> std::io::Result<()> {
             .configure(crate::inventory_location::inventory_location_api::configurer)
             .configure(crate::item::item_api::configurer)
             .configure(crate::label::label_api::configurer)
-            .configure(crate::item_image::item_image_api::configurer)
             .configure(crate::item_attribute::item_attribute_api::configurer)
             .configure(crate::metric_counter::metric_counter_api::configurer)
             .configure(crate::customer::customer_api::configurer)

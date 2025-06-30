@@ -1,13 +1,19 @@
 use super::*;
+use crate::error::ShopError;
 use crate::item_audit::{item_audit_db, ItemAudit, ItemAuditSerial};
-use crate::item_image::{item_image_db, ItemImageSerial};
+use crate::item_image::{item_image_action, item_image_db, ItemImage, ItemImageEntity, ItemImageSerial};
 use crate::label::LabelSerial;
 use crate::object::JsonHttpResponse;
-use crate::{unwrap_result_else_400, unwrap_result_else_500, ShopEntity, ShopModel, ShopSerial};
+use crate::{environment, object, unwrap_result_else_400, unwrap_result_else_500, ShopEntity, ShopModel, ShopSerial};
+use actix_web::dev::Payload;
 use actix_web::http::StatusCode;
 use actix_web::{web, HttpResponse, HttpResponseBuilder, Responder};
+use futures::{StreamExt, TryStreamExt};
+use serde::Deserialize;
 use sqlx::postgres::PgQueryResult;
 use sqlx::PgPool;
+use std::path::PathBuf;
+use std::pin::Pin;
 use uuid::Uuid;
 
 pub fn configurer(config: &mut web::ServiceConfig) {
@@ -16,6 +22,7 @@ pub fn configurer(config: &mut web::ServiceConfig) {
             .route("", web::post().to(create_item))
             .route("/{item_id}", web::get().to(get_item))
             .route("/{item_id}/image", web::get().to(get_all_item_images))
+            .route("/{item_id}/image", web::post().to(create_item_image))
             .route("/{item_id}/label", web::get().to(get_all_item_labels))
             .route(
                 "/{item_id}/label/{label_id}",
@@ -90,6 +97,25 @@ async fn get_all_item_images(
         .map(|item_image| item_image.to_serial())
         .collect::<Vec<ItemImageSerial>>()
         .to_http_response()
+}
+
+#[derive(Debug, Deserialize)]
+struct CreateItemImageParameters {
+    pub alt_text: String,
+}
+
+async fn create_item_image(
+    pgpool: web::Data<PgPool>,
+    parameters: web::Query<CreateItemImageParameters>,
+    item_id: web::Path<String>,
+    mut payload: web::Payload,
+) -> HttpResponse {
+    let item_id: Uuid = unwrap_result_else_400!(Uuid::try_parse(item_id.into_inner().as_str()));
+    let item_image: ItemImage = ItemImage::new(item_id, parameters.alt_text.clone());
+
+    unwrap_result_else_500!(item_image.store_image_file(&mut payload).await);
+    
+    HttpResponse::Ok().body("todo")
 }
 
 async fn get_all_item_labels(

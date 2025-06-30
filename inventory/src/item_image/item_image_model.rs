@@ -8,7 +8,6 @@ use uuid::Uuid;
 pub struct ItemImageEntity {
     pub id: Uuid,
     pub item_id: Uuid,
-    pub uri: String,
     pub alt_text: String,
     pub priority: i32,
 }
@@ -27,7 +26,6 @@ impl ShopModel for ItemImage {
         ItemImageSerial {
             id: self.id.clone(),
             item_id: self.item_id.clone(),
-            uri: self.uri.clone(),
             alt_text: self.alt_text.clone(),
             priority: self.priority.clone(),
         }
@@ -37,7 +35,6 @@ impl ShopModel for ItemImage {
         Ok(ItemImageEntity {
             id: object::random_uuid(),
             item_id: serial.item_id.clone(),
-            uri: serial.uri.clone(),
             alt_text: serial.alt_text.clone(),
             priority: serial.priority.clone(),
         })
@@ -57,7 +54,6 @@ pub struct ItemImageSerial {
     #[serde(default)]
     pub id: Uuid,
     pub item_id: Uuid,
-    pub uri: String,
     pub alt_text: String,
     pub priority: i32,
 }
