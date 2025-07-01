@@ -1,4 +1,4 @@
-config = ./local.curl
+config = "./local.curl"
 
 variable = scheme=http
 expand-variable = base_url={{scheme}}://{{host}}:{{port}}
