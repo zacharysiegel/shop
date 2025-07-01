@@ -5,7 +5,7 @@
 1. Serve static images from NGINX
     * [done] Perhaps this easily leads to serving the other static files as well
 2. Implement image uploads through `frontend`/`inventory`.
-    * Simple file upload UI
+    * [done] Simple file upload UI
     * Create `item_image` record in the database.
     * Expect the image URI to be `[images]/[item_image_id]`
         * Write a small "uri generator" method
