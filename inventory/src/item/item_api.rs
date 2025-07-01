@@ -98,6 +98,7 @@ async fn get_all_item_images(
 #[derive(Debug, Deserialize)]
 struct CreateItemImageParameters {
     pub alt_text: String,
+    pub original_file_name: String,
 }
 
 async fn create_item_image(
@@ -107,7 +108,11 @@ async fn create_item_image(
     mut payload: web::Payload,
 ) -> HttpResponse {
     let item_id: Uuid = unwrap_result_else_400!(Uuid::try_parse(item_id.into_inner().as_str()));
-    let item_image: ItemImage = ItemImage::new(item_id, parameters.alt_text.clone());
+    let item_image: ItemImage = ItemImage::new(
+        item_id,
+        parameters.alt_text.clone(),
+        parameters.original_file_name.clone(),
+    );
 
     unwrap_result_else_500!(item_image.store_image_file(&mut payload).await);
     unwrap_result_else_500!(item_image_db::create_item_image(&pgpool, &item_image).await);

@@ -10,6 +10,7 @@ pub struct ItemImageEntity {
     pub item_id: Uuid,
     pub alt_text: String,
     pub priority: i32,
+    pub original_file_name: String,
 }
 
 impl ShopEntity for ItemImageEntity {
@@ -28,6 +29,7 @@ impl ShopModel for ItemImage {
             item_id: self.item_id.clone(),
             alt_text: self.alt_text.clone(),
             priority: self.priority.clone(),
+            original_file_name: self.original_file_name.clone(),
         }
     }
 
@@ -37,6 +39,7 @@ impl ShopModel for ItemImage {
             item_id: serial.item_id.clone(),
             alt_text: serial.alt_text.clone(),
             priority: serial.priority.clone(),
+            original_file_name: serial.original_file_name.clone(),
         })
     }
 
@@ -56,6 +59,7 @@ pub struct ItemImageSerial {
     pub item_id: Uuid,
     pub alt_text: String,
     pub priority: i32,
+    pub original_file_name: String,
 }
 
 impl ShopSerial for ItemImageSerial {

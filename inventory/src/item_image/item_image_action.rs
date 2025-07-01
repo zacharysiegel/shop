@@ -10,18 +10,23 @@ use std::path::PathBuf;
 use uuid::Uuid;
 
 impl ItemImage {
-    pub fn new(item_id: Uuid, alt_text: String) -> ItemImage {
+    pub fn new(
+        item_id: Uuid,
+        alt_text: String,
+        original_file_name: String,
+    ) -> ItemImage {
         ItemImage {
             id: object::random_uuid(),
             item_id,
             alt_text,
             priority: 0, // Priority mechanism is currently unused
+            original_file_name,
         }
     }
 
     pub fn get_item_image_path(&self) -> Result<PathBuf, ShopError> {
         let images_directory = environment::images_directory_path()?;
-        Ok(images_directory.join(format!("{}_{}", self.item_id, self.id)))
+        Ok(images_directory.join(format!("{}_{}_{}", self.item_id, self.id, self.original_file_name)))
     }
 
     /// If an error is returned, any created file will be deleted before returning.
