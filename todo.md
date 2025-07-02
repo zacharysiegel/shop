@@ -13,7 +13,7 @@
 3. Upload images to eBay
     * [done] Get all images associated with a given item. 
         * `select * from item_image where item_id = [id]`
-    * Invoke [UploadSiteHostedPictures](https://developer.ebay.com/Devzone/XML/docs/Reference/eBay/UploadSiteHostedPictures.html)
+    * [done] Invoke [UploadSiteHostedPictures](https://developer.ebay.com/Devzone/XML/docs/Reference/eBay/UploadSiteHostedPictures.html)
 
 ## eBay webhook
 
