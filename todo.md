@@ -11,7 +11,7 @@
         * [done] Write a small "uri generator" method
     * [done] Store the image file at the expected URI.
 3. Upload images to eBay
-    * Get all images associated with a given item. 
+    * [done] Get all images associated with a given item. 
         * `select * from item_image where item_id = [id]`
     * Invoke [UploadSiteHostedPictures](https://developer.ebay.com/Devzone/XML/docs/Reference/eBay/UploadSiteHostedPictures.html)
 
