@@ -35,6 +35,7 @@ pub fn configurer(config: &mut ServiceConfig) {
             .route("/listing/{listing_id}", web::get().to(get_listing))
             .route("/location", web::get().to(get_all_locations))
             .route("/location", web::put().to(sync_locations))
+            .route("/image/{item_image_id}", web::post().to(upload_image))
     );
 }
 
@@ -205,5 +206,20 @@ async fn sync_locations(
     };
 
     unwrap_result_else_500!(ebay_action::sync_all_locations(&pgpool, &user_access_token.value()).await);
+    HttpResponse::build(StatusCode::NO_CONTENT).finish()
+}
+
+async fn upload_image(
+    pgpool: web::Data<PgPool>,
+    request: HttpRequest,
+    item_image_id: web::Path<String>,
+) -> HttpResponse {
+    let user_access_token: Cookie = match extract_user_token(&request) {
+        Ok(value) => value,
+        Err(response) => return response,
+    };
+    let item_image_id: Uuid = unwrap_result_else_400!(Uuid::parse_str(&item_image_id.into_inner()));
+
+    unwrap_result_else_500!(ebay_action::upload_image(&pgpool, &user_access_token.value(), &item_image_id).await);
     HttpResponse::build(StatusCode::NO_CONTENT).finish()
 }

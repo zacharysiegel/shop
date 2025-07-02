@@ -27,7 +27,6 @@ pub const EBAY_CATEGORY_STANDARD: &str = "ALL_EXCLUDING_MOTORS_VEHICLES";
 // https://developer.ebay.com/api-docs/sell/account/types/api:CategoryTypeEnum
 pub const EBAY_CONTENT_LANGUAGE: &str = "en-US";
 
-
 /// Returns the base64-encoded basic authentication value.
 pub fn ebay_basic_auth() -> String {
     let raw: String = format!("{}:{}", EBAY_CLIENT_ID, *EBAY_CLIENT_SECRET);

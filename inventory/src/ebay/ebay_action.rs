@@ -3,6 +3,7 @@ use crate::category::Category;
 use crate::error::ShopError;
 use crate::inventory_location::InventoryLocation;
 use crate::item::Item;
+use crate::item_image::{item_image_db, ItemImage};
 use crate::listing::{Listing, ListingStatus};
 use crate::marketplace::marketplace_db;
 use crate::product::Product;
@@ -207,6 +208,21 @@ pub async fn sync_all_locations(pgpool: &PgPool, user_token: &str) -> Result<(),
             // client::update_inventory_location(user_token, &inventory_location).await?;
         }
     }
+
+    Ok(())
+}
+
+pub async fn upload_image(
+    pgpool: &PgPool,
+    user_token: &str,
+    item_image_id: &Uuid,
+) -> Result<(), ShopError> {
+    let item_image: ItemImage = item_image_db::get_item_image(pgpool, item_image_id)
+        .await?
+        .ok_or_else(|| ShopError::new(&format!("Item image expected; [{}]", item_image_id)))?
+        .try_to_model()?;
+
+    _ = ebay_client::upload_image(user_token, &item_image).await?;
 
     Ok(())
 }

@@ -17,6 +17,6 @@ rand = "0.9.1"
 chrono = { version = "0.4", features = ["serde", "now"] }
 uuid = { version = "1.16", features = ["serde"] }
 strum = { version = "0.27", features = ["derive"] }
-reqwest = { version = "0.12", features = ["json", "native-tls-vendored"] }
+reqwest = { version = "0.12", features = ["json", "native-tls-vendored", "multipart", "stream"] }
 base64 = { version = "0.22" }
 futures = { version = "0.3" }
