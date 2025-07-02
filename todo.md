@@ -7,9 +7,9 @@
 2. Implement image uploads through `frontend`/`inventory`.
     * [done] Simple file upload UI
     * [done] Create `item_image` record in the database.
-    * Expect the image URI to be `[images]/[item_image_id]`
-        * Write a small "uri generator" method
-    * Store the image file at the expected URI.
+    * [done] Expect the image URI to be `[images]/[item_image_id]`
+        * [done] Write a small "uri generator" method
+    * [done] Store the image file at the expected URI.
 3. Upload images to eBay
     * Get all images associated with a given item. 
         * `select * from item_image where item_id = [id]`
