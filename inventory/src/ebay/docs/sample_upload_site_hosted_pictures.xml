@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- https://developer.ebay.com/Devzone/XML/docs/Reference/eBay/UploadSiteHostedPictures.html -->
+<UploadSiteHostedPicturesRequest xmlns="urn:ebay:apis:eBLBaseComponents">
+    <RequesterCredentials>
+        <eBayAuthToken>{token}</eBayAuthToken>
+    </RequesterCredentials>
+    <!-- Call-specific Input Fields -->
+    <!-- <ExternalPictureURL> anyURI </ExternalPictureURL> -->
+    <PictureName>{item_image.id}</PictureName>
+    <PictureSet>Standard</PictureSet>
+    <PictureSystemVersion>2</PictureSystemVersion> <!-- "Only version 2 is valid" 07/01/2025 -->
+    <PictureUploadPolicy>Add</PictureUploadPolicy> <!-- Append rather than replace -->
+    <!-- Standard Input Fields -->
+    <ErrorLanguage>en_US</ErrorLanguage>
+    <MessageID>{item_image.id}</MessageID>
+    <WarningLevel>High</WarningLevel>
+</UploadSiteHostedPicturesRequest>
