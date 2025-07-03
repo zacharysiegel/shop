@@ -1,6 +1,7 @@
 import {component} from "../util/sigma.js";
 import {h} from "../util/hyperscript.js";
-import {api_url, fetch_checked} from "../util/http.js";
+import {api_url, base_url, fetch_checked} from "../util/http.js";
+import {form_response_component} from "../util/submit_form.js";
 
 /** @type {ComponentInstance | null} */
 let current_item_images_component = null;
@@ -11,11 +12,19 @@ let current_item_images_id = null;
  * @typedef {{
  *     id: String,
  *     item_id: String,
- *     uri: String,
  *     alt_text: String,
  *     priority: Number,
+ *     original_file_name: String,
  *   }} ItemImage
  */
+
+/**
+ * @param {ItemImage} item_image
+ * @return String
+ */
+function get_image_uri(item_image) {
+    return `${base_url}/volatile/images/${item_image.item_id}_${item_image.id}_${item_image.original_file_name}`;
+}
 
 const item_image_element = component()
     .properties({
@@ -27,7 +36,7 @@ const item_image_element = component()
             item_image,
         } = properties;
         const element = h("li",
-            h("a", {href: item_image.uri}, `${item_image.id}`),
+            h("a", {href: get_image_uri(item_image)}, `${item_image.id}`),
             h("span", item_image.alt_text ? ` [${item_image.alt_text}]` : ""),
         );
         fragment.appendChild(element);
@@ -36,32 +45,56 @@ const item_image_element = component()
 
 const item_image_upload_form = component()
     .properties({
+        fetch: null,
         item_id: null,
     })
     .factory(({fragment, properties}) => {
         /** @type HTMLInputElement */
         const file_input = h("input", {type: "file", name: "file"});
-        const error_placeholder = h("div");
+        const alt_text_input = h("input", {type: "text", name: "alt_text"});
+        const error_container = h("div");
+        const result_container = h("div");
         const form = h("div",
             h("h3", {style: {"margin-top": ".5rem"}}, "Upload"),
+            h("label", {htmlFor: "alt_text"}, "Alt text"),
+            alt_text_input,
             file_input,
             h("button", {onclick: submit}, "Submit"),
-            error_placeholder,
+            error_container,
+            result_container,
         );
         fragment.append(form);
 
         function submit() {
-            const request = new Request(`${api_url}/item/${properties.item_id}/image`, {
+            if (!alt_text_input.value) {
+                error_container.textContent = "Alt text required";
+                return;
+            } else if (!file_input.files.item(0)) {
+                error_container.textContent = "File required";
+                return;
+            }
+            error_container.replaceChildren();
+
+            const query_string = new URLSearchParams([
+                ["alt_text", alt_text_input.value],
+                ["original_file_name", file_input.files.item(0).name],
+            ]).toString();
+            const request = new Request(`${api_url}/item/${properties.item_id}/image?${query_string}`, {
                 method: "POST",
                 body: file_input.files.item(0),
             });
+
+            const form_response = form_response_component();
+            form_response.append_self(result_container);
+            // noinspection JSIgnoredPromiseFromCall
             fetch_checked(request, {
-                error_target: error_placeholder,
-                json: true,
+                error_target: error_container,
+                response_handler: response => {
+                    form_response.callbacks["set_status"](response);
+                    return response;
+                },
             })
-                .then(json => {
-                    console.log(json);
-                });
+                .then(_body => properties.refetch_images());
         }
     })
     .build();
@@ -79,20 +112,21 @@ const item_images_component = component()
             content,
         ]);
         const upload_form = item_image_upload_form({
+            refetch_images: fetch,
             item_id: properties.item_id,
         });
         upload_form.append_self(section);
         fragment.appendChild(section);
 
-        add_callback("fetch", () => {
+        add_callback("fetch", fetch);
+
+        function fetch() {
             const request = new Request(`${api_url}/item/${properties.item_id}/image`, {
                 method: "GET",
             });
-            fetch_checked(request, {
-                error_target: content,
-                json: true,
-            })
-                .then(json => {
+            fetch_checked(request, {error_target: content})
+                .then(body => {
+                    const json = JSON.parse(body);
                     ol.replaceChildren();
                     if (json.length === 0) {
                         content.append("None");
@@ -104,7 +138,7 @@ const item_images_component = component()
                     }
                 })
                 .catch(() => null);
-        });
+        }
     })
     .build();
 

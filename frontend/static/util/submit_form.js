@@ -144,15 +144,13 @@ function as_number(form, key, value) {
  * }} parameters.properties
  */
 const form_response_component_factory = ({fragment, properties, add_callback}) => {
-    const {response} = properties;
-
     let text;
     fragment.append((() => {
         const root = document.createElement("div");
         root.classList.add("form_response_component");
         root.append((() => {
             text = document.createElement("span");
-            set_status(response);
+            set_status(null);
             return text;
         })());
         root.append((() => {
@@ -179,6 +177,7 @@ const form_response_component_factory = ({fragment, properties, add_callback}) =
     add_callback("set_status", set_status);
 };
 
-const form_response_component = component()
+export const form_response_component = component()
     .factory(form_response_component_factory)
+    .properties({response: null})
     .build();
