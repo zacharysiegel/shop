@@ -12,16 +12,18 @@
     * [done] Store the image file at the expected URI.
     * [done] Conform upload button to raw payload expectation
 3. Upload images to eBay
-    * [done] Get all images associated with a given item. 
+    * [done] Get all images associated with a given item.
         * `select * from item_image where item_id = [id]`
-    * [done] Invoke [UploadSiteHostedPictures](https://developer.ebay.com/Devzone/XML/docs/Reference/eBay/UploadSiteHostedPictures.html)
+    * [done]
+      Invoke [UploadSiteHostedPictures](https://developer.ebay.com/Devzone/XML/docs/Reference/eBay/UploadSiteHostedPictures.html)
     * Add ebay global sync button per (or per item/image if that is preferred)
+        * eBay doesn't work
 4. Delete images
-   * Delete button with mini form per image
-   * Endpoint
-   * Delete image file
-   * Delete item_image record
-   * Refresh image list
+    * Delete button with mini form per image
+    * Endpoint
+    * Delete image file
+    * Delete item_image record
+    * Refresh image list
 
 ## eBay webhook
 
