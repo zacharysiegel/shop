@@ -49,7 +49,7 @@ pub async fn upload_image(
             <PictureUploadPolicy>Add</PictureUploadPolicy>
             <!-- Standard Input Fields -->
             <ErrorLanguage>{}</ErrorLanguage>
-            <MessageID>{0}</MessageID>
+            <MessageID>{1}</MessageID>
             <WarningLevel>{}</WarningLevel>
         </UploadSiteHostedPicturesRequest>
     "#,
