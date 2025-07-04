@@ -15,7 +15,7 @@
     * [done] Get all images associated with a given item. 
         * `select * from item_image where item_id = [id]`
     * [done] Invoke [UploadSiteHostedPictures](https://developer.ebay.com/Devzone/XML/docs/Reference/eBay/UploadSiteHostedPictures.html)
-    * Add ebay sync button per item (or image if that is preferred)
+    * Add ebay global sync button per (or per item/image if that is preferred)
 4. Delete images
    * Delete button with mini form per image
    * Endpoint

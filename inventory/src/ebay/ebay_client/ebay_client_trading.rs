@@ -18,10 +18,10 @@ enum PictureSetCodeType {
 }
 
 impl PictureSetCodeType {
-    pub fn get_serial_value(&self) -> String {
+    pub fn get_serial_value(&self) -> &'static str {
         match self {
-            PictureSetCodeType::Standard => "Standard".to_string(),
-            PictureSetCodeType::Supersize => "Supersize".to_string(),
+            PictureSetCodeType::Standard => "Standard",
+            PictureSetCodeType::Supersize => "Supersize",
         }
     }
 }
