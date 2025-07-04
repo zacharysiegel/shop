@@ -56,7 +56,7 @@ const item_image_upload_form = component()
         const result_container = h("div");
         const form = h("div",
             h("h3", {style: {"margin-top": ".5rem"}}, "Upload"),
-            h("label", {htmlFor: "alt_text"}, "Alt text"),
+            h("label", {htmlFor: "alt_text", style: {"margin-right": "1rem"}}, "Alt text"),
             alt_text_input,
             file_input,
             h("button", {onclick: submit}, "Submit"),
