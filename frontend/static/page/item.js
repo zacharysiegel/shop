@@ -106,16 +106,16 @@ const item_images_component = component()
     .factory(({fragment, properties, add_callback}) => {
         const ol = h("ol");
         const content = h("div", ol);
-        const section = h("div", [
-            h("hr"),
-            h("h2", "Item images"),
-            content,
-        ]);
         const upload_form = item_image_upload_form({
             refetch_images: fetch,
             item_id: properties.item_id,
         });
-        upload_form.append_self(section);
+        const section = h("div", [
+            h("hr"),
+            h("h2", "Item images"),
+            content,
+            upload_form.elements.at(0),
+        ]);
         fragment.appendChild(section);
 
         add_callback("fetch", fetch);
