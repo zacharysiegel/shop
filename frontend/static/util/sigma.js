@@ -1,3 +1,4 @@
+// todo: pull from https://github.com/zacharysiegel/sigma.js
 /**
  * @module sigma
  * @description A truly minimal, opinionated UI component framework for operating directly with the browser.
@@ -39,8 +40,6 @@
  * // <button onclick="document.querySelector('my-counter').increment()">+</button>
  */
 
-// todo: move to external repository
-
 /**
  * @typedef {Object} ComponentFactoryParameters
  * @readonly
@@ -57,8 +56,8 @@
 
 /**
  * @typedef {Object} ComponentInstance
- * @property {HTMLCollection} elements - The collection of {@link Element} children of the internal {@link DocumentFragment}
- * @property {NodeList} nodes - The collection of {@link Node} children of the internal {@link DocumentFragment}
+ * @property {Array<Element>} elements - The collection of {@link Element} children of the internal {@link DocumentFragment}
+ * @property {Array<ChildNode>} nodes - The collection of {@link ChildNode} children of the internal {@link DocumentFragment}
  * @property {Object.<string, function>} callbacks - Object containing registered callbacks
  * @property {function(Node): void} append_self - Append the component's {@link NodeList} to a provided parent {@link Node}
  * @property {function(Node): void} remove_self - Remove the component's {@link NodeList} from a provided parent {@link Node}
