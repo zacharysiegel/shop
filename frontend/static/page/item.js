@@ -36,7 +36,7 @@ const item_image_element = component()
             item_image,
         } = properties;
         const element = h("li",
-            h("a", {href: get_image_uri(item_image)}, `${item_image.id}`),
+            h("a", {href: get_image_uri(item_image), target: "_blank"}, `${item_image.id}`),
             h("span", item_image.alt_text ? ` [${item_image.alt_text}]` : ""),
         );
         fragment.appendChild(element);
