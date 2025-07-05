@@ -16,8 +16,7 @@
         * `select * from item_image where item_id = [id]`
     * [done]
       Invoke [UploadSiteHostedPictures](https://developer.ebay.com/Devzone/XML/docs/Reference/eBay/UploadSiteHostedPictures.html)
-    * Add ebay global sync button per (or per item/image if that is preferred)
-        * eBay doesn't work
+    * [done] add own image uris to create/update inventory item call
 4. Delete images
     * Delete button with mini form per image
     * Endpoint
