@@ -5,6 +5,7 @@ pub const EBAY_ERROR_LANGUAGE: &str = "en_US";
 pub const EBAY_SCHEMA_VERSION: &str = "1415";
 
 /// https://developer.ebay.com/api-docs/user-guides/static/make-a-call/using-xml.html#headers
+#[allow(unused)]
 pub enum EbayXmlHeader {
     XEbayApiIafToken,
     XEbayApiCompatibilityLevel,
@@ -29,6 +30,7 @@ impl EbayXmlHeader {
     }
 }
 
+#[allow(unused)]
 pub enum WarningLevel {
     High,
     Low,

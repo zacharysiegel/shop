@@ -1,5 +1,4 @@
 use super::*;
-use crate::item_image::ItemImageEntity;
 use crate::label::LabelEntity;
 use crate::listing::ListingEntity;
 use sqlx::postgres::PgQueryResult;
@@ -93,21 +92,6 @@ pub async fn get_all_item_listings(
     query_as!(ListingEntity, "
 		select id, item_id, marketplace_id, status, created, updated
 		from shop.public.listing
-		where item_id = $1
-	",
-		item_id,
-	)
-        .fetch_all(pgpool)
-        .await
-}
-
-pub async fn get_all_item_images(
-    pgpool: &PgPool,
-    item_id: &Uuid,
-) -> Result<Vec<ItemImageEntity>, Error> {
-    query_as!(ItemImageEntity, "\
-		select id, item_id, alt_text, priority, original_file_name
-		from shop.public.item_image
 		where item_id = $1
 	",
 		item_id,

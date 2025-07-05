@@ -43,12 +43,10 @@ pub async fn get_all_item_images(
     pgpool: &PgPool,
     item_id: &Uuid,
 ) -> Result<Vec<ItemImageEntity>, sqlx::Error> {
-    query_as!(
-		ItemImageEntity,
-		"\
-        select id, item_id, alt_text, priority, original_file_name \
-        from shop.public.item_image \
-        where item_id = $1 \
+    query_as!(ItemImageEntity, "
+        select id, item_id, alt_text, priority, original_file_name
+        from shop.public.item_image
+        where item_id = $1
     ",
 		item_id
 	)

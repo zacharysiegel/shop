@@ -1,6 +1,7 @@
 use super::super::ebay_category::ebay_category_model::Category;
 use super::ebay_client_shared;
 use crate::ebay::ebay_client::ebay_client_shared::EBAY_BASE_URL;
+use crate::environment::RuntimeEnvironment;
 use crate::error::ShopError;
 use crate::http;
 use crate::http::{WithBearer, HTTP_CLIENT};
@@ -45,10 +46,9 @@ pub async fn create_or_replace_inventory_item(
             "title": product.display_name,
             "description": product.display_name,
             "upc": [],
-            "imageUrls": [],
         },
-        // todo: product images (required for non-catalog products)
     });
+
     // The upc array cannot take null values (from Option::None), so we need to dynamically insert
     if let Some(upc) = &product.upc {
         let upc_array = body.index_mut("product")
@@ -57,12 +57,17 @@ pub async fn create_or_replace_inventory_item(
             .ok_or_else(|| ShopError::default())?;
         upc_array.push(json!(upc))
     }
-    let image_urls_array = body.index_mut("product")
-        .index_mut("imageUrls")
-        .as_array_mut()
-        .ok_or_else(|| ShopError::default())?;
-    for uri in item_image_uris {
-        image_urls_array.push(Value::String(uri));
+
+    // Do not include images when running locally because the image URIs are not publicly available
+    if RuntimeEnvironment::default() != RuntimeEnvironment::Local {
+        let uris: Vec<Value> = item_image_uris
+            .iter()
+            .map(|uri| Value::String(uri.clone()))
+            .collect::<Vec<_>>();
+        body.index_mut("product")
+            .as_object_mut()
+            .ok_or_else(|| ShopError::default())?
+            .insert("imageUrls".to_string(), Value::Array(uris));
     }
 
     let body: String = serde_json::to_string(&body)

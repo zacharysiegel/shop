@@ -12,6 +12,7 @@ use reqwest::{Request, Response};
 
 const TRADING_API_BASE_PATH: &str = "/ws/api.dll";
 
+#[allow(unused)]
 enum PictureSetCodeType {
     Standard,
     Supersize,
