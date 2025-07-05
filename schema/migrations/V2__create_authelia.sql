@@ -9,6 +9,7 @@ create role authelia
     noreplication
     nobypassrls
     password 'IOv/Anp95KZPERCAYNecgDPdlmsxSRkj0vBjgssskF8'
+-- todo: rotate this password and set it in a setup script
 ;
 
 alter database authelia

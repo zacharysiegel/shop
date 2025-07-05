@@ -77,3 +77,9 @@ _"Venus" is the name of the machine (or cluster of machines) which hosts the pro
 
 todo: talk about cloudflare tunnel and ssh connection via `cloudflared`
 
+scratch:
+cloudflared tunnel login
+    select "venus" tunnel in browser
+    clourflared creates ~/.cloudflared/cert.pem
+cloudflared tunnel route ip add 127.0.0.1/32 venus
+

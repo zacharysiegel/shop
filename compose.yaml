@@ -4,6 +4,7 @@ services:
   postgres:
     image: postgres:17.4-alpine
     environment:
+      # todo: change the password and set the value via setup.sh
       POSTGRES_USER: user
       POSTGRES_PASSWORD: password
       POSTGRES_DB: shop
