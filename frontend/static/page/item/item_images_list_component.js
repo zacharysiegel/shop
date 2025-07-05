@@ -38,7 +38,7 @@ export const item_images_list_component = component()
                         return;
                     }
                     for (let item_image of json) {
-                        const element = item_image_list_item_component({item_image});
+                        const element = item_image_list_item_component({item_image, refetch_images: fetch});
                         element.append_self(ol);
                     }
                 })

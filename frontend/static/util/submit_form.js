@@ -139,11 +139,8 @@ function as_number(form, key, value) {
 /**
  * @type {ComponentFactory}
  * @param parameters
- * @param {{
- *     response: Response,
- * }} parameters.properties
  */
-const form_response_component_factory = ({fragment, properties, add_callback}) => {
+const form_response_component_factory = ({fragment, add_callback}) => {
     let text;
     fragment.append((() => {
         const root = document.createElement("div");
@@ -179,5 +176,4 @@ const form_response_component_factory = ({fragment, properties, add_callback}) =
 
 export const form_response_component = component()
     .factory(form_response_component_factory)
-    .properties({response: null})
     .build();
