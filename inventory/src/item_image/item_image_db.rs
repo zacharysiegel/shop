@@ -1,4 +1,5 @@
 use super::*;
+use crate::error::ShopError;
 use sqlx::postgres::PgQueryResult;
 use sqlx::{query, query_as, PgPool};
 use uuid::Uuid;
@@ -37,6 +38,22 @@ pub async fn create_item_image(
 	)
         .execute(pgpool)
         .await
+}
+
+pub async fn delete_item_image(
+    pgpool: &PgPool,
+    item_image_id: &Uuid,
+) -> Result<PgQueryResult, ShopError> {
+    query!("
+		delete
+		from shop.public.item_image
+		where id = $1
+	",
+		item_image_id,
+	)
+        .execute(pgpool)
+        .await
+        .map_err(From::from)
 }
 
 pub async fn get_all_item_images(

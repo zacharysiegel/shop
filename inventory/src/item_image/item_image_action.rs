@@ -1,9 +1,10 @@
 use crate::environment::RuntimeEnvironment;
 use crate::error::ShopError;
-use crate::item_image::ItemImage;
+use crate::item_image::{item_image_db, ItemImage};
 use crate::{environment, object};
 use actix_web::web::{Bytes, Payload};
 use futures::StreamExt;
+use sqlx::PgPool;
 use std::fs;
 use std::fs::File;
 use std::io::Write;
@@ -79,4 +80,14 @@ impl ItemImage {
             log::warn!("FIle not deleted; {}", e);
         }
     }
+}
+
+pub async fn delete_item_image(pgpool: &PgPool, item_image: &ItemImage) -> Result<(), ShopError> {
+    item_image_db::delete_item_image(pgpool, &item_image.id).await?;
+
+    let path: PathBuf = item_image.get_item_image_path()?;
+    fs::remove_file(path)
+        .map_err(|e| ShopError::from_error("Item image DB record was deleted, but the image file was not", Box::new(e)))?;
+
+    Ok(())
 }

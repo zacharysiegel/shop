@@ -1,9 +1,9 @@
 use super::*;
 use crate::item_audit::{item_audit_db, ItemAudit, ItemAuditSerial};
-use crate::item_image::{item_image_db, ItemImage, ItemImageSerial};
+use crate::item_image::{item_image_action, item_image_db, ItemImage, ItemImageEntity, ItemImageSerial};
 use crate::label::LabelSerial;
 use crate::object::JsonHttpResponse;
-use crate::{unwrap_result_else_400, unwrap_result_else_500, ShopEntity, ShopModel, ShopSerial};
+use crate::{unwrap_option_else_404, unwrap_result_else_400, unwrap_result_else_500, ShopEntity, ShopModel, ShopSerial};
 use actix_web::http::StatusCode;
 use actix_web::{web, HttpResponse, HttpResponseBuilder, Responder};
 pub use futures::StreamExt;
@@ -19,6 +19,7 @@ pub fn configurer(config: &mut web::ServiceConfig) {
             .route("/{item_id}", web::get().to(get_item))
             .route("/{item_id}/image", web::get().to(get_all_item_images))
             .route("/{item_id}/image", web::post().to(create_item_image))
+            .route("/{item_id}/image/{item_image_id}", web::delete().to(delete_item_image))
             .route("/{item_id}/label", web::get().to(get_all_item_labels))
             .route(
                 "/{item_id}/label/{label_id}",
@@ -118,6 +119,20 @@ async fn create_item_image(
     unwrap_result_else_500!(item_image_db::create_item_image(&pgpool, &item_image).await);
 
     item_image.to_serial().to_http_response()
+}
+
+async fn delete_item_image(
+    pgpool: web::Data<PgPool>,
+    path: web::Path<(String, String)>,
+) -> HttpResponse {
+    let (_, item_image_id): (String, String) = path.into_inner();
+    let item_image_id: Uuid = unwrap_result_else_400!(Uuid::parse_str(&item_image_id));
+    let item_image: ItemImageEntity = unwrap_option_else_404!(unwrap_result_else_500!(
+        item_image_db::get_item_image(&pgpool, &item_image_id).await
+    ));
+
+    unwrap_result_else_500!(item_image_action::delete_item_image(&pgpool, &item_image).await);
+    HttpResponse::build(StatusCode::OK).finish()
 }
 
 async fn get_all_item_labels(

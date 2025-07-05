@@ -53,7 +53,7 @@ export const item_image_list_item_component = component()
             form_response.append_self(result_target);
 
             const request = new Request(
-                `${api_url}/item_image/${item_image.id}`,
+                `${api_url}/item/${item_image.item_id}/image/${item_image.id}`,
                 {method: "DELETE"},
             );
             fetch_checked(request, {

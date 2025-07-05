@@ -17,12 +17,12 @@
     * [done]
       Invoke [UploadSiteHostedPictures](https://developer.ebay.com/Devzone/XML/docs/Reference/eBay/UploadSiteHostedPictures.html)
     * [done] add own image uris to create/update inventory item call
-4. Delete images
-    * Delete button with mini form per image
-    * Endpoint
-    * Delete image file
-    * Delete item_image record
-    * Refresh image list
+4. [done] Delete images
+    * [done] Delete button with mini form per image
+    * [done] Endpoint
+    * [done] Delete image file
+    * [done] Delete item_image record
+    * [done] Refresh image list
 
 ## eBay webhook
 
