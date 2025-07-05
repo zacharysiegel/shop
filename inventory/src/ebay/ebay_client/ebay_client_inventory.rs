@@ -6,6 +6,7 @@ use crate::http;
 use crate::http::{WithBearer, HTTP_CLIENT};
 use crate::inventory_location::InventoryLocation;
 use crate::item::Item;
+use crate::item_image::ItemImage;
 use crate::product::Product;
 use reqwest::header::{CONTENT_LANGUAGE, CONTENT_TYPE};
 use reqwest::{Request, Response};
@@ -19,8 +20,14 @@ pub async fn create_or_replace_inventory_item(
     user_access_token: &str,
     item: &Item,
     product: &Product,
+    item_images: &Vec<ItemImage>,
 ) -> Result<(), ShopError> {
     let condition: &str = super::ebay_condition::Condition::from(&item.condition).to_serial();
+    let item_image_uris: Vec<String> = item_images
+        .iter()
+        .map(|element| element.get_item_image_uri())
+        .collect::<Vec<_>>();
+
     let mut body: Value = json!({
         "availability": {
             "shipToLocationAvailability": {
@@ -38,16 +45,26 @@ pub async fn create_or_replace_inventory_item(
             "title": product.display_name,
             "description": product.display_name,
             "upc": [],
+            "imageUrls": [],
         },
         // todo: product images (required for non-catalog products)
     });
     // The upc array cannot take null values (from Option::None), so we need to dynamically insert
     if let Some(upc) = &product.upc {
-        let upc_array = body.index_mut("product").index_mut("upc")
+        let upc_array = body.index_mut("product")
+            .index_mut("upc")
             .as_array_mut()
             .ok_or_else(|| ShopError::default())?;
         upc_array.push(json!(upc))
     }
+    let image_urls_array = body.index_mut("product")
+        .index_mut("imageUrls")
+        .as_array_mut()
+        .ok_or_else(|| ShopError::default())?;
+    for uri in item_image_uris {
+        image_urls_array.push(Value::String(uri));
+    }
+
     let body: String = serde_json::to_string(&body)
         .map_err(|e|
             ShopError::from_error("serializing inventory item", Box::new(e))

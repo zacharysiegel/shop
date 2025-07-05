@@ -1,3 +1,4 @@
+use crate::environment::RuntimeEnvironment;
 use crate::error::ShopError;
 use crate::item_image::ItemImage;
 use crate::{environment, object};
@@ -24,9 +25,23 @@ impl ItemImage {
         }
     }
 
+    pub fn get_item_image_name(&self) -> String {
+        format!("{}_{}_{}", self.item_id, self.id, self.original_file_name)
+    }
+
     pub fn get_item_image_path(&self) -> Result<PathBuf, ShopError> {
         let images_directory = environment::images_directory_path()?;
-        Ok(images_directory.join(format!("{}_{}_{}", self.item_id, self.id, self.original_file_name)))
+        Ok(images_directory.join(self.get_item_image_name()))
+    }
+
+    pub fn get_item_image_uri(&self) -> String {
+        let host: &str = RuntimeEnvironment::default().get_origin();
+        format!(
+            "{}/{}/{}",
+            host,
+            environment::images_directory_subpath(),
+            self.get_item_image_name()
+        )
     }
 
     /// If an error is returned, any created file will be deleted before returning.

@@ -8,6 +8,7 @@ use crate::listing::{Listing, ListingStatus};
 use crate::marketplace::marketplace_db;
 use crate::product::Product;
 use crate::{listing, ShopEntity};
+use listing::listing_action;
 use serde_json::Value;
 use sqlx::PgPool;
 use std::sync::OnceLock;
@@ -45,10 +46,12 @@ pub async fn publish(
         return Err(ShopError::new("listing is not draft"));
     }
 
-    let (item, product): (Item, Product) = listing::listing_action::get_item_and_product_for_listing(pgpool, listing).await?;
+    let (item, product): (Item, Product) = listing_action::get_item_and_product_for_listing(pgpool, listing).await?;
+    let item_images: Vec<ItemImage> = item.get_all_item_images(pgpool).await?;
+
     log::info!("Posting listing to {}; [listing_id: {}]; [marketplace_id: {}]", MARKETPLACE_INTERNAL_NAME, listing.id, MARKETPLACE_ID.get().unwrap());
 
-    ebay_client::create_or_replace_inventory_item(user_access_token, &item, &product).await?;
+    ebay_client::create_or_replace_inventory_item(user_access_token, &item, &product, &item_images).await?;
 
     let mut offer: Option<Value> = get_offer(user_access_token, &item.id).await?;
     let offer_id: String;
@@ -74,7 +77,7 @@ pub async fn publish(
     }
 
     ebay_client::publish_offer(user_access_token, &offer_id).await?;
-    listing::listing_action::update_listing_status(pgpool, listing, ListingStatus::Published).await?;
+    listing_action::update_listing_status(pgpool, listing, ListingStatus::Published).await?;
     log::info!("Published ebay offer [{}]", offer_id);
 
     Ok(())
@@ -96,7 +99,7 @@ pub async fn withdraw(
     };
 
     ebay_client::withdraw_offer(user_access_token, &offer_id).await?;
-    listing::listing_action::update_listing_status(pgpool, listing, ListingStatus::Cancelled).await?;
+    listing_action::update_listing_status(pgpool, listing, ListingStatus::Cancelled).await?;
     Ok(())
 }
 

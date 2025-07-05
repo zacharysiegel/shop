@@ -14,8 +14,8 @@ static CARGO_MANIFEST_DIR: LazyLock<String> = LazyLock::new(||
     env::var("CARGO_MANIFEST_DIR").unwrap_or("/dev/null".to_string())
 );
 
-const VOLATILE_DIRECTORY_NAME: &str = "volatile";
-const IMAGES_DIRECTORY_NAME: &str = "images";
+pub const VOLATILE_DIRECTORY_NAME: &str = "volatile";
+pub const IMAGES_DIRECTORY_NAME: &str = "images";
 
 #[derive(Debug, PartialEq, Clone)]
 pub enum RuntimeEnvironment {
@@ -29,6 +29,15 @@ impl RuntimeEnvironment {
         RuntimeEnvironment::try_from(
             env::var("RUNTIME_ENVIRONMENT").unwrap_or(String::from("local"))
         )
+    }
+
+    // todo: update when released to stage and production environments
+    pub fn get_origin(&self) -> &'static str {
+        match self {
+            RuntimeEnvironment::Local => "https://127.0.0.1:1443",
+            RuntimeEnvironment::Stage => "todo",
+            RuntimeEnvironment::Production => "todo",
+        }
     }
 }
 
@@ -81,7 +90,7 @@ pub fn images_directory_path() -> Result<PathBuf, ShopError> {
         let manifest_path: &Path = Path::new(&*CARGO_MANIFEST_DIR);
         let workspace_path: &Path = manifest_path.parent()
             .ok_or_else(|| ShopError::default())?;
-        let images_path: PathBuf = workspace_path.join(VOLATILE_DIRECTORY_NAME).join(IMAGES_DIRECTORY_NAME);
+        let images_path: PathBuf = workspace_path.join(images_directory_subpath());
 
         let images_directory_exists: bool = fs::exists(&images_path)
             .map_err(|e| ShopError::from_error_default(Box::new(e)))?;
@@ -93,7 +102,11 @@ pub fn images_directory_path() -> Result<PathBuf, ShopError> {
         images_path
     } else {
         // Container volume
-        Path::new("/").join(IMAGES_DIRECTORY_NAME).to_path_buf()
+        Path::new("/").join(images_directory_subpath()).to_path_buf()
     };
     Ok(path)
+}
+
+pub fn images_directory_subpath() -> String {
+    format!("{}/{}", VOLATILE_DIRECTORY_NAME, IMAGES_DIRECTORY_NAME)
 }

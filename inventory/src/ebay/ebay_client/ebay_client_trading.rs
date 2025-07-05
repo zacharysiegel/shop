@@ -26,6 +26,7 @@ impl PictureSetCodeType {
     }
 }
 
+/// This eBay endpoint seems to be broken. We opt to serve images directly from our own server instead.
 pub async fn upload_image(
     user_access_token: &str,
     item_image: &ItemImage,
