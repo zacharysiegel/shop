@@ -17,7 +17,7 @@ services:
       - shop
 
   nginx:
-    build: proxy/nginx.dockerfile
+    image: nginx:1.28-alpine-slim
     ports:
       - '127.0.0.1:1443:443/tcp'
     volumes:
@@ -30,6 +30,8 @@ services:
     restart: unless-stopped
     networks:
       - shop
+    extra_hosts:
+      - "shop.zach.ro=127.0.0.1"
 
   authelia:
     image: authelia/authelia:4.39
