@@ -209,6 +209,7 @@ async fn sync_locations(
     HttpResponse::build(StatusCode::NO_CONTENT).finish()
 }
 
+/// This function is currently unused due to eBay's UploadSiteHostedImages endpoint being inoperable
 async fn upload_image(
     pgpool: web::Data<PgPool>,
     request: HttpRequest,
