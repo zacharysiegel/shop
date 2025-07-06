@@ -38,9 +38,7 @@ while IFS= read -r property; do
 
 	secret_name="authelia__${property}"
 	secret=$(\
-		cargo run -p crypt -- decrypt --key "$master_key" "$secret_name" \
-			2> /dev/null \
-			| sed -E -e 's/[[:space:]]//g; 1d; 3,$d' # Remove whitespace and select line 2 (1-indexed) (utf-8)
+		cargo run -p crypt -- decrypt --utf8 --key "$master_key" "$secret_name" \
 	)
 	echo "$secret" > "./secret/${file_name}"
 done <<< "$properties"

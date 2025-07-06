@@ -12,9 +12,7 @@ git submodule update
 
 postgres__user_shop_password_key="postgres__user.shop.password"
 postgres__user_shop_password=$(
-	cargo run -p crypt -- decrypt --key "$master_key" "$postgres__user_shop_password_key" \
-		2>/dev/null |
-		sed -E -e 's/[[:space:]]//g; 1d; 3,$d' # Remove whitespace and select line 2 (1-indexed) (utf-8)
+	cargo run -p crypt -- decrypt --utf8 --key "$master_key" "$postgres__user_shop_password_key"
 )
 
 if test -e .env; then
