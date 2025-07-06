@@ -20,7 +20,7 @@ cd "${repo_path}/identity" || exit
 properties="$(< ./secret/index.yaml yq '.[]')"
 
 if test -e .env; then
-	echo "Environment file .env already exists; Copying to .env.bak;"
+	echo "Environment file identity/.env already exists; Copying to identity/.env.bak;"
 	cp .env .env.bak
 	rm .env
 fi
