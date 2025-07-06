@@ -66,6 +66,8 @@ services:
 # We would prefer to not run these services as containers during local development.
 # Currently nginx proxies these routes to the host machine's network.
 
+# todo: cloudflared container
+
 volumes:
   postgres-data:
 
