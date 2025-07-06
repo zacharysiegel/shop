@@ -5,8 +5,7 @@ use sqlx::PgPool;
 
 pub async fn get_all_inventory_locations(pgpool: &PgPool) -> Result<Vec<InventoryLocation>, ShopError> {
     let inventory_location_vec: Vec<InventoryLocationEntity> = super::inventory_location_db::get_all_inventory_locations(pgpool)
-        .await
-        .map_err(|e| ShopError::from_error("get_all_inventory_locations", Box::new(e)))?;
+        .await?;
     let inventory_location_vec: Result<Vec<InventoryLocation>, ShopError> = inventory_location_vec
         .iter()
         .map(|entity| entity.try_to_model())
