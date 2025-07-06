@@ -30,8 +30,6 @@ services:
     restart: unless-stopped
     networks:
       - shop
-    extra_hosts:
-      - "shop.zach.ro:127.0.0.1"
 
   authelia:
     image: authelia/authelia:4.39
