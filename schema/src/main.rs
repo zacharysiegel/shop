@@ -8,6 +8,7 @@ use crypt::{cryptography, BASE64};
 refinery::embed_migrations!("migrations");
 
 fn main() -> Result<(), Box<dyn Error>> {
+    dotenvy::dotenv()?;
     env_logger::builder()
         .filter_level(log::LevelFilter::Info)
         .init();

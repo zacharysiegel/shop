@@ -8,8 +8,8 @@ create role authelia
     login
     noreplication
     nobypassrls
+    -- This password is expected to be rotated immediately after database initialization
     password 'IOv/Anp95KZPERCAYNecgDPdlmsxSRkj0vBjgssskF8'
--- todo: rotate this password and set it in a setup script
 ;
 
 alter database authelia
