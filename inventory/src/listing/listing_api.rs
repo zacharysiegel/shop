@@ -26,7 +26,6 @@ async fn create_listing(
     let query_result: PgQueryResult =
         unwrap_result_else_500!(listing_db::create_listing(&pgpool, &listing.to_entity()).await);
 
-    // todo: refactor the create endpoints to return the created item (contains the generated id)
     HttpResponse::Ok().body(query_result.rows_affected().to_string())
 }
 
