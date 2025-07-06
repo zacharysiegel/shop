@@ -1,6 +1,6 @@
 use super::*;
 use crate::object::JsonHttpResponse;
-use crate::ShopModel;
+use crate::{unwrap_result_else_500, ShopModel};
 use actix_web::http::StatusCode;
 use actix_web::{get, post, web, HttpResponseBuilder, Responder};
 use sqlx::{PgPool, Pool, Postgres};
@@ -25,10 +25,9 @@ pub fn configurer_public(config: &mut web::ServiceConfig) {
 
 #[get("")]
 async fn get_all_categories(pgpool: web::Data<PgPool>) -> impl Responder {
-    let all_categories = category_db::get_all_categories(pgpool.get_ref()).await;
-    let Ok(all_categories) = all_categories else {
-        return HttpResponseBuilder::new(StatusCode::INTERNAL_SERVER_ERROR).finish();
-    };
+    let all_categories: Vec<CategoryEntity> = unwrap_result_else_500!(
+        category_db::get_all_categories(pgpool.get_ref()).await
+    );
     all_categories
         .iter()
         .map(|category| category.to_serial())
@@ -42,10 +41,9 @@ async fn get_category(pgpool: web::Data<PgPool>, category_id: web::Path<String>)
         return HttpResponseBuilder::new(StatusCode::BAD_REQUEST).finish();
     };
 
-    let category = category_db::get_category(pgpool.get_ref(), category_id).await;
-    let Ok(category) = category else {
-        return HttpResponseBuilder::new(StatusCode::INTERNAL_SERVER_ERROR).finish();
-    };
+    let category: Option<CategoryEntity> = unwrap_result_else_500!(
+        category_db::get_category(pgpool.get_ref(), category_id).await
+    );
     category
         .map(|category| category.to_serial().to_http_response())
         .unwrap_or(HttpResponseBuilder::new(StatusCode::INTERNAL_SERVER_ERROR).finish())
@@ -60,10 +58,9 @@ async fn create_category(
         return HttpResponseBuilder::new(StatusCode::BAD_REQUEST).finish();
     };
 
-    let result = category_db::create_category(&pgpool, category).await;
-    match result {
-        Ok(pg_query_result) => HttpResponseBuilder::new(StatusCode::CREATED)
-            .body(pg_query_result.rows_affected().to_string()),
-        Err(_) => HttpResponseBuilder::new(StatusCode::INTERNAL_SERVER_ERROR).finish(),
-    }
+    let result = unwrap_result_else_500!(
+        category_db::create_category(&pgpool, category).await
+    );
+    HttpResponseBuilder::new(StatusCode::CREATED)
+        .body(result.rows_affected().to_string())
 }
