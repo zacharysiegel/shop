@@ -9,10 +9,7 @@ pub async fn get_item_and_product_for_listing(
     pgpool: &PgPool,
     listing: &Listing,
 ) -> Result<(Item, Product), ShopError> {
-    let item: Option<ItemEntity> = match item_db::get_item(pgpool, &listing.item_id).await {
-        Ok(entity) => entity,
-        Err(error) => return Err(ShopError::from(error)),
-    };
+    let item: Option<ItemEntity> = item_db::get_item(pgpool, &listing.item_id).await?;
     let Some(item): Option<ItemEntity> = item else {
         return Err(ShopError::new(&format!("Item not found for listing; [{}]", listing.id)));
     };

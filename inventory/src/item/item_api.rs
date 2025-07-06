@@ -1,4 +1,5 @@
 use super::*;
+use crate::error::ShopError;
 use crate::item_audit::{item_audit_db, ItemAudit, ItemAuditSerial};
 use crate::item_image::{item_image_action, item_image_db, ItemImage, ItemImageEntity, ItemImageSerial};
 use crate::label::LabelSerial;
@@ -45,11 +46,8 @@ async fn get_item(pgpool: web::Data<PgPool>, item_id: web::Path<String>) -> impl
         return HttpResponseBuilder::new(StatusCode::INTERNAL_SERVER_ERROR).finish();
     };
 
-    let Ok(item) = item_db::get_item(&pgpool, &item_id).await else {
-        return HttpResponseBuilder::new(StatusCode::INTERNAL_SERVER_ERROR).finish();
-    };
-
-    let item = match item {
+    let item: Option<ItemEntity> = unwrap_result_else_500!(item_db::get_item(&pgpool, &item_id).await);
+    let item: Result<Item, ShopError> = match item {
         None => {
             return HttpResponseBuilder::new(StatusCode::NOT_FOUND).finish();
         }
@@ -67,13 +65,8 @@ async fn create_item(pgpool: web::Data<PgPool>, item: web::Json<ItemSerial>) -> 
         return HttpResponseBuilder::new(StatusCode::INTERNAL_SERVER_ERROR).finish();
     };
 
-    let query_result = item_db::create_item(&pgpool, &item.to_entity()).await;
-    match query_result {
-        Ok(query_result) => {
-            HttpResponseBuilder::new(StatusCode::OK).body(query_result.rows_affected().to_string())
-        }
-        Err(_) => HttpResponseBuilder::new(StatusCode::INTERNAL_SERVER_ERROR).finish(),
-    }
+    let query_result: PgQueryResult = unwrap_result_else_500!(item_db::create_item(&pgpool, &item.to_entity()).await);
+    HttpResponseBuilder::new(StatusCode::OK).body(query_result.rows_affected().to_string())
 }
 
 async fn get_all_item_images(
