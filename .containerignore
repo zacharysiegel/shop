@@ -8,5 +8,3 @@ target/**/build
 target/**/deps
 target/**/examples
 target/**/incremental
-
-compose.yaml

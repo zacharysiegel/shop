@@ -7,3 +7,6 @@
 /.env
 /volatile/*
 !/volatile/keep.txt
+
+# This file may contain secrets. A template file is committed instead.
+/compose.yaml
