@@ -75,6 +75,17 @@ The command produces literal Rust code which should be copied and pasted into `c
 
 _"Venus" is the name of the machine (or cluster of machines) which hosts the production environment_
 
+### IntellIJ
+
+For convenience, you may want to add the following entries to the "Editor" > "File Types" > "Recognized File Types":
+    * "DockerIgnore"
+        * `*.containerignore`
+    * "YAML"
+        * `*.yaml.template`
+        * `*.yml.template`
+    * ".env file"
+        * `.env.template`
+
 todo: talk about cloudflare tunnel and ssh connection via `cloudflared`
 
 scratch:
