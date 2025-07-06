@@ -48,11 +48,12 @@ totp:
 authentication_backend:
   file:
     path: '/data/users_database.yml'
-
 access_control:
   default_policy: deny
   rules:
     - domain: '127.0.0.1'
+      policy: one_factor
+    - domain: 'shop.zach.ro'
       policy: one_factor
 
 session:
@@ -62,9 +63,12 @@ session:
     # https://www.authelia.com/integration/proxies/nginx/
     - name: 'authelia_session'
       domain: '127.0.0.1' # Should match whatever your root protected domain is
+      # domain: 'zach.ro' # modify this value per environment
       # These links are used in 302 redirects, so they must be accessible from the public Internet
       authelia_url: 'https://127.0.0.1:1443/auth'
       default_redirection_url: 'https://127.0.0.1:1443/admin'
+      # authelia_url: 'https://shop.zach.ro:443/auth' # modify this value per environment
+      # default_redirection_url: 'https://shop.zach.ro:443/admin' # modify this value per environment
       expiration: '1 hour'
       inactivity: '5 minutes'
 
