@@ -15,11 +15,8 @@ pub async fn get_item_and_product_for_listing(
     };
     let item: Item = item.try_to_model()?;
 
-    let product: Option<ProductEntity> = match product_db::get_product(pgpool, &item.product_id).await {
-        Ok(entity) => entity,
-        Err(error) => return Err(ShopError::from(error)),
-    };
-    let Some(product): Option<ProductEntity> = product else {
+    let product: Option<ProductEntity> = product_db::get_product(pgpool, &item.product_id).await?;
+    let Some(product) = product else {
         return Err(ShopError::new(&format!("Product not found for item; [{}]", item.id)));
     };
 

@@ -4,22 +4,24 @@ use crate::item::ItemEntity;
 use crate::pagination::{Direction, KeysetPaginationOptionsForString, KeysetPaginationResultForString};
 use sqlx::postgres::{PgArguments, PgQueryResult, PgRow};
 use sqlx::query::Map;
-use sqlx::{query, query_as, Error, PgPool, Postgres};
+use sqlx::{query, query_as, PgPool, Postgres};
 use uuid::Uuid;
+use crate::error::ShopError;
 
-pub async fn get_all_products(pgpool: &PgPool) -> Result<Vec<ProductEntity>, Error> {
+pub async fn get_all_products(pgpool: &PgPool) -> Result<Vec<ProductEntity>, ShopError> {
     query_as!(ProductEntity, "\
 		select id, display_name, internal_name, upc, release_date, created, updated \
 	 	from shop.public.product \
 	")
         .fetch_all(pgpool)
         .await
+        .map_err(|e| ShopError::from(e))
 }
 
 pub async fn get_all_products_paged_display_name(
     pgpool: &PgPool,
     keyset_pagination_options: &KeysetPaginationOptionsForString,
-) -> Result<(Vec<ProductEntity>, KeysetPaginationResultForString), Error> {
+) -> Result<(Vec<ProductEntity>, KeysetPaginationResultForString), ShopError> {
     let limit: u32 = if keyset_pagination_options.start_value.is_none() {
         keyset_pagination_options.max_page_size
     } else {
@@ -29,7 +31,7 @@ pub async fn get_all_products_paged_display_name(
 
     /* This function always returns records in ascending order on the ordered column, but we must alternate
         between ascending and descending in order to move forward and backward between pages. */
-    let query: Map<Postgres, fn(PgRow) -> Result<ProductEntity, Error>, PgArguments> = match keyset_pagination_options.direction {
+    let query: Map<Postgres, fn(PgRow) -> Result<ProductEntity, sqlx::Error>, PgArguments> = match keyset_pagination_options.direction {
         Direction::Ascending => {
             query_as!(ProductEntity, "\
         		select id, display_name, internal_name, upc, release_date, created, updated
@@ -83,7 +85,7 @@ pub async fn get_all_products_paged_display_name(
 pub async fn get_product(
     pgpool: &PgPool,
     product_id: &Uuid,
-) -> Result<Option<ProductEntity>, Error> {
+) -> Result<Option<ProductEntity>, ShopError> {
     query_as!(ProductEntity, "\
 		select id, display_name, internal_name, upc, release_date, created, updated \
 		from shop.public.product \
@@ -93,12 +95,13 @@ pub async fn get_product(
 	)
         .fetch_optional(pgpool)
         .await
+        .map_err(|e| ShopError::from(e))
 }
 
 pub async fn delete_product(
     pgpool: &PgPool,
     product_id: &Uuid,
-) -> Result<PgQueryResult, Error> {
+) -> Result<PgQueryResult, ShopError> {
     query!("
         delete from shop.public.product
         where id = $1
@@ -107,12 +110,13 @@ pub async fn delete_product(
     )
         .execute(pgpool)
         .await
+        .map_err(|e| ShopError::from(e))
 }
 
 pub async fn get_product_categories(
     pgpool: &PgPool,
     product_id: &Uuid,
-) -> Result<Vec<CategoryEntity>, Error> {
+) -> Result<Vec<CategoryEntity>, ShopError> {
     query_as!(CategoryEntity, "
         select category.id, category.display_name, category.internal_name, category.parent_id, category.ebay_category_id
 		from shop.public.category
@@ -121,12 +125,13 @@ pub async fn get_product_categories(
     ", product_id)
         .fetch_all(pgpool)
         .await
+        .map_err(|e| ShopError::from(e))
 }
 
 pub async fn create_product(
     pgpool: &PgPool,
     product: &ProductEntity,
-) -> Result<PgQueryResult, Error> {
+) -> Result<PgQueryResult, ShopError> {
     query!(
 		"\
 		insert into shop.public.product (id, display_name, internal_name, upc, release_date, created, updated)\
@@ -142,13 +147,14 @@ pub async fn create_product(
 	)
         .execute(pgpool)
         .await
+        .map_err(|e| ShopError::from(e))
 }
 
 pub async fn create_product_category_association(
     pgpool: &PgPool,
     product_id: &Uuid,
     category_id: &Uuid,
-) -> Result<PgQueryResult, Error> {
+) -> Result<PgQueryResult, ShopError> {
     query!(
 		"\
 		insert into shop.public.product_category_association (category_id, product_id)\
@@ -159,13 +165,14 @@ pub async fn create_product_category_association(
 	)
         .execute(pgpool)
         .await
+        .map_err(|e| ShopError::from(e))
 }
 
 pub async fn delete_product_category_association(
     pgpool: &PgPool,
     product_id: &Uuid,
     category_id: &Uuid,
-) -> Result<PgQueryResult, Error> {
+) -> Result<PgQueryResult, ShopError> {
     query!(
 		"\
 		delete from shop.public.product_category_association \
@@ -176,12 +183,13 @@ pub async fn delete_product_category_association(
 	)
         .execute(pgpool)
         .await
+        .map_err(|e| ShopError::from(e))
 }
 
 pub async fn get_all_product_items(
     pgpool: &PgPool,
     product_id: &Uuid,
-) -> Result<Vec<ItemEntity>, Error> {
+) -> Result<Vec<ItemEntity>, ShopError> {
     query_as!(
 		ItemEntity,
 		"\
@@ -193,4 +201,5 @@ pub async fn get_all_product_items(
 	)
         .fetch_all(pgpool)
         .await
+        .map_err(|e| ShopError::from(e))
 }

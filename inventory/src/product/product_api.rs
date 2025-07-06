@@ -73,10 +73,9 @@ async fn get_product(pgpool: web::Data<PgPool>, product_id: web::Path<String>) -
         return HttpResponseBuilder::new(StatusCode::INTERNAL_SERVER_ERROR).finish();
     };
 
-    let Ok(product) = product_db::get_product(&pgpool, &product_id).await else {
-        return HttpResponseBuilder::new(StatusCode::INTERNAL_SERVER_ERROR).finish();
-    };
-
+    let product = unwrap_result_else_500!(
+        product_db::get_product(&pgpool, &product_id).await
+    );
     product
         .map(|product| product.to_serial().to_http_response())
         .unwrap_or(HttpResponseBuilder::new(StatusCode::INTERNAL_SERVER_ERROR).finish())
@@ -99,13 +98,11 @@ async fn create_product(
         return HttpResponseBuilder::new(StatusCode::BAD_REQUEST).finish();
     };
 
-    let result: Result<PgQueryResult, sqlx::Error> =
-        product_db::create_product(&pgpool, &product).await;
-    match result {
-        Ok(query_result) => HttpResponseBuilder::new(StatusCode::CREATED)
-            .body(query_result.rows_affected().to_string()),
-        Err(_) => HttpResponseBuilder::new(StatusCode::INTERNAL_SERVER_ERROR).finish(),
-    }
+    let result = unwrap_result_else_500!(
+        product_db::create_product(&pgpool, &product).await
+    );
+    HttpResponseBuilder::new(StatusCode::CREATED)
+        .body(result.rows_affected().to_string())
 }
 
 async fn get_product_categories(
@@ -116,11 +113,9 @@ async fn get_product_categories(
         return HttpResponseBuilder::new(StatusCode::INTERNAL_SERVER_ERROR).finish();
     };
 
-    let Ok(product_categories) = product_db::get_product_categories(&pgpool, &product_id).await
-    else {
-        return HttpResponseBuilder::new(StatusCode::INTERNAL_SERVER_ERROR).finish();
-    };
-
+    let product_categories = unwrap_result_else_500!(
+        product_db::get_product_categories(&pgpool, &product_id).await
+    );
     product_categories
         .iter()
         .map(|category| category.to_serial())
@@ -159,13 +154,11 @@ async fn create_product_category_association(
         return HttpResponseBuilder::new(StatusCode::INTERNAL_SERVER_ERROR).finish();
     };
 
-    let result =
-        product_db::create_product_category_association(&pgpool, &product_id, &category_id).await;
-    match result {
-        Ok(query_result) => HttpResponseBuilder::new(StatusCode::CREATED)
-            .body(query_result.rows_affected().to_string()),
-        Err(_) => HttpResponseBuilder::new(StatusCode::INTERNAL_SERVER_ERROR).finish(),
-    }
+    let result = unwrap_result_else_500!(
+        product_db::create_product_category_association(&pgpool, &product_id, &category_id).await
+    );
+    HttpResponseBuilder::new(StatusCode::CREATED)
+        .body(result.rows_affected().to_string())
 }
 
 async fn delete_product_category_association(
