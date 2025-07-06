@@ -1,13 +1,14 @@
+use crate::error::ShopError;
 use crate::listing::ListingEntity;
 use crate::purchase::PurchaseEntity;
 use sqlx::postgres::PgQueryResult;
-use sqlx::{query, query_as, Error, PgPool};
+use sqlx::{query, query_as, PgPool};
 use uuid::Uuid;
 
 pub async fn create_purchase(
     pgpool: &PgPool,
     purchase_entity: &PurchaseEntity,
-) -> Result<PgQueryResult, Error> {
+) -> Result<PgQueryResult, ShopError> {
     query!("\
         insert into shop.public.purchase (id, marketplace_id, external_id, customer_id, contact_email_address, listing_id, status, cost_subtotal_cents, cost_tax_cents, cost_shipping_cents, cost_discount_cents, seller_cost_total_cents, shipping_method, payment_method, note, shipping_street_address, shipping_municipality, shipping_district, shipping_postal_area, shipping_country, billing_street_address, billing_municipality, billing_district, billing_postal_area, billing_country, created, updated) \
         values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21,$22,$23,$24,$25,$26,$27) \
@@ -42,12 +43,13 @@ pub async fn create_purchase(
     )
         .execute(pgpool)
         .await
+        .map_err(|e| ShopError::from(e))
 }
 
 pub async fn get_purchase(
     pgpool: &PgPool,
     purchase_id: &Uuid,
-) -> Result<Option<PurchaseEntity>, Error> {
+) -> Result<Option<PurchaseEntity>, ShopError> {
     query_as!(
 		PurchaseEntity,
 		"\
@@ -59,12 +61,13 @@ pub async fn get_purchase(
 	)
         .fetch_optional(pgpool)
         .await
+        .map_err(|e| ShopError::from(e))
 }
 
 pub async fn get_purchase_listing(
     pgpool: &PgPool,
     purchase_id: &Uuid,
-) -> Result<Option<ListingEntity>, Error> {
+) -> Result<Option<ListingEntity>, ShopError> {
     query_as!(ListingEntity, "\
         select listing.id, listing.item_id, listing.marketplace_id, listing.status, listing.created, listing.updated \
         from shop.public.listing \
@@ -75,4 +78,5 @@ pub async fn get_purchase_listing(
     )
         .fetch_optional(pgpool)
         .await
+        .map_err(|e| ShopError::from(e))
 }
