@@ -1,11 +1,12 @@
 use super::*;
-use sqlx::{query_as, Error, PgPool};
+use crate::error::ShopError;
+use sqlx::{query_as, PgPool};
 use uuid::Uuid;
 
 pub async fn get_all_item_item_audits(
     pgpool: &PgPool,
     item_id: &Uuid,
-) -> Result<Vec<ItemAuditEntity>, Error> {
+) -> Result<Vec<ItemAuditEntity>, ShopError> {
     query_as!(
 		ItemAuditEntity,
 		"\
@@ -17,4 +18,5 @@ pub async fn get_all_item_item_audits(
 	)
         .fetch_all(pgpool)
         .await
+		.map_err(|e| ShopError::from(e))
 }

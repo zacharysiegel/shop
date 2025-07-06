@@ -1,6 +1,6 @@
-use crate::label::{label_db, LabelSerial};
+use crate::label::{label_db, LabelEntity, LabelSerial};
 use crate::object::JsonHttpResponse;
-use crate::{ShopModel, ShopSerial};
+use crate::{unwrap_option_else_404, unwrap_result_else_500, ShopModel, ShopSerial};
 use actix_web::web::ServiceConfig;
 use actix_web::{web, HttpResponse, Responder};
 use sqlx::PgPool;
@@ -20,20 +20,16 @@ async fn get_label(pgpool: web::Data<PgPool>, label_id: web::Path<String>) -> im
         return HttpResponse::BadRequest().finish();
     };
 
-    let Ok(label) = label_db::get_label(&pgpool, label_id).await else {
-        return HttpResponse::InternalServerError().finish();
-    };
-
-    match label {
-        None => HttpResponse::NotFound().finish(),
-        Some(label) => label.to_serial().to_http_response(),
-    }
+    let label: LabelEntity = unwrap_option_else_404!(
+        unwrap_result_else_500!(label_db::get_label(&pgpool, label_id).await)
+    );
+    label.to_serial().to_http_response()
 }
 
 async fn get_all_labels(pgpool: web::Data<PgPool>) -> impl Responder {
-    let Ok(labels) = label_db::get_all_labels(&pgpool).await else {
-        return HttpResponse::InternalServerError().finish();
-    };
+    let labels = unwrap_result_else_500!(
+        label_db::get_all_labels(&pgpool).await
+    );
 
     labels
         .iter()

@@ -1,9 +1,10 @@
 use super::*;
+use crate::error::ShopError;
 use sqlx::postgres::PgQueryResult;
 use sqlx::{query, query_as, PgPool};
 use uuid::Uuid;
 
-pub async fn get_label(pgpool: &PgPool, label_id: Uuid) -> Result<Option<LabelEntity>, sqlx::Error> {
+pub async fn get_label(pgpool: &PgPool, label_id: Uuid) -> Result<Option<LabelEntity>, ShopError> {
     query_as!(
 		LabelEntity,
 		"\
@@ -15,9 +16,10 @@ pub async fn get_label(pgpool: &PgPool, label_id: Uuid) -> Result<Option<LabelEn
 	)
         .fetch_optional(pgpool)
         .await
+		.map_err(|e| ShopError::from(e))
 }
 
-pub async fn create_label(pgpool: &PgPool, label: &LabelEntity) -> Result<PgQueryResult, sqlx::Error> {
+pub async fn create_label(pgpool: &PgPool, label: &LabelEntity) -> Result<PgQueryResult, ShopError> {
     query!(
 		"\
         insert into shop.public.label (id, display_name, internal_name) \
@@ -29,9 +31,10 @@ pub async fn create_label(pgpool: &PgPool, label: &LabelEntity) -> Result<PgQuer
 	)
         .execute(pgpool)
         .await
+		.map_err(|e| ShopError::from(e))
 }
 
-pub async fn get_all_labels(pgpool: &PgPool) -> Result<Vec<LabelEntity>, sqlx::Error> {
+pub async fn get_all_labels(pgpool: &PgPool) -> Result<Vec<LabelEntity>, ShopError> {
     query_as!(
 		LabelEntity,
 		"\
@@ -41,4 +44,5 @@ pub async fn get_all_labels(pgpool: &PgPool) -> Result<Vec<LabelEntity>, sqlx::E
 	)
         .fetch_all(pgpool)
         .await
+		.map_err(|e| ShopError::from(e))
 }

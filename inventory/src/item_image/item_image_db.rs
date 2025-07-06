@@ -7,7 +7,7 @@ use uuid::Uuid;
 pub async fn get_item_image(
     pgpool: &PgPool,
     item_image_id: &Uuid,
-) -> Result<Option<ItemImageEntity>, sqlx::Error> {
+) -> Result<Option<ItemImageEntity>, ShopError> {
     query_as!(
 		ItemImageEntity,
 		"\
@@ -19,12 +19,13 @@ pub async fn get_item_image(
 	)
         .fetch_optional(pgpool)
         .await
+        .map_err(|e| ShopError::from(e))
 }
 
 pub async fn create_item_image(
     pgpool: &PgPool,
     item_image: &ItemImageEntity,
-) -> Result<PgQueryResult, sqlx::Error> {
+) -> Result<PgQueryResult, ShopError> {
     query!(
 		"\
         insert into shop.public.item_image (id, item_id, alt_text, priority, original_file_name) \
@@ -38,6 +39,7 @@ pub async fn create_item_image(
 	)
         .execute(pgpool)
         .await
+        .map_err(|e| ShopError::from(e))
 }
 
 pub async fn delete_item_image(
@@ -53,13 +55,13 @@ pub async fn delete_item_image(
 	)
         .execute(pgpool)
         .await
-        .map_err(From::from)
+        .map_err(|e| ShopError::from(e))
 }
 
 pub async fn get_all_item_images(
     pgpool: &PgPool,
     item_id: &Uuid,
-) -> Result<Vec<ItemImageEntity>, sqlx::Error> {
+) -> Result<Vec<ItemImageEntity>, ShopError> {
     query_as!(ItemImageEntity, "
         select id, item_id, alt_text, priority, original_file_name
         from shop.public.item_image
@@ -69,4 +71,5 @@ pub async fn get_all_item_images(
 	)
         .fetch_all(pgpool)
         .await
+        .map_err(|e| ShopError::from(e))
 }
