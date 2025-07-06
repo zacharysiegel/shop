@@ -13,7 +13,7 @@ fn main() -> Result<(), Box<dyn Error>> {
         .init();
 
     let mut postgres_config = Config::new();
-    postgres_config.user("user"); // todo: rename "shop"
+    postgres_config.user("shop");
     postgres_config.password(get_shop_password()?);
     postgres_config.dbname("shop");
     postgres_config.host("localhost");
