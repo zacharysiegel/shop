@@ -39,7 +39,17 @@ fn main() -> Result<(), Box<dyn Error>> {
                 .required(true))
             .arg(Arg::new("name")
                 .help("The name of the encrypted secret")
-                .required(true)))
+                .required(true))
+            .arg(Arg::new("utf8")
+                .long("utf8")
+                .conflicts_with("base64")
+                .action(ArgAction::SetTrue)
+                .help("Print only the UTF-8-encoded plaintext to standard output"))
+            .arg(Arg::new("base64")
+                .long("base64")
+                .conflicts_with("utf8")
+                .action(ArgAction::SetTrue)
+                .help("Print only the Base64-encoded plaintext to standard output")))
         .subcommand(Command::new("key")
             .about("Generate a new encryption key"))
         .arg(Arg::new("list")
@@ -90,12 +100,24 @@ fn main() -> Result<(), Box<dyn Error>> {
             Some(key) => BASE64.decode(key.as_bytes())?,
             None => panic!("key is required"),
         };
+        let only_utf8: bool = sub_matches.get_flag("utf8");
+        let only_base64: bool = sub_matches.get_flag("base64");
 
         let plaintext: Vec<u8> = decrypt(&key, secret_name)?;
 
-        if let Ok(plaintext_utf8) = String::from_utf8(plaintext.clone()) {
-            println!("UTF-8 encoding:\n\t{}", plaintext_utf8);
+        if only_utf8 {
+            let plaintext_utf8: String = String::from_utf8(plaintext.clone())?;
+            println!("{}", plaintext_utf8);
+            return Ok(());
         }
+
+        if only_base64 {
+            let plaintext_base64: String = BASE64.encode(&plaintext);
+            println!("{}", plaintext_base64);
+            return Ok(());
+        }
+
+        println!("UTF-8 encoding:\n\t{}", String::from_utf8(plaintext.clone())?);
         println!("Base64 encoding:\n\t{}", BASE64.encode(&plaintext));
         return Ok(());
     }
