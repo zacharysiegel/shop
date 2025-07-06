@@ -77,4 +77,3 @@ pub async fn get_all_by_status_and_marketplace(
 }
 
 // todo: Paginated get_all_marketplace_listings(_page) query
-// todo: refactor all _db modules to return ShopError like this one
