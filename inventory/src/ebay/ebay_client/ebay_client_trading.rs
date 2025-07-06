@@ -73,11 +73,7 @@ pub async fn upload_image(
         .header(EbayXmlHeader::XEbayApiIafToken.to_serial_value(), user_access_token)
         .header(EbayXmlHeader::XEbayApiCallName.to_serial_value(), "UploadSiteHostedPictures")
         .header(EbayXmlHeader::XEbayApiSiteId.to_serial_value(), "0")
-        // todo: needed?
-        // .header("X-EBAY-API-RESPONSE-ENCODING", "XML")
         .header(EbayXmlHeader::XEbayApiCompatibilityLevel.to_serial_value(), EBAY_SCHEMA_VERSION)
-        // todo: needed?
-        // .header("X-EBAY-API-DETAIL-LEVEL", "0")
         .with_bearer(user_access_token)
         .multipart(body)
         .build()
