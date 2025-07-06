@@ -39,5 +39,12 @@ pub const SECRETS: LazyLock<BTreeMap<&'static str, SecretBase64>> = LazyLock::ne
             ciphertext: String::from("3ZbKuEVJtLpXtSt8oGZrifeTMma9RGBW+mB3niU0BU2O2DSOg5C9tS42JbhyISeLg834X5dK+Wl66rV5lDhVEck1TsiCDVwcDOhm8a2pMi4="),
         },
     );
+    map.insert(
+        "postgres__user.shop.password",
+        SecretBase64 {
+            nonce: String::from("mBwYxQkQv1e7itjC"),
+            ciphertext: String::from("mmkNZyyYI+YWwhIJ2OQSqv9Hd+G0FiVlUYnXx53nfoMBtqKFcDfV1TEu380NzSMBjPNfG0Ca2SM4LobpjG4pSbtNmlJoWfsPuqhMqVQRT/0="),
+        },
+    );
     map
 });

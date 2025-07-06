@@ -40,7 +40,7 @@ while IFS= read -r property; do
 	secret=$(\
 		cargo run -p crypt -- decrypt --key "$master_key" "$secret_name" \
 			2> /dev/null \
-			| sed -E -e 's/[[:space:]]//g; 1d; 3,$d' # Remove whitespace and select line 2 (1-indexed)
+			| sed -E -e 's/[[:space:]]//g; 1d; 3,$d' # Remove whitespace and select line 2 (1-indexed) (utf-8)
 	)
 	echo "$secret" > "./secret/${file_name}"
 done <<< "$properties"

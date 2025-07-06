@@ -5,8 +5,8 @@ services:
     image: postgres:17.4-alpine
     environment:
       # todo: change the password and set the value via setup.sh
-      POSTGRES_USER: user
-      POSTGRES_PASSWORD: password
+      POSTGRES_USER: shop
+      POSTGRES_PASSWORD: postgres__user.shop.password # Replaced by setup script
       POSTGRES_DB: shop
     ports:
       - '127.0.0.1:5432:5432/tcp'
