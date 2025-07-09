@@ -75,5 +75,3 @@ pub async fn get_all_by_status_and_marketplace(
         .await
         .map_err(|e| ShopError::from(e))
 }
-
-// todo: Paginated get_all_marketplace_listings(_page) query
