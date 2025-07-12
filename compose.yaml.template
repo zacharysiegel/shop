@@ -25,7 +25,6 @@ services:
       - ./proxy/cert:/cert:ro
       - ./frontend/static:/frontend/static:ro
       - ./volatile:/volatile:ro
-      - ./appended_hosts:/etc/appended_hosts
     restart: unless-stopped
     networks:
       - shop
