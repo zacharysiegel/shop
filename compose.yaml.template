@@ -1,7 +1,12 @@
+# todo: rename "compose.template.yaml"
 name: shop
 
 services:
   postgres:
+    profiles:
+      - prod
+      - stage
+      - local
     image: postgres:17.4-alpine
     environment:
       POSTGRES_USER: shop
@@ -16,6 +21,10 @@ services:
       - shop
 
   nginx:
+    profiles:
+      - prod
+      - stage
+      - local
     image: nginx:1.28-alpine-slim
     ports:
       - '127.0.0.1:1443:443/tcp'
@@ -29,12 +38,61 @@ services:
     networks:
       - shop
 
-  authelia:
+  authelia-prod:
+    profiles:
+      - prod
+    hostname: authelia
     image: authelia/authelia:4.39
     ports:
       - '127.0.0.1:11002:11002/tcp'
+    environment:
+      X_AUTHELIA_CONFIG: /config/configuration.prod.yaml
+      X_AUTHELIA_CONFIG_FILTERS: template
     env_file:
-      - ./identity/.env
+      - path: ./identity/.env
+        required: true
+    volumes:
+      - ./identity/config:/config
+      - ./identity/secret:/secret
+      - ./identity/data:/data
+    restart: unless-stopped
+    networks:
+      - shop
+
+  authelia-stage:
+    profiles:
+      - stage
+    hostname: authelia
+    image: authelia/authelia:4.39
+    ports:
+      - '127.0.0.1:11002:11002/tcp'
+    environment:
+      X_AUTHELIA_CONFIG: /config/configuration.stage.yaml
+      X_AUTHELIA_CONFIG_FILTERS: template
+    env_file:
+      - path: ./identity/.env
+        required: true
+    volumes:
+      - ./identity/config:/config
+      - ./identity/secret:/secret
+      - ./identity/data:/data
+    restart: unless-stopped
+    networks:
+      - shop
+
+  authelia-local:
+    profiles:
+      - local
+    hostname: authelia
+    image: authelia/authelia:4.39
+    ports:
+      - '127.0.0.1:11002:11002/tcp'
+    environment:
+      X_AUTHELIA_CONFIG: /config/configuration.local.yaml
+      X_AUTHELIA_CONFIG_FILTERS: template
+    env_file:
+      - path: ./identity/.env
+        required: true
     volumes:
       - ./identity/config:/config
       - ./identity/secret:/secret
@@ -44,6 +102,8 @@ services:
       - shop
 
   authelia-validate:
+    profiles:
+      - validate
     image: authelia/authelia:4.39
     command: authelia config validate --config /config/configuration.yml
     env_file:
@@ -53,8 +113,6 @@ services:
       - ./identity/secret:/secret
       - ./identity/data:/data
     restart: 'no'
-    profiles:
-      - validate
 
 # todo: inventory container
 # todo: frontend container
