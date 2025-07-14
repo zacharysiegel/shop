@@ -170,17 +170,23 @@ async fn cancel_listing(
     HttpResponse::NoContent().finish()
 }
 
-// todo: fix this to accept listing_id
 async fn get_listing(
-    item_id: web::Path<String>,
+    listing_id: web::Path<String>,
     request: HttpRequest,
+    pgpool: web::Data<PgPool>,
 ) -> impl Responder {
     let user_access_token: Cookie = match extract_user_token(&request) {
         Ok(value) => value,
         Err(response) => return response,
     };
 
-    let json: Value = unwrap_result_else_500!(ebay_client::get_inventory_item(&user_access_token.value(), &item_id).await);
+    let listing_id: Uuid = unwrap_result_else_400!(Uuid::try_parse(&listing_id.into_inner()));
+    let listing: ListingEntity = unwrap_option_else_404!(unwrap_result_else_500!(
+        listing_db::get_listing(&pgpool, &listing_id).await
+    ));
+    let listing: Listing = unwrap_result_else_500!(listing.try_to_model());
+
+    let json: Value = unwrap_result_else_500!(ebay_client::get_inventory_item(&user_access_token.value(), &listing.item_id.to_string()).await);
     HttpResponse::Ok().json(json)
 }
 
