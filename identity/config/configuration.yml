@@ -1,5 +1,6 @@
 ---
 # yaml-language-server: $schema=https://www.authelia.com/schemas/v4.39/json-schema/configuration.json
+# todo: configuration.prod.yml, configuration.stage.yml, configuration.local.yml
 
 ###############################################################
 #                   Authelia configuration                    #
