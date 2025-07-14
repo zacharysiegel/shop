@@ -23,7 +23,7 @@ else
 fi
 
 echo "Generating compose.yaml"
-sed -e "s/${postgres__user_shop_password_key}/${postgres__user_shop_password}/g" ./compose.yaml.template >./compose.yaml
+sed -e "s/${postgres__user_shop_password_key}/${postgres__user_shop_password}/g" ./compose.template.yaml >./compose.yaml
 
 # All setup scripts should be idempotent and callable from the repo root directory
 zsh ./identity/setup.sh "$master_key"
