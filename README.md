@@ -26,6 +26,11 @@ Ensure the `cargo` program is accessible in your shell.
 
 ### Application setup
 
+Run the top-level setup script (requires zsh). This script will invoke any requisite nested setup scripts.
+
+    # At the repository root
+    zsh ./setup.sh
+
 Start the application database and the NGINX reverse proxy server.
 
     # At the repository root
