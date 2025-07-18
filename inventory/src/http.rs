@@ -10,8 +10,10 @@ pub(crate) static HTTP_CLIENT: LazyLock<Client> = LazyLock::new(|| Client::build
 pub static DOMAIN: LazyLock<&'static str> = LazyLock::new(||
     match RuntimeEnvironment::default() {
         RuntimeEnvironment::Local => "127.0.0.1",
-        RuntimeEnvironment::Stage => "todo",
-        RuntimeEnvironment::Production => "todo",
+        /* The stage and production systems are expected to provide entries in /etc/hosts to redirect these domains locally
+            in order to conform to Authelia's authentication system which associates authentication with a single domain. */
+        RuntimeEnvironment::Stage => "shop-stage.zach.ro",
+        RuntimeEnvironment::Production => "shop.zach.ro",
     }
 );
 
