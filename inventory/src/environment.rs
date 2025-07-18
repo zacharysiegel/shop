@@ -31,12 +31,11 @@ impl RuntimeEnvironment {
         )
     }
 
-    // todo: update when released to stage and production environments
     pub fn get_origin(&self) -> &'static str {
         match self {
             RuntimeEnvironment::Local => "https://127.0.0.1:1443",
-            RuntimeEnvironment::Stage => "todo",
-            RuntimeEnvironment::Production => "todo",
+            RuntimeEnvironment::Stage => "https://shop-stage.zach.ro:443",
+            RuntimeEnvironment::Production => "https://shop.zach.ro:443",
         }
     }
 }
