@@ -86,11 +86,18 @@ For convenience, you may want to add the following entries to the "Editor" > "Fi
     * ".env file"
         * `.env.template`
 
-todo: talk about cloudflare tunnel and ssh connection via `cloudflared`
+### Cloudflare Tunnel
 
-scratch:
-cloudflared tunnel login
-    select "venus" tunnel in browser
-    clourflared creates ~/.cloudflared/cert.pem
-cloudflared tunnel route ip add 127.0.0.1/32 venus
+Our server does not have access to a static IP address, so we use a Cloudflare tunnel to expose our services to the public Internet. The tunnel operates by using the `cloudflared` program (running on our own server) establishing a long-lived TCP connection with a Cloudflare server which acts as an application-level router. Rather than directing a DNS record to the NGINX reverse proxy server, our DNS records point to this Cloudflare server which is configured to forward traffic to the "local" `cloudflared` process. The `cloudflared` program itself may be configured to foward traffic to the NGINX process at a local IP address.
+
+We use the Cloudflare tunnel for both public application routing and internal SSH access.
+
+#### Cloudflare tunnel setup
+
+A tunnel called "venus" has already been created in the Cloudflare ZeroTrust console.
+
+1. `cloudflared tunnel login`
+    * select "venus" tunnel in browser
+    * `clourflared` creates ~/.cloudflared/cert.pem
+2. `cloudflared tunnel route ip add 127.0.0.1/32 venus`
 
