@@ -2,10 +2,6 @@ name: shop
 
 services:
   postgres:
-    profiles:
-      - prod
-      - stage
-      - local
     image: postgres:17.4-alpine
     environment:
       POSTGRES_USER: shop
@@ -20,10 +16,6 @@ services:
       - shop
 
   nginx:
-    profiles:
-      - prod
-      - stage
-      - local
     image: nginx:1.28-alpine-slim
     ports:
       - '127.0.0.1:1443:443/tcp'
