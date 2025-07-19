@@ -15,15 +15,11 @@ postgres__user_shop_password=$(
 	cargo run -p crypt -- decrypt --utf8 --key "$master_key" "$postgres__user_shop_password_key"
 )
 
-if test -e .env; then
-	echo "Environment file .env already exists; Skipping;"
-else
-	echo "Generating .env"
-	sed -e "s/${postgres__user_shop_password_key}/${postgres__user_shop_password}/g" ./.env.template >./.env
-fi
+echo "Generating .env"
+sed -e "s/${postgres__user_shop_password_key}/${postgres__user_shop_password}/g" ./.env.template > ./.env
 
 echo "Generating compose.yaml"
-sed -e "s/${postgres__user_shop_password_key}/${postgres__user_shop_password}/g" ./compose.template.yaml >./compose.yaml
+sed -e "s/${postgres__user_shop_password_key}/${postgres__user_shop_password}/g" ./compose.template.yaml > ./compose.yaml
 
 # All setup scripts should be idempotent and callable from the repo root directory
 zsh ./identity/setup.sh "$master_key"
