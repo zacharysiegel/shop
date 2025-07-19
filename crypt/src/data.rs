@@ -35,8 +35,8 @@ pub const SECRETS: LazyLock<BTreeMap<&'static str, SecretBase64>> = LazyLock::ne
     map.insert(
         "authelia__storage.postgres.password",
         SecretBase64 {
-            nonce: String::from("I/F3oqpYXEmTO7O4"),
-            ciphertext: String::from("CoK1ebFHA/PvE5FMnWpOqGvV0HXiDKvILhxQ/2h6kH4+og60hS+34eP7zlwLj2rJgr78QKhQs2S/JdEfn8JZ1P3kFZ6b0FZGJRzVxd95TqY="),
+            nonce: String::from("kB3iY32TYjwXNLbV"),
+            ciphertext: String::from("VRWQCyroStd3wtAfbwOrVzXWi5ukAnDfsg6ewPfdcJ9HACo6bHifRHBKUin4B/jH0p0HaRXCWdMMTZafnTidEkFN2f++Z3rCj5krq7ByubU="),
         },
     );
     map.insert(
