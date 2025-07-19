@@ -16,7 +16,11 @@ postgres__user_shop_password=$(
 )
 
 echo "Generating .env"
-sed -e "s/${postgres__user_shop_password_key}/${postgres__user_shop_password}/g" ./.env.template > ./.env
+sed > ./.env \
+	-E \
+	-e "s/^(MASTER_SECRET=).*$/\1${master_key}/g" \
+	-e "s/${postgres__user_shop_password_key}/${postgres__user_shop_password}/g" \
+	./.env.template
 
 echo "Generating compose.yaml"
 sed -e "s/${postgres__user_shop_password_key}/${postgres__user_shop_password}/g" ./compose.template.yaml > ./compose.yaml
