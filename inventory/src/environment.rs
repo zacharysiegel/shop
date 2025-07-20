@@ -1,6 +1,7 @@
 use crate::error::ShopError;
 use log::{LevelFilter, SetLoggerError};
 use std::backtrace::Backtrace;
+use std::fmt::Display;
 use std::ops::Deref;
 use std::path::{Path, PathBuf};
 use std::string::ToString;
@@ -56,6 +57,17 @@ impl TryFrom<String> for RuntimeEnvironment {
             "production" => Ok(Self::Production),
             _ => Err(ShopError::new(&format!("Error parsing runtime environment [{}]", value)))
         }
+    }
+}
+
+impl Display for RuntimeEnvironment {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let str = match self {
+            RuntimeEnvironment::Local => String::from("local"),
+            RuntimeEnvironment::Stage => String::from("stage"),
+            RuntimeEnvironment::Production => String::from("production"),
+        };
+        write!(f, "{}", str)
     }
 }
 

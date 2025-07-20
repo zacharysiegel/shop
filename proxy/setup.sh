@@ -20,3 +20,21 @@ function generate_secret_certificates {
 		> "${production_path}/${key_file_name}"
 }
 generate_secret_certificates
+
+function generate_nginx_env_configurations {
+	template_file_name="nginx.template.conf"
+	local_file_name="nginx.local.conf"
+	stage_file_name="nginx.stage.conf"
+	production_file_name="nginx.production.conf"
+
+	sed > "./${local_file_name}" \
+		-e "s/environment.name/local/g" \
+		"$template_file_name"
+	sed > "./${stage_file_name}" \
+		-e "s/environment.name/stage/g" \
+		"$template_file_name"
+	sed > "./${production_file_name}" \
+		-e "s/environment.name/production/g" \
+		"$template_file_name"
+}
+generate_nginx_env_configurations

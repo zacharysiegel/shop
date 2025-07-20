@@ -1,2 +1,5 @@
 /cert/production
 /cert/stage
+
+/nginx.*.conf
+!/nginx.template.conf
