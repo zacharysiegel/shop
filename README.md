@@ -90,13 +90,6 @@ For convenience, you may want to add the following entries to the "Editor" > "Fi
     <td><code>*.containerignore</code></td>
 </tr>
 <tr>
-    <td>"YAML"</td>
-    <td>
-        <code>*.yaml.template</code><br/>
-        <code>*.yml.template</code>
-    </td>
-</tr>
-<tr>
     <td>".env file"</td>
     <td><code>.env.template</code></td>
 </tr>
