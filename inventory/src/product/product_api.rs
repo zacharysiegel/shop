@@ -8,7 +8,6 @@ use crate::{unwrap_option_else_404, unwrap_result_else_400, unwrap_result_else_5
 use actix_web::guard::fn_guard;
 use actix_web::http::StatusCode;
 use actix_web::{guard, web, HttpResponse, HttpResponseBuilder, Responder};
-use sqlx::postgres::PgQueryResult;
 use sqlx::PgPool;
 use uuid::Uuid;
 

@@ -15,12 +15,14 @@ services:
     networks:
       - shop
 
-  nginx:
+  nginx-local:
+    profiles:
+      - local
     image: nginx:1.28-alpine-slim
     ports:
       - '127.0.0.1:1443:443/tcp'
     volumes:
-      - ./proxy/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./proxy/nginx.local.conf:/etc/nginx/nginx.conf:ro
       - ./proxy/authelia:/etc/nginx/authelia:ro
       - ./proxy/cert:/cert:ro
       - ./frontend/static:/frontend/static:ro
@@ -29,15 +31,47 @@ services:
     networks:
       - shop
 
-  authelia-prod:
+  nginx-stage:
+    profiles:
+      - stage
+    image: nginx:1.28-alpine-slim
+    ports:
+      - '127.0.0.1:1443:443/tcp'
+    volumes:
+      - ./proxy/nginx.stage.conf:/etc/nginx/nginx.conf:ro
+      - ./proxy/authelia:/etc/nginx/authelia:ro
+      - ./proxy/cert:/cert:ro
+      - ./frontend/static:/frontend/static:ro
+      - ./volatile:/volatile:ro
+    restart: unless-stopped
+    networks:
+      - shop
+
+  nginx-prod:
     profiles:
       - prod
+    image: nginx:1.28-alpine-slim
+    ports:
+      - '127.0.0.1:1443:443/tcp'
+    volumes:
+      - ./proxy/nginx.production.conf:/etc/nginx/nginx.conf:ro
+      - ./proxy/authelia:/etc/nginx/authelia:ro
+      - ./proxy/cert:/cert:ro
+      - ./frontend/static:/frontend/static:ro
+      - ./volatile:/volatile:ro
+    restart: unless-stopped
+    networks:
+      - shop
+
+  authelia-local:
+    profiles:
+      - local
     hostname: authelia
     image: authelia/authelia:4.39
     ports:
       - '127.0.0.1:11002:11002/tcp'
     environment:
-      X_AUTHELIA_CONFIG: /config/configuration.prod.yaml
+      X_AUTHELIA_CONFIG: /config/configuration.local.yaml
       X_AUTHELIA_CONFIG_FILTERS: template
     env_file:
       - path: ./identity/.env
@@ -71,15 +105,15 @@ services:
     networks:
       - shop
 
-  authelia-local:
+  authelia-prod:
     profiles:
-      - local
+      - prod
     hostname: authelia
     image: authelia/authelia:4.39
     ports:
       - '127.0.0.1:11002:11002/tcp'
     environment:
-      X_AUTHELIA_CONFIG: /config/configuration.local.yaml
+      X_AUTHELIA_CONFIG: /config/configuration.prod.yaml
       X_AUTHELIA_CONFIG_FILTERS: template
     env_file:
       - path: ./identity/.env
