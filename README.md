@@ -83,13 +83,28 @@ _"Venus" is the name of the machine (or cluster of machines) which hosts the pro
 ### IntellIJ
 
 For convenience, you may want to add the following entries to the "Editor" > "File Types" > "Recognized File Types":
-    * "DockerIgnore"
-        * `*.containerignore`
-    * "YAML"
-        * `*.yaml.template`
-        * `*.yml.template`
-    * ".env file"
-        * `.env.template`
+
+<table>
+<tr>
+    <td>"DockerIgnore"</td>
+    <td><code>*.containerignore</code></td>
+</tr>
+<tr>
+    <td>"YAML"</td>
+    <td>
+        <code>*.yaml.template</code><br/>
+        <code>*.yml.template</code>
+    </td>
+</tr>
+<tr>
+    <td>".env file"</td>
+    <td><code>.env.template</code></td>
+</tr>
+<tr>
+    <td>"XML"</td>
+    <td><code>*.plist</code></td>
+</tr>
+</table>
 
 ### Cloudflare Tunnel
 
