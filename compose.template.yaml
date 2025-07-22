@@ -1,5 +1,38 @@
 name: shop
 
+x-nginx-common: &nginx_common
+  image: nginx:1.28-alpine-slim
+  ports:
+    - '127.0.0.1:1443:443/tcp'
+  restart: unless-stopped
+  networks:
+    - shop
+
+x-authelia_common: &authelia_common
+  hostname: authelia
+  image: authelia/authelia:4.39
+  ports:
+    - '127.0.0.1:11002:11002/tcp'
+  env_file:
+    - path: ./identity/.env
+      required: true
+  volumes:
+    - ./identity/config:/config
+    - ./identity/secret:/secret
+    - ./identity/data:/data
+  restart: unless-stopped
+  networks:
+    - shop
+
+x-rust_package_common: &rust_package_common
+  env_file:
+    - path: ./.env
+      required: true
+x-rust_package_common_build: &rust_package_common_build
+  context: ./
+  dockerfile: ./rust_package.containerfile
+  network: shop
+
 services:
   postgres:
     image: postgres:17.4-alpine
@@ -16,128 +49,81 @@ services:
       - shop
 
   nginx-local:
+    <<: *nginx_common
     profiles:
       - local
-    image: nginx:1.28-alpine-slim
-    ports:
-      - '127.0.0.1:1443:443/tcp'
     volumes:
       - ./proxy/nginx.local.conf:/etc/nginx/nginx.conf:ro
       - ./proxy/authelia:/etc/nginx/authelia:ro
       - ./proxy/cert:/cert:ro
       - ./frontend/static:/frontend/static:ro
       - ./volatile:/volatile:ro
-    restart: unless-stopped
-    networks:
-      - shop
 
   nginx-stage:
+    <<: *nginx_common
     profiles:
       - stage
-    image: nginx:1.28-alpine-slim
-    ports:
-      - '127.0.0.1:1443:443/tcp'
     volumes:
       - ./proxy/nginx.stage.conf:/etc/nginx/nginx.conf:ro
       - ./proxy/authelia:/etc/nginx/authelia:ro
       - ./proxy/cert:/cert:ro
       - ./frontend/static:/frontend/static:ro
       - ./volatile:/volatile:ro
-    restart: unless-stopped
-    networks:
-      - shop
 
   nginx-prod:
+    <<: *nginx_common
     profiles:
       - prod
-    image: nginx:1.28-alpine-slim
-    ports:
-      - '127.0.0.1:1443:443/tcp'
     volumes:
       - ./proxy/nginx.production.conf:/etc/nginx/nginx.conf:ro
       - ./proxy/authelia:/etc/nginx/authelia:ro
       - ./proxy/cert:/cert:ro
       - ./frontend/static:/frontend/static:ro
       - ./volatile:/volatile:ro
-    restart: unless-stopped
-    networks:
-      - shop
 
   authelia-local:
+    <<: *authelia_common
     profiles:
       - local
-    hostname: authelia
-    image: authelia/authelia:4.39
-    ports:
-      - '127.0.0.1:11002:11002/tcp'
     environment:
       X_AUTHELIA_CONFIG: /config/configuration.local.yaml
-      X_AUTHELIA_CONFIG_FILTERS: template
-    env_file:
-      - path: ./identity/.env
-        required: true
-    volumes:
-      - ./identity/config:/config
-      - ./identity/secret:/secret
-      - ./identity/data:/data
-    restart: unless-stopped
-    networks:
-      - shop
 
   authelia-stage:
+    <<: *authelia_common
     profiles:
       - stage
-    hostname: authelia
-    image: authelia/authelia:4.39
-    ports:
-      - '127.0.0.1:11002:11002/tcp'
     environment:
       X_AUTHELIA_CONFIG: /config/configuration.stage.yaml
-      X_AUTHELIA_CONFIG_FILTERS: template
-    env_file:
-      - path: ./identity/.env
-        required: true
-    volumes:
-      - ./identity/config:/config
-      - ./identity/secret:/secret
-      - ./identity/data:/data
-    restart: unless-stopped
-    networks:
-      - shop
 
   authelia-prod:
+    <<: *authelia_common
     profiles:
       - prod
-    hostname: authelia
-    image: authelia/authelia:4.39
-    ports:
-      - '127.0.0.1:11002:11002/tcp'
     environment:
       X_AUTHELIA_CONFIG: /config/configuration.prod.yaml
-      X_AUTHELIA_CONFIG_FILTERS: template
-    env_file:
-      - path: ./identity/.env
-        required: true
-    volumes:
-      - ./identity/config:/config
-      - ./identity/secret:/secret
-      - ./identity/data:/data
-    restart: unless-stopped
-    networks:
-      - shop
 
   authelia-validate:
+    <<: *authelia_common
     profiles:
       - validate
-    image: authelia/authelia:4.39
-    command: authelia config validate --config /config/configuration.yml
-    env_file:
-      - ./identity/.env
-    volumes:
-      - ./identity/config:/config
-      - ./identity/secret:/secret
-      - ./identity/data:/data
+    environment:
+      X_AUTHELIA_CONFIG: /config/configuration.local.yaml
+    command: authelia config validate
     restart: 'no'
+#
+#  inventory:
+#    <<: *rust_package_common
+#    build:
+#      <<: *rust_package_common_build
+#      args:
+#        package_name: inventory
+#
+#  frontend:
+#    <<: *rust_package_common
+#    build:
+#      <<: *rust_package_common_build
+#      args:
+#        package_name: frontend
 
 # todo: inventory container
 # todo: frontend container

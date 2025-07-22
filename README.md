@@ -60,6 +60,8 @@ Even during local development, you should access web pages through the proxy. Ot
 Authentication is proxied through the [Authelia](https://www.authelia.com/overview/prologue/introduction/) server. It uses a session cookie to persist a user's authorization across HTTP connections.
 Since the cookie can only apply to a single domain, during local development, if you touch Authelia, only `127.0.0.1` will work (`localhost` will not).
 
+Validate the Authelia configuration using the `authelia-validate` container specified in the compose file. (It points to "local" by default.)
+
 ### Environment variables
 
 Environment variables are specified in `.env`. If you need to add an environment variable, add it to both `.env` and `.env.template`. If the value is secret, still add the variable declaration to the template file, but leave it unassigned. (e.g. `TWITTER_API_TOKEN=`)
