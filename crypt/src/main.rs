@@ -52,21 +52,10 @@ fn main() -> Result<(), Box<dyn Error>> {
                 .help("Print only the Base64-encoded plaintext to standard output")))
         .subcommand(Command::new("key")
             .about("Generate a new encryption key"))
-        .arg(Arg::new("list")
-            .short('l')
-            .long("list")
-            .action(ArgAction::SetTrue)
-            .exclusive(true)
-            .help("List all available secrets"))
+        .subcommand(Command::new("list")
+            .about("List all available secrets"))
         ;
     let matches: ArgMatches = command.clone().get_matches();
-
-    if matches.get_flag("list") {
-        let text = list_secret_names()
-            .join("\n");
-        println!("{}", text);
-        return Ok(());
-    }
 
     if let Some(sub_matches) = matches.subcommand_matches("encrypt") {
         let plaintext: &String = sub_matches.get_one("plaintext")
@@ -125,6 +114,13 @@ fn main() -> Result<(), Box<dyn Error>> {
     if let Some(_) = matches.subcommand_matches("key") {
         let key: Vec<u8> = generate_key();
         println!("Generated key (base64):\n\t{}", BASE64.encode(key));
+        return Ok(());
+    }
+
+    if let Some(_) = matches.subcommand_matches("list") {
+        let text: String = list_secret_names()
+            .join("\n");
+        println!("{}", text);
         return Ok(());
     }
 
