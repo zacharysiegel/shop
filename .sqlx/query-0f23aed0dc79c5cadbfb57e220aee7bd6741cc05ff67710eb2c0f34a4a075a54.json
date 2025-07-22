@@ -1,0 +1,16 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        update shop.public.listing\n        set (status, updated) = ($2, $3)\n        where id = $1\n    ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Int4",
+        "Timestamptz"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "0f23aed0dc79c5cadbfb57e220aee7bd6741cc05ff67710eb2c0f34a4a075a54"
+}

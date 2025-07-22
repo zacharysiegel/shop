@@ -1,0 +1,17 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "insert into shop.public.metric_counter (id, internal_name, object_id, value)  values ($1, $2, $3, $4) ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Text",
+        "Text",
+        "Int8"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "3e5667ea87e41a6afb6adc9266ac6ab71d4b13dfa6e72deac724cb5a0f5bd3d5"
+}

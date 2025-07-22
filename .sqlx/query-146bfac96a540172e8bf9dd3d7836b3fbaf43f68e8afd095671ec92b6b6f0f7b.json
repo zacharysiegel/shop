@@ -1,0 +1,56 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "select * from shop.public.product order by display_name asc limit 1",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "display_name",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 2,
+        "name": "internal_name",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 3,
+        "name": "upc",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 4,
+        "name": "release_date",
+        "type_info": "Date"
+      },
+      {
+        "ordinal": 5,
+        "name": "created",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 6,
+        "name": "updated",
+        "type_info": "Timestamptz"
+      }
+    ],
+    "parameters": {
+      "Left": []
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      true,
+      true,
+      false,
+      false
+    ]
+  },
+  "hash": "146bfac96a540172e8bf9dd3d7836b3fbaf43f68e8afd095671ec92b6b6f0f7b"
+}

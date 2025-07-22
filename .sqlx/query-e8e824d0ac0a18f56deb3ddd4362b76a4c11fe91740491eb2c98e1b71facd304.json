@@ -1,0 +1,17 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n\t\tINSERT INTO shop.public.marketplace (id, display_name, internal_name, uri)\n\t\tVALUES ($1, $2, $3, $4)\n\t",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Text",
+        "Text",
+        "Text"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "e8e824d0ac0a18f56deb3ddd4362b76a4c11fe91740491eb2c98e1b71facd304"
+}

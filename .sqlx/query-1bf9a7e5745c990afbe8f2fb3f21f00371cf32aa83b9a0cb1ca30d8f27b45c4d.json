@@ -1,0 +1,17 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n\t\tinsert into shop.public.category (id, display_name, internal_name, parent_id)\n\t\tvalues ($1, $2, $3, $4)\n\t",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Text",
+        "Text",
+        "Uuid"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "1bf9a7e5745c990afbe8f2fb3f21f00371cf32aa83b9a0cb1ca30d8f27b45c4d"
+}

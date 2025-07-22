@@ -1,0 +1,15 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "insert into shop.public.product_category_association (category_id, product_id)values ($1, $2)",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Uuid"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "432e6ad0b91cdd8a97352b199d2d83df928c46ea617d8772bf54c4952e4dce32"
+}

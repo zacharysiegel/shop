@@ -1,0 +1,15 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n\t\tdelete from shop.public.item_label_association\n\t\twhere item_id = $1 and label_id = $2\n\t",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Uuid"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "176964fb90607ccd52a7b2436258353dc01a05ca4b09b8808e9d6b775d128310"
+}

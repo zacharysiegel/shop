@@ -1,0 +1,18 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        insert into shop.public.item_attribute (item_id, key, value, visible, priority)\n        values ($1, $2, $3, $4, $5)\n    ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Text",
+        "Text",
+        "Bool",
+        "Int4"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "c0534660af8865c15eaca278284c8680acaee382361fb7537907bf6548b2d8b8"
+}

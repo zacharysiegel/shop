@@ -1,0 +1,15 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        delete from shop.public.item_attribute\n        where item_id = $1 and key = $2\n    ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Text"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "515b2330c6e02d854b62bc577d4bea40a365ff735a147bbf7e135615e54acd8e"
+}

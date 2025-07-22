@@ -1,0 +1,16 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "insert into shop.public.label (id, display_name, internal_name) values ($1, $2, $3) ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Text",
+        "Text"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "ace298c258fa568f4231318e244776b61a0b9ec99e6774c7d75af8da9deff49b"
+}

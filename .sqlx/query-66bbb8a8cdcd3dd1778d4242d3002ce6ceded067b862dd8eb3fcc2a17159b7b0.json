@@ -1,0 +1,15 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "update shop.public.metric_counter set value = value + $1 where id = $2 ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Int8",
+        "Uuid"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "66bbb8a8cdcd3dd1778d4242d3002ce6ceded067b862dd8eb3fcc2a17159b7b0"
+}

@@ -1,0 +1,32 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "select id, display_name, internal_name from shop.public.label ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "display_name",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 2,
+        "name": "internal_name",
+        "type_info": "Text"
+      }
+    ],
+    "parameters": {
+      "Left": []
+    },
+    "nullable": [
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "9023b6d079412e972800598ae6bb017ca16a9c1b4ab709dbd28bfcee33f2b80b"
+}

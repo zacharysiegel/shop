@@ -1,0 +1,46 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        select id, ebay_category_id, ebay_category_tree_id, ebay_category_tree_version, ebay_category_name\n        from shop.ebay.category\n        where id = $1\n    ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "ebay_category_id",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 2,
+        "name": "ebay_category_tree_id",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 3,
+        "name": "ebay_category_tree_version",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 4,
+        "name": "ebay_category_name",
+        "type_info": "Text"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "21d9a696807bacd676fbf5cdcc5c4b7ca5b3ff4f0ddebbb82eb66077e13b0e43"
+}

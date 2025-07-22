@@ -1,0 +1,59 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "with PAGE as (\n                    select id, display_name, internal_name, upc, release_date, created, updated\n                    from shop.public.product\n                    where display_name <= $1\n                    order by display_name desc\n                    limit $2\n                )\n                select id, display_name, internal_name, upc, release_date, created, updated\n                from PAGE\n                order by display_name asc\n        \t",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "display_name",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 2,
+        "name": "internal_name",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 3,
+        "name": "upc",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 4,
+        "name": "release_date",
+        "type_info": "Date"
+      },
+      {
+        "ordinal": 5,
+        "name": "created",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 6,
+        "name": "updated",
+        "type_info": "Timestamptz"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Text",
+        "Int8"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      true,
+      true,
+      false,
+      false
+    ]
+  },
+  "hash": "6b9872228624c172959c6a6e2deb6700f246ca577a20622cb455ab9c2c4df489"
+}

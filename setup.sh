@@ -15,6 +15,13 @@ if ! which cargo 1> /dev/null 2>&1; then
 	exit 1
 fi
 
+function sqlx_setup {
+	echo 'Installing the SQLx CLI onto the system (used for caching database state for query validations)'
+	echo 'You can run this command to check the status of ./.sqlx: `cargo sqlx prepare --workspace --check -- --all-targets --all-features`'
+	echo '...or to regenerate ./.sqlx: `cargo sqlx prepare --workspace -- --all-targets --all-features`'
+	cargo install sqlx-cli
+}
+
 postgres__user_shop_password_key="postgres__user.shop.password"
 postgres__user_shop_password=$(
 	cargo run -p crypt -- decrypt --utf8 --key "$master_key" "$postgres__user_shop_password_key"

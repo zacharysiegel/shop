@@ -1,0 +1,14 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        delete from shop.public.product\n        where id = $1\n    ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "62096e8850ec3975af45b9bd41e4fe49e6b49af65b744f47e3d3e31d8cba0b97"
+}

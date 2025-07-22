@@ -1,0 +1,15 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "delete from shop.public.product_category_association where product_id = $1 and category_id = $2 ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Uuid"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "523a3ee0bcd597fd41d4dc99350c386897833f133d48f71e524bc57eb5c8ed09"
+}

@@ -1,0 +1,32 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "insert into shop.public.customer (id, email_address, phone_number, password_hash, display_name, role, status, shipping_street_address, shipping_municipality, shipping_district, shipping_postal_area, shipping_country, billing_street_address, billing_municipality, billing_district, billing_postal_area, billing_country, created, updated)  values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19)\n    ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Text",
+        "Text",
+        "Text",
+        "Text",
+        "Int4",
+        "Int4",
+        "Text",
+        "Text",
+        "Text",
+        "Text",
+        "Text",
+        "Text",
+        "Text",
+        "Text",
+        "Text",
+        "Text",
+        "Timestamptz",
+        "Timestamptz"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "7d320cdb3292c390691c68aac8d31011b34747eef2e71904a168ff46f1e5c7c8"
+}

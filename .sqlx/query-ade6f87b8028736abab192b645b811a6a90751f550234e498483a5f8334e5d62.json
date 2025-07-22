@@ -1,0 +1,58 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "select id, item_id, status_before, status_after, initiated_by_admin, note, created from shop.public.item_audit where item_audit.item_id = $1\n    ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "item_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 2,
+        "name": "status_before",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 3,
+        "name": "status_after",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 4,
+        "name": "initiated_by_admin",
+        "type_info": "Bool"
+      },
+      {
+        "ordinal": 5,
+        "name": "note",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 6,
+        "name": "created",
+        "type_info": "Timestamptz"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      false,
+      true,
+      false
+    ]
+  },
+  "hash": "ade6f87b8028736abab192b645b811a6a90751f550234e498483a5f8334e5d62"
+}
