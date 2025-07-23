@@ -116,3 +116,12 @@ A tunnel called "venus" has already been created in the Cloudflare ZeroTrust con
     * `clourflared` creates ~/.cloudflared/cert.pem
 2. `cloudflared tunnel route ip add 127.0.0.1/32 venus`
 
+### SQLx
+
+We use [the SQLx library](https://github.com/launchbadge/sqlx) to construct and statically analyze SQL queries to the database.
+
+During development, SQLx can connect to a live database server during compilation in order to verify syntactical validity of SQL queries written within strings within Rust macros. When building container images for the Rust applications, the compiler does not have access to the database server (nor should it), so we use the `SQLX_OFFLINE=true` environment variable to direct SQLx to read a cached version of database state instead. This cache is checked in to version control at `/.sqlx`.
+
+*Important:* Any modification to the database schema must be followed by manual regeneration of the SQLx cache. Fail to do so, and compilations during container image builds will fail.
+
+    cargo sqlx prepare --workspace -- --all-targets --all-features
