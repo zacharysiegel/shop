@@ -24,11 +24,11 @@ x-authelia_common: &authelia_common
   networks:
     - shop
 
-x-rust_package_common: &rust_package_common
+x-application_common: &application_common
   env_file:
     - path: ./.env
       required: true
-x-rust_package_common_build: &rust_package_common_build
+x-application_common_build: &application_common_build
   context: ./
   dockerfile: ./rust_package.containerfile
   network: shop
@@ -70,10 +70,10 @@ services:
       - ./frontend/static:/frontend/static:ro
       - ./volatile:/volatile:ro
 
-  nginx-prod:
+  nginx-production:
     <<: *nginx_common
     profiles:
-      - prod
+      - production
     volumes:
       - ./proxy/nginx.production.conf:/etc/nginx/nginx.conf:ro
       - ./proxy/authelia:/etc/nginx/authelia:ro
@@ -95,12 +95,12 @@ services:
     environment:
       X_AUTHELIA_CONFIG: /config/configuration.stage.yaml
 
-  authelia-prod:
+  authelia-production:
     <<: *authelia_common
     profiles:
-      - prod
+      - production
     environment:
-      X_AUTHELIA_CONFIG: /config/configuration.prod.yaml
+      X_AUTHELIA_CONFIG: /config/configuration.production.yaml
 
   authelia-validate:
     <<: *authelia_common
@@ -110,26 +110,106 @@ services:
       X_AUTHELIA_CONFIG: /config/configuration.local.yaml
     command: authelia config validate
     restart: 'no'
-#
-#  inventory:
-#    <<: *rust_package_common
-#    build:
-#      <<: *rust_package_common_build
-#      args:
-#        package_name: inventory
-#
-#  frontend:
-#    <<: *rust_package_common
-#    build:
-#      <<: *rust_package_common_build
-#      args:
-#        package_name: frontend
 
-# todo: inventory container
-# todo: frontend container
+  inventory-local:
+    <<: *application_common
+    profiles:
+      - local
+    build:
+      <<: *application_common_build
+      args:
+        package_name_arg: inventory
+        environment_arg: local
+    ports:
+      - "11001:11001"
+    depends_on:
+      - postgres
+      - authelia-local
+      - nginx-local
+
+  inventory-stage:
+    <<: *application_common
+    profiles:
+      - stage
+    build:
+      <<: *application_common_build
+      args:
+        package_name_arg: inventory
+        environment_arg: stage
+    ports:
+      - "11001:11001"
+    depends_on:
+      - postgres
+      - authelia-stage
+      - nginx-stage
+
+  inventory-production:
+    <<: *application_common
+    profiles:
+      - production
+    build:
+      <<: *application_common_build
+      args:
+        package_name_arg: inventory
+        environment_arg: production
+    ports:
+      - "11001:11001"
+    depends_on:
+      - postgres
+      - authelia-production
+      - nginx-production
+
+  frontend-local:
+    <<: *application_common
+    profiles:
+      - local
+    build:
+      <<: *application_common_build
+      args:
+        package_name_arg: frontend
+        environment_arg: local
+    ports:
+      - "11000:11000"
+    depends_on:
+      - postgres
+      - authelia-local
+      - nginx-local
+
+  frontend-stage:
+    <<: *application_common
+    profiles:
+      - stage
+    build:
+      <<: *application_common_build
+      args:
+        package_name_arg: frontend
+        environment_arg: stage
+    ports:
+      - "11000:11000"
+    depends_on:
+      - postgres
+      - authelia-stage
+      - nginx-stage
+
+  frontend-production:
+    <<: *application_common
+    profiles:
+      - production
+    build:
+      <<: *application_common_build
+      args:
+        package_name_arg: frontend
+        environment_arg: production
+    ports:
+      - "11000:11000"
+    depends_on:
+      - postgres
+      - authelia-production
+      - nginx-production
+
 # These containers should be qualified with [prod/qa] profiles.
 # We would prefer to not run these services as containers during local development.
-# Currently nginx proxies these routes to the host machine's network.
+# Currently, nginx proxies these routes to the host machine's network.
 
 # todo: cloudflared container
 
