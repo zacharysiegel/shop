@@ -1,6 +1,6 @@
 /.env
 /.env.bak
 /secret/*.txt
-/config/configuration.prod.yaml
+/config/configuration.production.yaml
 /config/configuration.stage.yaml
 /config/configuration.local.yaml

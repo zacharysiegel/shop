@@ -40,8 +40,8 @@ function generate_configurations {
 
 	echo "Generating environment-specific configuration files from ${configuration_path_template}"
 
-	# prod
-	sed > "${configuration_dir}/configuration.prod.yaml" \
+	# production
+	sed > "${configuration_dir}/configuration.production.yaml" \
 		-E \
 		-e "s/${session_cookies_0_domain}/shop.zach.ro/g" \
 		-e "s/${session_cookies_0_authelia_url}/https:\/\/shop.zach.ro\/auth/g" \
