@@ -2,6 +2,7 @@
 
 set -e -u -o pipefail
 
+# todo: pull from .env file
 master_key="${1?"Argument 1 required: master_key"}"
 
 repo_dir=$(git rev-parse --show-toplevel)
