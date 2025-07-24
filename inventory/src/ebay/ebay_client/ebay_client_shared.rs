@@ -22,6 +22,7 @@ pub const EBAY_CLIENT_ID: &str = "ZacharyS-shop-SBX-9a6e149a0-59597965";
 pub const EBAY_MARKETPLACE_ID_US: &str = "EBAY_US";
 
 // https://developer.ebay.com/api-docs/sell/account/types/ba:MarketplaceIdEnum
+#[allow(unused)]
 pub const EBAY_CATEGORY_STANDARD: &str = "ALL_EXCLUDING_MOTORS_VEHICLES";
 
 // https://developer.ebay.com/api-docs/sell/account/types/api:CategoryTypeEnum
