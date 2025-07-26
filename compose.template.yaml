@@ -42,6 +42,8 @@ x-application_common: &application_common
   env_file:
     - path: ./.env
       required: true
+  networks:
+    - shop
 x-application_common_build: &application_common_build
   context: ./
   dockerfile: ./rust_package.containerfile
@@ -139,6 +141,7 @@ services:
     <<: *application_common
     profiles:
       - stage
+    hostname: inventory
     build:
       <<: *application_common_build
       args:
@@ -156,6 +159,7 @@ services:
     <<: *application_common
     profiles:
       - production
+    hostname: inventory
     build:
       <<: *application_common_build
       args:
@@ -173,6 +177,7 @@ services:
     <<: *application_common
     profiles:
       - stage
+    hostname: frontend
     build:
       <<: *application_common_build
       args:
@@ -190,6 +195,7 @@ services:
     <<: *application_common
     profiles:
       - production
+    hostname: frontend
     build:
       <<: *application_common_build
       args:
