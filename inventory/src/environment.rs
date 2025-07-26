@@ -1,6 +1,5 @@
 use crate::error::ShopError;
 use log::{LevelFilter, SetLoggerError};
-use std::backtrace::Backtrace;
 use std::fmt::Display;
 use std::ops::Deref;
 use std::path::{Path, PathBuf};
