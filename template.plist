@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+    <dict>
+        <key>Label</key>
+        <string>ro.zach.shop.__PACKAGE_NAME__</string> <!-- Replaced by setup script -->
+
+        <key>ProgramArguments</key>
+        <array>
+            <string>cargo</string>
+            <string>run</string>
+            <string>-p</string>
+            <string>__PACKAGE_NAME__</string> <!-- Replaced by setup script -->
+        </array>
+
+        <key>WorkingDirectory</key>
+        <string>__REPOSITORY_DIRECTORY__</string> <!-- Replaced by setup script -->
+
+        <key>EnvironmentVariables</key>
+        <dict>
+            <key>RUNTIME_ENVIRONMENT</key>
+            <string>__ENVIRONMENT__</string> <!-- Replaced by setup script -->
+        </dict>
+
+        <key>RunAtLoad</key>
+        <true/>
+
+        <key>KeepAlive</key>
+        <dict>
+            <key>SuccessfulExit</key>
+            <false/>
+            <key>Crashed</key>
+            <true/>
+        </dict>
+
+        <key>StandardOutPath</key>
+        <string>/var/log/ro/zach/shop/__PACKAGE_NAME__.log</string> <!-- Replaced by setup script -->
+
+        <key>StandardErrorPath</key>
+        <string>/var/log/ro/zach/shop/__PACKAGE_NAME__.log</string> <!-- Replaced by setup script -->
+
+        <key>ProcessType</key>
+        <string>Standard</string>
+    </dict>
+</plist>
