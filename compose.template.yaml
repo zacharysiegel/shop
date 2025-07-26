@@ -2,6 +2,7 @@ name: shop
 
 x-postgres_common: &postgres_common
   image: postgres:17.4-alpine
+  hostname: postgres
   ports:
     - '127.0.0.1:5432:5432/tcp'
   volumes:
@@ -9,7 +10,6 @@ x-postgres_common: &postgres_common
   restart: unless-stopped
   networks:
     - shop
-
 x-postgres_common_environment: &postgres_common_environment
   POSTGRES_USER: shop
   POSTGRES_DB: shop

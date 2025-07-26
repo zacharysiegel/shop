@@ -31,6 +31,6 @@ fn get_db_host() -> String {
     match runtime_environment {
         // Local development does not run the Rust applications inside containers
         RuntimeEnvironment::Local => "localhost:5432".to_string(),
-        RuntimeEnvironment::Stage | RuntimeEnvironment::Production => format!("postgres-{}:5432", runtime_environment.to_string()),
+        RuntimeEnvironment::Stage | RuntimeEnvironment::Production => "postgres:5432".to_string(),
     }
 }
