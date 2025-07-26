@@ -149,7 +149,7 @@ services:
     environment:
       RUNTIME_ENVIRONMENT: stage
     ports:
-      - "11001:11001"
+      - '11001:11001'
     depends_on:
       - postgres-stage
       - authelia-stage
@@ -167,7 +167,7 @@ services:
     environment:
       RUNTIME_ENVIRONMENT: production
     ports:
-      - "11001:11001"
+      - '11001:11001'
     depends_on:
       - postgres-production
       - authelia-production
@@ -185,7 +185,7 @@ services:
     environment:
       RUNTIME_ENVIRONMENT: stage
     ports:
-      - "11000:11000"
+      - '11000:11000'
     depends_on:
       - postgres-stage
       - authelia-stage
@@ -203,7 +203,7 @@ services:
     environment:
       RUNTIME_ENVIRONMENT: production
     ports:
-      - "11000:11000"
+      - '11000:11000'
     depends_on:
       - postgres-production
       - authelia-production
