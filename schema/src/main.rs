@@ -7,6 +7,7 @@ use crypt::{cryptography, BASE64};
 
 refinery::embed_migrations!("migrations");
 
+// todo: adapt per environment (password)
 fn main() -> Result<(), Box<dyn Error>> {
     dotenvy::dotenv()?;
     env_logger::builder()
@@ -48,7 +49,7 @@ fn check_connection(client: &mut Client) -> Result<(), postgres::Error> {
 
 fn get_shop_password() -> Result<String, Box<dyn Error>> {
     let master_secret: Vec<u8> = get_master_secret()?;
-    let secret: Vec<u8> = cryptography::decrypt(&master_secret, "postgres__user.shop.password")?;
+    let secret: Vec<u8> = cryptography::decrypt(&master_secret, "postgres__user.shop.password.local")?;
     let secret: String = String::from_utf8(secret)?;
     Ok(secret)
 }

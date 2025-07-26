@@ -1,5 +1,7 @@
 #!/bin/zsh
 
+environments=("local" "stage" "production")
+
 function prepare_env_file {
 	if test -e .env; then
 		echo "Environment file identity/.env already exists; Copying to identity/.env.bak;"
@@ -39,30 +41,35 @@ function generate_configurations {
 	session_cookies_0_default_redirection_url="session.cookies.0.default_redirection_url"
 
 	echo "Generating environment-specific configuration files from ${configuration_path_template}"
+	for environment in "${environments[@]}"; do
+		local configuration_path_env="${configuration_dir}/configuration.${environment}.yaml"
+		cp "$configuration_path_template" "$configuration_path_env"
+
+		sed -I "" -E \
+			-e "s/ENVIRONMENT/${environment}/g" \
+			"$configuration_path_env"
+	done
 
 	# production
-	sed > "${configuration_dir}/configuration.production.yaml" \
-		-E \
+	sed -I "" -E \
 		-e "s/${session_cookies_0_domain}/shop.zach.ro/g" \
 		-e "s/${session_cookies_0_authelia_url}/https:\/\/shop.zach.ro\/auth/g" \
 		-e "s/${session_cookies_0_default_redirection_url}/https:\/\/shop.zach.ro\/admin/g" \
-		"${configuration_path_template}"
+		"${configuration_dir}/configuration.production.yaml"
 
 	# stage
-	sed > "${configuration_dir}/configuration.stage.yaml" \
-		-E \
+	sed -I "" -E \
 		-e "s/${session_cookies_0_domain}/shop-stage.zach.ro/g" \
 		-e "s/${session_cookies_0_authelia_url}/https:\/\/shop-stage.zach.ro\/auth/g" \
 		-e "s/${session_cookies_0_default_redirection_url}/https:\/\/shop-stage.zach.ro\/admin/g" \
-		"${configuration_path_template}"
+		"${configuration_dir}/configuration.stage.yaml"
 
 	# local
-	sed > "${configuration_dir}/configuration.local.yaml" \
-		-E \
+	sed -I "" -E \
 		-e "s/${session_cookies_0_domain}/127.0.0.1/g" \
 		-e "s/${session_cookies_0_authelia_url}/https:\/\/127.0.0.1:1443\/auth/g" \
 		-e "s/${session_cookies_0_default_redirection_url}/https:\/\/127.0.0.1:1443\/admin/g" \
-		"${configuration_path_template}"
+		"${configuration_dir}/configuration.local.yaml"
 }
 
 set -euo pipefail

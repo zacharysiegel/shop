@@ -40,7 +40,21 @@ pub const SECRETS: LazyLock<BTreeMap<&'static str, SecretBase64>> = LazyLock::ne
         },
     );
     map.insert(
-        "postgres__user.shop.password",
+        "postgres__user.shop.password.local",
+        SecretBase64 {
+            nonce: String::from("mBwYxQkQv1e7itjC"),
+            ciphertext: String::from("mmkNZyyYI+YWwhIJ2OQSqv9Hd+G0FiVlUYnXx53nfoMBtqKFcDfV1TEu380NzSMBjPNfG0Ca2SM4LobpjG4pSbtNmlJoWfsPuqhMqVQRT/0="),
+        },
+    );
+    map.insert(
+        "postgres__user.shop.password.stage",
+        SecretBase64 {
+            nonce: String::from("mBwYxQkQv1e7itjC"),
+            ciphertext: String::from("mmkNZyyYI+YWwhIJ2OQSqv9Hd+G0FiVlUYnXx53nfoMBtqKFcDfV1TEu380NzSMBjPNfG0Ca2SM4LobpjG4pSbtNmlJoWfsPuqhMqVQRT/0="),
+        },
+    );
+    map.insert(
+        "postgres__user.shop.password.production",
         SecretBase64 {
             nonce: String::from("mBwYxQkQv1e7itjC"),
             ciphertext: String::from("mmkNZyyYI+YWwhIJ2OQSqv9Hd+G0FiVlUYnXx53nfoMBtqKFcDfV1TEu380NzSMBjPNfG0Ca2SM4LobpjG4pSbtNmlJoWfsPuqhMqVQRT/0="),

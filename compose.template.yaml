@@ -1,5 +1,19 @@
 name: shop
 
+x-postgres_common: &postgres_common
+  image: postgres:17.4-alpine
+  ports:
+    - '127.0.0.1:5432:5432/tcp'
+  volumes:
+    - postgres-data:/var/lib/postgresql/data
+  restart: unless-stopped
+  networks:
+    - shop
+
+x-postgres_common_environment: &postgres_common_environment
+  POSTGRES_USER: shop
+  POSTGRES_DB: shop
+
 x-nginx-common: &nginx_common
   image: nginx:1.28-alpine-slim
   ports:
@@ -34,19 +48,29 @@ x-application_common_build: &application_common_build
   network: shop
 
 services:
-  postgres:
-    image: postgres:17.4-alpine
+  postgres-local:
+    <<: *postgres_common
+    profiles:
+      - local
     environment:
-      POSTGRES_USER: shop
-      POSTGRES_PASSWORD: postgres__user.shop.password # Replaced by setup script
-      POSTGRES_DB: shop
-    ports:
-      - '127.0.0.1:5432:5432/tcp'
-    volumes:
-      - postgres-data:/var/lib/postgresql/data
-    restart: unless-stopped
-    networks:
-      - shop
+      <<: *postgres_common_environment
+      POSTGRES_PASSWORD: postgres__user.shop.password.local # Replaced by setup script
+
+  postgres-stage:
+    <<: *postgres_common
+    profiles:
+      - stage
+    environment:
+      <<: *postgres_common_environment
+      POSTGRES_PASSWORD: postgres__user.shop.password.stage # Replaced by setup script
+
+  postgres-production:
+    <<: *postgres_common
+    profiles:
+      - production
+    environment:
+      <<: *postgres_common_environment
+      POSTGRES_PASSWORD: postgres__user.shop.password.production # Replaced by setup script
 
   nginx-local:
     <<: *nginx_common
@@ -111,22 +135,6 @@ services:
     command: authelia config validate
     restart: 'no'
 
-  inventory-local:
-    <<: *application_common
-    profiles:
-      - local
-    build:
-      <<: *application_common_build
-      args:
-        package_name_arg: inventory
-        environment_arg: local
-    ports:
-      - "11001:11001"
-    depends_on:
-      - postgres
-      - authelia-local
-      - nginx-local
-
   inventory-stage:
     <<: *application_common
     profiles:
@@ -139,7 +147,7 @@ services:
     ports:
       - "11001:11001"
     depends_on:
-      - postgres
+      - postgres-stage
       - authelia-stage
       - nginx-stage
 
@@ -155,25 +163,9 @@ services:
     ports:
       - "11001:11001"
     depends_on:
-      - postgres
+      - postgres-production
       - authelia-production
       - nginx-production
-
-  frontend-local:
-    <<: *application_common
-    profiles:
-      - local
-    build:
-      <<: *application_common_build
-      args:
-        package_name_arg: frontend
-        environment_arg: local
-    ports:
-      - "11000:11000"
-    depends_on:
-      - postgres
-      - authelia-local
-      - nginx-local
 
   frontend-stage:
     <<: *application_common
@@ -187,7 +179,7 @@ services:
     ports:
       - "11000:11000"
     depends_on:
-      - postgres
+      - postgres-stage
       - authelia-stage
       - nginx-stage
 
@@ -203,7 +195,7 @@ services:
     ports:
       - "11000:11000"
     depends_on:
-      - postgres
+      - postgres-production
       - authelia-production
       - nginx-production
 

@@ -62,10 +62,10 @@ session:
   cookies:
     # https://www.authelia.com/integration/proxies/nginx/
     - name: 'authelia_session'
-      domain: session.cookies.0.domain # modify this value per environment
+      domain: session.cookies.0.domain # the setup script modifies this value per environment
       # These links are used in 302 redirects, so they must be accessible from the public Internet
-      authelia_url: session.cookies.0.authelia_url # modify this value per environment
-      default_redirection_url: session.cookies.0.default_redirection_url # modify this value per environment
+      authelia_url: session.cookies.0.authelia_url # the setup script modifies this value per environment
+      default_redirection_url: session.cookies.0.default_redirection_url # the setup script modifies this value per environment
       expiration: '1 hour'
       inactivity: '5 minutes'
 
@@ -77,7 +77,7 @@ regulation:
 storage:
   # encryption_key defined via AUTHELIA_STORAGE_ENCRYPTION_KEY_FILE
   postgres:
-    address: 'tcp://postgres:5432' # This address is applicable only within the Docker Compose virtual network
+    address: 'tcp://postgres-ENVIRONMENT:5432' # This address is applicable only within the Docker Compose virtual network
     database: authelia
     schema: public
     username: authelia

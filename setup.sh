@@ -4,8 +4,9 @@ set -e -u -o pipefail
 
 # todo: pull from .env file
 master_key="${1?"Argument 1 required: master_key"}"
-
+environments=("local" "stage" "production")
 repo_dir=$(git rev-parse --show-toplevel)
+
 cd "${repo_dir}"
 
 git submodule init
@@ -22,21 +23,39 @@ function sqlx_setup {
 	echo '...or to regenerate ./.sqlx: `cargo sqlx prepare --workspace -- --all-targets --all-features`'
 	cargo install sqlx-cli
 }
+sqlx_setup
 
-postgres__user_shop_password_key="postgres__user.shop.password"
-postgres__user_shop_password=$(
-	cargo run -p crypt -- decrypt --utf8 --key "$master_key" "$postgres__user_shop_password_key"
-)
+function generate_env_from_template {
+	echo "Generating .env"
+	local postgres__user_shop_password_local_key="postgres__user.shop.password.local"
+	local postgres__user_shop_password_local=$(
+		cargo run -p crypt -- decrypt --utf8 --key "$master_key" "$postgres__user_shop_password_local_key"
+	)
 
-echo "Generating .env"
-sed > ./.env \
-	-E \
-	-e "s/^(MASTER_SECRET=).*$/\1${master_key}/g" \
-	-e "s/${postgres__user_shop_password_key}/${postgres__user_shop_password}/g" \
-	./.env.template
+	sed > ./.env \
+		-E \
+		-e "s/^(MASTER_SECRET=).*$/\1${master_key}/g" \
+		-e "s/${postgres__user_shop_password_local_key}/${postgres__user_shop_password_local}/g" \
+		./.env.template
+}
+generate_env_from_template
 
-echo "Generating compose.yaml"
-sed -e "s/${postgres__user_shop_password_key}/${postgres__user_shop_password}/g" ./compose.template.yaml > ./compose.yaml
+function generate_compose_from_template {
+	echo "Generating compose.yaml"
+	cp ./compose.template.yaml ./compose.yaml
+
+	for environment in "${environments[@]}"; do
+		local postgres__user_shop_password_env_key="postgres__user.shop.password.${environment}"
+		local postgres__user_shop_password_env=$(
+			cargo run -p crypt -- decrypt --utf8 --key "$master_key" "$postgres__user_shop_password_env_key"
+		)
+		echo "s/${postgres__user_shop_password_env_key}/${postgres__user_shop_password_env}/g"
+		sed -E -I "" \
+			-e "s/${postgres__user_shop_password_env_key}/${postgres__user_shop_password_env}/g" \
+			./compose.yaml
+	done
+}
+generate_compose_from_template
 
 # All setup scripts should be idempotent and callable from the repo root directory
 zsh ./identity/setup.sh "$master_key"

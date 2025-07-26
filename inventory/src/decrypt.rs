@@ -3,7 +3,7 @@ use base64::Engine;
 use std::env;
 
 /// Decrypt a secret managed by the `crypt` application.
-pub fn master_decrypt(secret_name: &'static str) -> Result<Vec<u8>, ShopError> {
+pub fn master_decrypt(secret_name: &str) -> Result<Vec<u8>, ShopError> {
     let variable_name = "MASTER_SECRET";
     let master_secret: String = match env::var(variable_name) {
         Ok(value) => value,

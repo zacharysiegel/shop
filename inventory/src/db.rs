@@ -1,19 +1,36 @@
 use crate::decrypt::master_decrypt;
+use crate::environment::RuntimeEnvironment;
 use crate::error::ShopError;
 use sqlx::postgres::PgPoolOptions;
-use sqlx::{Error, Pool, Postgres};
+use sqlx::{Pool, Postgres};
 
 pub async fn sqlx_connect() -> Result<Pool<Postgres>, ShopError> {
-    let password: Vec<u8> = master_decrypt("postgres__user.shop.password")?;
+    let host: String = get_db_host();
+    let password: String = get_db_password()?;
+
+    let pool: Pool<Postgres> = PgPoolOptions::new()
+        .max_connections(16)
+        .connect(&format!("postgres://shop:{}@{}/shop", password, host))
+        .await
+        .map_err(|e| ShopError::from(e))?;
+    Ok(pool)
+}
+
+fn get_db_password() -> Result<String, ShopError> {
+    let runtime_environment: RuntimeEnvironment = RuntimeEnvironment::default();
+    let password_key: String = format!("postgres__user.shop.password.{}", runtime_environment.to_string());
+
+    let password: Vec<u8> = master_decrypt(&password_key)?;
     let password: String = String::from_utf8(password)
         .map_err(|e| ShopError::from_error_default(Box::new(e)))?;
-    let pool_result: Result<Pool<Postgres>, Error> = PgPoolOptions::new()
-        .max_connections(16)
-        .connect(&format!("postgres://shop:{}@localhost:5432/shop", password))
-        .await;
+    Ok(password)
+}
 
-    match pool_result {
-        Ok(pool) => Ok(pool),
-        Err(error) => Err(ShopError::from(error)),
+fn get_db_host() -> String {
+    let runtime_environment: RuntimeEnvironment = RuntimeEnvironment::default();
+    match runtime_environment {
+        // Local development does not run the Rust applications inside containers
+        RuntimeEnvironment::Local => "localhost:5432".to_string(),
+        RuntimeEnvironment::Stage | RuntimeEnvironment::Production => format!("postgres-{}:5432", runtime_environment.to_string()),
     }
 }
