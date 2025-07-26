@@ -143,7 +143,8 @@ services:
       <<: *application_common_build
       args:
         package_name_arg: inventory
-        environment_arg: stage
+    environment:
+      RUNTIME_ENVIRONMENT: stage
     ports:
       - "11001:11001"
     depends_on:
@@ -159,7 +160,8 @@ services:
       <<: *application_common_build
       args:
         package_name_arg: inventory
-        environment_arg: production
+    environment:
+      RUNTIME_ENVIRONMENT: production
     ports:
       - "11001:11001"
     depends_on:
@@ -175,7 +177,8 @@ services:
       <<: *application_common_build
       args:
         package_name_arg: frontend
-        environment_arg: stage
+    environment:
+      RUNTIME_ENVIRONMENT: stage
     ports:
       - "11000:11000"
     depends_on:
@@ -191,7 +194,8 @@ services:
       <<: *application_common_build
       args:
         package_name_arg: frontend
-        environment_arg: production
+    environment:
+      RUNTIME_ENVIRONMENT: production
     ports:
       - "11000:11000"
     depends_on:

@@ -1,6 +1,5 @@
 from rust:1.88-trixie as compile
 arg package_name_arg
-arg environment_arg
 
 # The build context is expected to be the shop repository root
 copy ./ /shop
