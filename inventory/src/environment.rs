@@ -86,14 +86,6 @@ pub fn init_logger() -> Result<(), SetLoggerError> {
         .try_init()
 }
 
-/// Capture a backtrace, ignoring RUST_BACKTRACE and RUST_LIB_BACKTRACE environment variables in non-production environments.
-pub fn capture_backtrace() -> Backtrace {
-    match RuntimeEnvironment::default() {
-        RuntimeEnvironment::Local | RuntimeEnvironment::Stage => Backtrace::force_capture(),
-        RuntimeEnvironment::Production => Backtrace::capture(),
-    }
-}
-
 pub fn images_directory_path() -> Result<PathBuf, ShopError> {
     let path: PathBuf = if RuntimeEnvironment::default() == RuntimeEnvironment::Local {
         /* For local development, it is expected that the server is running on the host system.

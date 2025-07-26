@@ -27,7 +27,7 @@ impl ShopError {
     }
 
     fn _new(message: &str, error: Option<Box<dyn Error>>) -> ShopError {
-        let backtrace: Backtrace = crate::environment::capture_backtrace();
+        let backtrace: Backtrace = Backtrace::force_capture();
         let shop_error = ShopError {
             message: format!("Error: {}", message),
             sub_error: error,
