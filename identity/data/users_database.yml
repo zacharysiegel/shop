@@ -23,7 +23,7 @@ users:
         address: null
         extra: {}
     bentley:
-        password: $6$rounds=50000$BpLnfgDsc2WD8F2q$Zis.ixdg9s/UOJYrs56b5QEZFiZECu0qZVNsIYxBaNJ7ucIL.nlxVCT5tqh8KHG8X4tlwCFm5r6NTOZZ5qRFN/
+        password: $argon2id$v=19$m=65536,t=3,p=4$WVRYODBKZ0dIaUZZbGdIeA$EW6bVxGs1BY0EmVlnkRXgmainwhqfjRC4+ZhV/88n/w
         displayname: Bentley Hatchet
         email: ""
         groups:
