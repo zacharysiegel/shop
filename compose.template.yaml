@@ -38,17 +38,6 @@ x-authelia_common: &authelia_common
   networks:
     - shop
 
-x-application_common: &application_common
-  env_file:
-    - path: ./.env
-      required: true
-  networks:
-    - shop
-x-application_common_build: &application_common_build
-  context: ./
-  dockerfile: ./rust_package.containerfile
-  network: shop
-
 services:
   postgres-local:
     <<: *postgres_common
@@ -136,78 +125,6 @@ services:
       X_AUTHELIA_CONFIG: /config/configuration.local.yaml
     command: authelia config validate
     restart: 'no'
-
-  inventory-stage:
-    <<: *application_common
-    profiles:
-      - stage
-    hostname: inventory
-    build:
-      <<: *application_common_build
-      args:
-        package_name_arg: inventory
-    environment:
-      RUNTIME_ENVIRONMENT: stage
-    ports:
-      - '11001:11001'
-    depends_on:
-      - postgres-stage
-      - authelia-stage
-      - nginx-stage
-
-  inventory-production:
-    <<: *application_common
-    profiles:
-      - production
-    hostname: inventory
-    build:
-      <<: *application_common_build
-      args:
-        package_name_arg: inventory
-    environment:
-      RUNTIME_ENVIRONMENT: production
-    ports:
-      - '11001:11001'
-    depends_on:
-      - postgres-production
-      - authelia-production
-      - nginx-production
-
-  frontend-stage:
-    <<: *application_common
-    profiles:
-      - stage
-    hostname: frontend
-    build:
-      <<: *application_common_build
-      args:
-        package_name_arg: frontend
-    environment:
-      RUNTIME_ENVIRONMENT: stage
-    ports:
-      - '11000:11000'
-    depends_on:
-      - postgres-stage
-      - authelia-stage
-      - nginx-stage
-
-  frontend-production:
-    <<: *application_common
-    profiles:
-      - production
-    hostname: frontend
-    build:
-      <<: *application_common_build
-      args:
-        package_name_arg: frontend
-    environment:
-      RUNTIME_ENVIRONMENT: production
-    ports:
-      - '11000:11000'
-    depends_on:
-      - postgres-production
-      - authelia-production
-      - nginx-production
 
 # These containers should be qualified with [prod/qa] profiles.
 # We would prefer to not run these services as containers during local development.
