@@ -65,7 +65,7 @@ Validate the Authelia configuration using the `authelia-validate` container spec
 
 Environment variables are specified to the applications by `.env`. Since this file may include secrets, it is generated dynamically by the setup script.
 If you need to add an environment variable, add it to `template.env`.
-If your variable's value is a secret, encrypt it using `cargo run -p crypt -- encrypt ...` and add the encrypted entry to `crypt`'s data store. Decrypt the value in the setup script following the patter used for `MASTER_SECRET`.
+If your variable's value is a secret, encrypt it using `cargo run -p crypt -- encrypt ...` and add the encrypted entry to `crypt`'s data store. Decrypt the value in the setup script following the pattern used for `postgres__user.shop.password.local`.
 
 ### Secrets
 
