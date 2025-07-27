@@ -1,3 +1,0 @@
-#!/bin/sh
-
-exec ${CONTAINER_EXECUTABLE_PATH}
