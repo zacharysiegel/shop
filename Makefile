@@ -18,8 +18,10 @@ exec-release: compile-release
 	touch $(log_dir)/inventory/stdout.log
 	touch $(log_dir)/inventory/stderr.log
 	$(env) $(release_dir)/inventory 1> $(log_dir)/inventory/stdout.log 2> $(log_dir)/inventory/stderr.log &
+	ps aux | grep '[i]nventory'
 
 	mkdir -p $(log_dir)/frontend
 	touch $(log_dir)/frontend/stdout.log
 	touch $(log_dir)/frontend/stderr.log
 	$(env) $(release_dir)/frontend 1> $(log_dir)/frontend/stdout.log 2> $(log_dir)/frontend/stderr.log &
+	ps aux | grep '[f]rontend'

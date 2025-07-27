@@ -27,10 +27,5 @@ fn get_db_password() -> Result<String, ShopError> {
 }
 
 fn get_db_host() -> String {
-    let runtime_environment: RuntimeEnvironment = RuntimeEnvironment::default();
-    match runtime_environment {
-        // Local development does not run the Rust applications inside containers
-        RuntimeEnvironment::Local => "localhost:5432".to_string(),
-        RuntimeEnvironment::Stage | RuntimeEnvironment::Production => "postgres:5432".to_string(),
-    }
+    "localhost:5432".to_string()
 }
