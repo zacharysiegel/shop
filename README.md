@@ -36,7 +36,6 @@ Start the application database and the NGINX reverse proxy server.
     # At the repository root
     podman compose up --detach
 
-
 Execute `./schema/migrations/manual.sql` manually, then run the automatic migrations via the `schema` application.
 
     cargo run -p schema
@@ -64,7 +63,9 @@ Validate the Authelia configuration using the `authelia-validate` container spec
 
 ### Environment variables
 
-Environment variables are specified in `.env`. If you need to add an environment variable, add it to both `.env` and `.env.template`. If the value is secret, still add the variable declaration to the template file, but leave it unassigned. (e.g. `TWITTER_API_TOKEN=`)
+Environment variables are specified to the applications by `.env`. Since this file may include secrets, it is generated dynamically by the setup script.
+If you need to add an environment variable, add it to `template.env`.
+If your variable's value is a secret, encrypt it using `cargo run -p crypt -- encrypt ...` and add the encrypted entry to `crypt`'s data store. Decrypt the value in the setup script following the patter used for `MASTER_SECRET`.
 
 ### Secrets
 
@@ -89,7 +90,7 @@ For convenience, you may want to add the following entries to the "Editor" > "Fi
 <table>
 <tr>
     <td>".env file"</td>
-    <td><code>.env.template</code></td>
+    <td><code>*.env</code></td>
 </tr>
 </table>
 

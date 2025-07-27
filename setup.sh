@@ -36,7 +36,7 @@ function generate_env_from_template {
 		-E \
 		-e "s/^(MASTER_SECRET=).*$/\1${master_key}/g" \
 		-e "s/${postgres__user_shop_password_local_key}/${postgres__user_shop_password_local}/g" \
-		./.env.template
+		./template.env
 }
 generate_env_from_template
 
