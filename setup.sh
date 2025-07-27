@@ -57,27 +57,6 @@ function generate_compose_from_template {
 }
 generate_compose_from_template
 
-function generate_plists_from_template {
-	echo "Generating plist specifications for launchd"
-
-	local plist_path_template="${repo_dir}/template.plist"
-	for package_name in "${package_names[@]}"; do
-		for environment in "${environments[@]}"; do
-			local plist_dir_output="${repo_dir}/${package_name}/launch"
-			local plist_path_output="${plist_dir_output}/${package_name}.${environment}.plist"
-			mkdir -p "$plist_dir_output"
-
-			sed > "$plist_path_output" \
-				-E \
-				-e "s/__PACKAGE_NAME__/${package_name}/g" \
-				-e "s#__REPOSITORY_DIRECTORY__#${repo_dir}#g" \
-				-e "s/__ENVIRONMENT__/${environment}/g" \
-				"$plist_path_template"
-		done
-	done
-}
-generate_plists_from_template
-
 # All setup scripts should be idempotent and callable from the repo root directory
 zsh ./identity/setup.sh "$master_key"
 zsh ./proxy/setup.sh "$master_key"

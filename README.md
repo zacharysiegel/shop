@@ -88,16 +88,8 @@ For convenience, you may want to add the following entries to the "Editor" > "Fi
 
 <table>
 <tr>
-    <td>"DockerIgnore"</td>
-    <td><code>*.containerignore</code></td>
-</tr>
-<tr>
     <td>".env file"</td>
     <td><code>.env.template</code></td>
-</tr>
-<tr>
-    <td>"XML"</td>
-    <td><code>*.plist</code></td>
 </tr>
 </table>
 
