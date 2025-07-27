@@ -1,6 +1,6 @@
 # Shop
 
-## Setup instructions
+## Setup
 
 _This setup has only been tested on macOS and may not "just work" in a different environment._
 
@@ -47,6 +47,26 @@ Start the inventory management server.
 Start the web server.
 
     cargo run -p frontend
+
+## Deployment
+
+### Deploy to Venus
+
+"Venus" is the name of the Mac Mini (M1) currently used to host the servers for the production (and eventually stage) environments.
+
+To deploy the application to this computer, first SSH into the machine:
+
+    ssh zachary@ssh.zach.ro
+
+Launch the Docker containers:
+
+    podman compose --profile production up -d
+
+Start the Rust servers:
+
+    make exec-release
+
+## Other information
 
 ### Proxy
 
