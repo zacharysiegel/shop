@@ -54,7 +54,12 @@ Start the web server.
 
 "Venus" is the name of the Mac Mini (M1) currently used to host the servers for the production (and eventually stage) environments.
 
-To deploy the application to this computer, first SSH into the machine:
+To deploy the application to this computer, first SSH into the machine. Add the following to `~/.ssh/config`:
+
+    Host ssh.zach.ro
+        ProxyCommand /opt/homebrew/bin/cloudflared access ssh --hostname %h
+
+And then use the normal `ssh` program to connect to the server.
 
     ssh zachary@ssh.zach.ro
 
