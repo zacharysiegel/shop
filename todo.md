@@ -17,3 +17,8 @@
   * Categories
   * Listings
   * Webhook
+
+## Other
+
+* Migrate to [secr](https://crates.io/crates/secr)
+

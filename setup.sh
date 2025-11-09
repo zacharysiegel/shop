@@ -9,8 +9,7 @@ repo_dir=$(git rev-parse --show-toplevel)
 
 cd "${repo_dir}"
 
-git submodule init
-git submodule update
+git submodule update --init --recursive
 
 if ! which cargo 1> /dev/null 2>&1; then
 	echo 'The `cargo` program is required'
@@ -60,3 +59,4 @@ generate_compose_from_template
 # All setup scripts should be idempotent and callable from the repo root directory
 zsh ./identity/setup.sh "$master_key"
 zsh ./proxy/setup.sh "$master_key"
+
